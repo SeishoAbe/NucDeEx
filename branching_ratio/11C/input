@@ -1,0 +1,28 @@
+#
+# General
+#
+projectile 0
+element 6
+mass 11
+#energy energy.spin.parity
+energy energy
+
+bins 35
+maxlevelstar 8 #  7.4997
+maxlevelsbin g 8 #11C
+#maxlevelsbin n 1 #10C
+#maxlevelsbin p 4 #10B
+#maxlevelsbin a 1 #10B
+#maxlevelsbin d 1 
+#maxlevelsbin t 1 
+#maxlevelsbin h 1 
+ejectiles g n p a d t h
+#
+
+#
+# Output
+#
+outdiscrete y
+outpopulation y
+outspectra y
+outdecay y
