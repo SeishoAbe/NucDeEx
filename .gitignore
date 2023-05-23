@@ -5,6 +5,7 @@ old*
 output*
 bin
 obj
+lib
 !.gitignore
 
 # Suffix
@@ -12,3 +13,4 @@ obj
 *.Linux
 *.o
 *.a
+*.so
