@@ -5,6 +5,7 @@ projectile 0
 element 6
 mass 11
 #energy energy.spin.parity
+#energy /home/seisho/talys_1.96/work-dir_talys_1.96/tables/energy_distribution/energy
 energy energy
 
 bins 35

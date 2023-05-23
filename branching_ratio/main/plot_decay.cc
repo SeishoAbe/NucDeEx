@@ -12,7 +12,13 @@
 #include <TLegend.h>
 #include <TText.h>
 
+using namespace std;
+
 int main(int argc, char* argv[]){
+	if(argc!=2){
+		cerr << argv[0] << " [TALYS output]" << endl;
+		return 0;
+	}
   // --- FIXME  --- //
   std::string parent="11C";
   const int maxlevelstar=8;
@@ -31,7 +37,7 @@ int main(int argc, char* argv[]){
   
   std::ostringstream os;
   NucleusTable* nucleus_table = NucleusTable::getPointer();
-  nucleus_table->ReadTable("nucleus.txt");
+  nucleus_table->ReadTable( ((string)getenv("TALYS_WORK_TABLES") + (string)"/nucleus/nucleus.txt").c_str());
 
 
 // Get a table of nucleus //
@@ -43,7 +49,7 @@ int main(int argc, char* argv[]){
   const char* decay = " Decay of Z=";
   //const int n_decay = 12;
   std::ifstream ifs;
-  ifs.open("output/output");
+  ifs.open(argv[1]);
   if(!ifs.is_open()) return 1;
   bool multiple_emission=0;
   char buf[500];
@@ -374,13 +380,13 @@ int main(int argc, char* argv[]){
 
     // Graph target
     os.str("");
-    os << "txt/Br_" << target.c_str() << "_summary.root";
+    os << "output/Br_" << target.c_str() << "_summary.root";
     TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
     
     //
     double Sg=-1, Sn=-1, Sp=-1, Sd=-1, St=-1, Sh=-1, Sa=-1;
     os.str("");
-    os << "/userdata/work/seisho/TALYS/work-dir_talys_1.95/separation_energy/separation_energy_" << target.c_str() <<  ".txt";
+    os << ((string)getenv("TALYS_WORK_TABLES")).c_str() << "/separation_energy/separation_energy_" << target.c_str() <<  ".txt";
     ifs.open(os.str().c_str());
     cout << os.str().c_str() << endl;
     if(!ifs.is_open()) return 1;
@@ -869,7 +875,7 @@ int main(int argc, char* argv[]){
     //
     Sg=-1, Sn=-1, Sp=-1, Sd=-1, St=-1, Sh=-1, Sa=-1;
     os.str("");
-    os << "/userdata/work/seisho/TALYS/work-dir_talys_1.95/separation_energy/separation_energy_" << target.c_str() <<  ".txt";
+    os << ((string)getenv("TALYS_WORK_TABLES")).c_str() << "/separation_energy/separation_energy_" << target.c_str() <<  ".txt";
     ifs.open(os.str().c_str());
     if(!ifs.is_open()) return 1;
     else std::cout << os.str().c_str() << std::endl;
