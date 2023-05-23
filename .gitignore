@@ -1,8 +1,10 @@
 # Prefix
-txt*
+#txt*
 fig*
 old*
 output*
+
 # Suffix
 *.root
 *.Linux
+*.o
