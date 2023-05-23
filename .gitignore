@@ -3,8 +3,11 @@
 fig*
 old*
 output*
+#bin
+#obj
 
 # Suffix
 *.root
 *.Linux
 *.o
+*.a
