@@ -3,8 +3,9 @@
 fig*
 old*
 output*
-#bin
-#obj
+bin
+obj
+!.gitignore
 
 # Suffix
 *.root
