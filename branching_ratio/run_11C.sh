@@ -2,6 +2,7 @@
 
 ### FIXME ###
 TARGET=11C
+FILE=energy.1.2.p.txt
 #############
 
 OUTDIR=output
@@ -19,10 +20,6 @@ else
   cd $OUTDIR
 fi
 
-FILE=energy.spin.parity
-rm -v $FILE
-ln -sv $TALYS_WORK_TABLES/energy_distribution/$FILE ./
-FILE=energy
 rm -v $FILE
 ln -sv $TALYS_WORK_TABLES/energy_distribution/$FILE ./
 
