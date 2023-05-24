@@ -16,10 +16,10 @@ Nucleus::Nucleus()
 }
 
 ///////////////
-Nucleus::Nucleus(const char* name, int z, int n)
+Nucleus::Nucleus(const char* Name, int z, int n)
 ///////////////
 {
-  strcpy(Name,name);
+  strcpy(name,Name);
   Z=z;
   N=n;
   A=z+n;
@@ -33,24 +33,24 @@ void Nucleus::Init()
 	flag_s=0;
 	total_pop=0.0;
 
-  pop = new double[array];
-  Ex = new double[array];
-  Ex_bin=0.0;
+  pop = new float[array];
+  Ex = new float[array];
+  Ex_bin=0;
 
-  pop_g = new double*[array];
-  pop_n = new double*[array];
-  pop_p = new double*[array];
-  pop_a = new double*[array];
-  pop_d = new double*[array];
-  pop_t = new double*[array];
-  pop_h = new double*[array];
-  Ex_g = new double*[array];
-  Ex_n = new double*[array];
-  Ex_p = new double*[array];
-  Ex_a = new double*[array];
-  Ex_d = new double*[array];
-  Ex_t = new double*[array];
-  Ex_h = new double*[array];
+  pop_g = new float*[array];
+  pop_n = new float*[array];
+  pop_p = new float*[array];
+  pop_a = new float*[array];
+  pop_d = new float*[array];
+  pop_t = new float*[array];
+  pop_h = new float*[array];
+  Ex_g = new float*[array];
+  Ex_n = new float*[array];
+  Ex_p = new float*[array];
+  Ex_a = new float*[array];
+  Ex_d = new float*[array];
+  Ex_t = new float*[array];
+  Ex_h = new float*[array];
   Ex_bin_g = new int[array];
   Ex_bin_n = new int[array];
   Ex_bin_p = new int[array];
@@ -59,22 +59,22 @@ void Nucleus::Init()
   Ex_bin_t = new int[array];
   Ex_bin_h = new int[array];
   for(int i=0;i<array;i++){
-    pop[i]=0.;
-    Ex[i]=0.;
-    pop_g[i] = new double[array];
-    pop_n[i] = new double[array];
-    pop_p[i] = new double[array];
-    pop_a[i] = new double[array];
-    pop_d[i] = new double[array];
-    pop_t[i] = new double[array];
-    pop_h[i] = new double[array];
-    Ex_g[i] = new double[array];
-    Ex_n[i] = new double[array];
-    Ex_p[i] = new double[array];
-    Ex_a[i] = new double[array];
-    Ex_d[i] = new double[array];
-    Ex_t[i] = new double[array];
-    Ex_h[i] = new double[array];
+    pop[i]=0;
+    Ex[i]=-1;
+    pop_g[i] = new float[array];
+    pop_n[i] = new float[array];
+    pop_p[i] = new float[array];
+    pop_a[i] = new float[array];
+    pop_d[i] = new float[array];
+    pop_t[i] = new float[array];
+    pop_h[i] = new float[array];
+    Ex_g[i] = new float[array];
+    Ex_n[i] = new float[array];
+    Ex_p[i] = new float[array];
+    Ex_a[i] = new float[array];
+    Ex_d[i] = new float[array];
+    Ex_t[i] = new float[array];
+    Ex_h[i] = new float[array];
     Ex_bin_g[i] = 0;
     Ex_bin_n[i] = 0;
     Ex_bin_p[i] = 0;

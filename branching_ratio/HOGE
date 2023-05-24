@@ -1,0 +1,198 @@
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/nucleus/nucleus.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_11C.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_10C.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_9C.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_11B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_10B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_9B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_8B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_11B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_10B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_9B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_8B.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_10Be.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_9Be.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_8Be.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_7Be.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_6Be.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_9Li.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_8Li.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_7Li.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_6Li.txt
+Read: /home/seisho/talys_1.96/work-dir_talys_1.96/tables/separation_energy/separation_energy_6He.txt
+ReadTALYS::ReadPopulation()
+11C 6 5 11 100
+11C 0         0     1.007
+11C 1         2     2.175
+11C 2     4.319     1.412
+11C 3     4.804     1.017
+11C 4     6.339     0.843
+11C 5     6.478    0.2848
+11C 6     6.905    0.4642
+11C 7       7.4    0.2996
+11C 8       7.5    0.3347
+11C 9     8.065     1.138
+11C 10     9.195     1.138
+11C 11    10.324     1.138
+11C 12    11.454     1.138
+11C 13    12.584     1.138
+11C 14    13.714     1.138
+11C 15    14.844     1.138
+11C 16    15.974     1.138
+11C 17    17.104     1.138
+11C 18    18.234     1.138
+11C 19    19.364     1.138
+11C 20    20.494     1.138
+11C 21    21.624     1.138
+11C 22    22.753     1.138
+11C 23    23.883     1.138
+11C 24    25.013     1.138
+11C 25    26.143     1.138
+11C 26    27.273     1.138
+11C 27    28.403     1.138
+11C 28    29.533     1.138
+11C 29    30.663     1.138
+11C 30    31.793     1.138
+11C 31    32.923     1.138
+11C 32    34.052     1.138
+11C 33    35.182     1.138
+11C 34    36.312     1.138
+11C 35    37.442     1.138
+11C 36    38.572     1.138
+11C 37    39.702     1.138
+11C 38    40.832     1.138
+11C 39    41.962     1.138
+11C 40    43.092     1.138
+11C 41    44.222     1.138
+11C 42    45.352     1.138
+11C 43    46.481     1.138
+11C 44    47.611     1.138
+11C 45    48.741     1.138
+11C 46    49.871     1.138
+11C 47    51.001     1.138
+11C 48    52.131     1.138
+11C 49    53.261     1.138
+11C 50    54.391     1.138
+11C 51    55.521     1.138
+11C 52    56.651     1.138
+11C 53     57.78     1.138
+11C 54     58.91     1.138
+11C 55     60.04     1.138
+11C 56     61.17     1.138
+11C 57      62.3     1.138
+11C 58     63.43     1.138
+11C 59     64.56     1.138
+11C 60     65.69     1.138
+11C 61     66.82     1.138
+11C 62     67.95     1.138
+11C 63     69.08     1.138
+11C 64    70.209     1.138
+11C 65    71.339     1.138
+11C 66    72.469     1.138
+11C 67    73.599     1.138
+11C 68    74.729     1.138
+11C 69    75.859     1.138
+11C 70    76.989     1.138
+11C 71    78.119     1.138
+11C 72    79.249     1.138
+11C 73    80.379     1.138
+11C 74    81.508     1.138
+11C 75    82.638     1.138
+11C 76    83.768     1.138
+11C 77    84.898     1.138
+11C 78    86.028     1.138
+11C 79    87.158     1.138
+11C 80    88.288     1.138
+11C 81    89.418     1.138
+11C 82    90.548     1.138
+11C 83    91.678     1.138
+11C 84    92.808     1.138
+11C 85    93.937     1.138
+11C 86    95.067     1.138
+11C 87    96.197     1.138
+11C 88    97.327     1.138
+11C 89    98.457     1.116
+10C 6 4 10 12.2955
+10C 0         0    0.4583
+10C 1     3.354     0.071
+10C 2     3.863   0.01483
+10C 3     4.882   0.01683
+10C 4     5.901   0.01929
+10C 5     6.921   0.02222
+10C 6      7.94   0.02568
+10C 7     8.959   0.02971
+10C 8     9.978   0.03439
+10C 9    10.997   0.03977
+10C 10    12.016   0.04596
+10C 11    13.035   0.05323
+10C 12    14.054   0.06174
+10C 13    15.073   0.07069
+10C 14    16.093   0.07982
+10C 15    17.112   0.08898
+10C 16    18.131   0.09802
+10C 17     19.15    0.1068
+10C 18    20.169    0.1151
+10C 19    21.188     0.123
+10C 20    22.207    0.1302
+10C 21    23.226    0.1369
+10C 22    24.245     0.144
+10C 23    25.265    0.1507
+10C 24    26.284    0.1573
+10C 25    27.303    0.1636
+10C 26    28.322    0.1695
+10C 27    29.341    0.1749
+10C 28     30.36    0.1799
+10C 29    31.379    0.1842
+10C 30    32.398    0.1859
+10C 31    33.417    0.1865
+10C 32    34.436    0.1881
+10C 33    35.456    0.1896
+10C 34    36.475    0.1913
+10C 35    37.494    0.1929
+10C 36    38.513    0.1944
+10C 37    39.532    0.1956
+10C 38    40.551    0.1966
+10C 39     41.57    0.1974
+10C 40    42.589    0.1978
+10C 41    43.608     0.198
+10C 42    44.628    0.1989
+10C 43    45.647    0.1999
+10C 44    46.666    0.2011
+10C 45    47.685    0.2023
+10C 46    48.704    0.2034
+10C 47    49.723    0.2044
+10C 48    50.742    0.2051
+10C 49    51.761    0.2056
+10C 50     52.78    0.2058
+10C 51      53.8    0.2056
+10C 52    54.819    0.2059
+10C 53    55.838    0.2064
+10C 54    56.857    0.2069
+10C 55    57.876    0.2073
+10C 56    58.895    0.2076
+10C 57    59.914    0.2075
+10C 58    60.933    0.2071
+10C 59    61.952    0.2062
+10C 60    62.971    0.2049
+10C 61    63.991     0.203
+10C 62     65.01    0.2009
+10C 63    66.029    0.1988
+10C 64    67.048    0.1964
+10C 65    68.067    0.1935
+10C 66    69.086      0.19
+10C 67    70.105    0.1857
+10C 68    71.124    0.1804
+10C 69    72.143    0.1742
+10C 70    73.163    0.1667
+10C 71    74.182     0.158
+10C 72    75.201    0.1481
+10C 73     76.22    0.1377
+10C 74    77.239    0.1259
+10C 75    78.258    0.1129
+10C 76    79.277   0.09851
+10C 77    80.296   0.08276
+10C 78    81.315   0.06596
+10C 79    82.335   0.04875
+10C 80    83.354    0.0322
+10C 81    84.373   0.01746
+10C 82    85.392  0.005278
