@@ -6,18 +6,18 @@ using namespace std;
 class Nucleus{
   public :
 	Nucleus();
-  Nucleus(const char* name,
+  Nucleus(const char* Name,
           int z,
           int n);
 	~Nucleus();
 
-  char Name[5];
+  char name[5];
   int Z;
   int N;
   int A;
-  double total_pop;
-  double* pop;
-  double* Ex;
+  float total_pop;
+  float* pop;
+  float* Ex;
   int Ex_bin;
   int id;
 
@@ -28,46 +28,46 @@ class Nucleus{
 	// Sx: Separation energy
   
   // gamma
-  double** pop_g;
-  double** Ex_g;
+  float** pop_g;
+  float** Ex_g;
   int* Ex_bin_g;
-	double Sg;
+	float Sg;
 
   // neutron
-  double** pop_n;
-  double** Ex_n;
+  float** pop_n;
+  float** Ex_n;
   int* Ex_bin_n;
-	double Sn;
+	float Sn;
 
   // proton
-  double** pop_p;
-  double** Ex_p;
+  float** pop_p;
+  float** Ex_p;
   int* Ex_bin_p;
-	double Sp;
+	float Sp;
 
   // alpha
-  double** pop_a;
-  double** Ex_a;
+  float** pop_a;
+  float** Ex_a;
   int* Ex_bin_a;
-	double Sa;
+	float Sa;
 
   // deuteron
-  double** pop_d;
-  double** Ex_d;
+  float** pop_d;
+  float** Ex_d;
   int* Ex_bin_d;
-	double Sd;
+	float Sd;
 
   // triton
-  double** pop_t;
-  double** Ex_t;
+  float** pop_t;
+  float** Ex_t;
   int* Ex_bin_t;
-	double St;
+	float St;
 
   // he3
-  double** pop_h;
-  double** Ex_h;
+  float** pop_h;
+  float** Ex_h;
   int* Ex_bin_h;
-	double Sh;
+	float Sh;
 	
   const int array=100;
 	bool flag_s;
