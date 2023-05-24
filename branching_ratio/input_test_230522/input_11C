@@ -6,15 +6,17 @@ element 6
 mass 11
 energy energy.1.2.p.txt
 
-bins 35
+bins 0
 maxlevelstar 8 #  7.4997
 maxlevelsbin g 8 #11C
-#maxlevelsbin n 1 #10C
-#maxlevelsbin p 4 #10B
-#maxlevelsbin a 1 #10B
-#maxlevelsbin d 1 
-#maxlevelsbin t 1 
-#maxlevelsbin h 1 
+maxlevelsbin n 1 #10C
+maxlevelsbin p 4 #10B
+maxlevelsbin a 1 #10B
+maxlevelsbin d 1 
+maxlevelsbin t 1 
+maxlevelsbin h 1 
+#maxlevelstar 1
+#maxlevelsres 1
 ejectiles g n p a d t h
 #
 

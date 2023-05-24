@@ -3,12 +3,13 @@
 
 using namespace std;
 
-class nucleus{
+class Nucleus{
   public :
-  nucleus(const char* name,
+	Nucleus();
+  Nucleus(const char* name,
           int z,
           int n);
-  virtual ~nucleus(){}
+	~Nucleus();
 
   char Name[5];
   int Z;
@@ -18,56 +19,62 @@ class nucleus{
   double* pop;
   double* Ex;
   int Ex_bin;
-  int index;
+  int id;
 
 	// NOTATION
 	// pop_x[][]: population
 	// Ex_x[][]:  Excitation energy
 	// Ex_bin_x[]: Excitatioln energy bin
-	// S_x: Separation energy
+	// Sx: Separation energy
   
   // gamma
   double** pop_g;
   double** Ex_g;
   int* Ex_bin_g;
-	double S_g;
+	double Sg;
 
   // neutron
   double** pop_n;
   double** Ex_n;
   int* Ex_bin_n;
-	double S_n;
+	double Sn;
 
   // proton
   double** pop_p;
   double** Ex_p;
   int* Ex_bin_p;
-	double S_p;
+	double Sp;
 
   // alpha
   double** pop_a;
   double** Ex_a;
   int* Ex_bin_a;
-	double S_a;
+	double Sa;
 
   // deuteron
   double** pop_d;
   double** Ex_d;
   int* Ex_bin_d;
-	double S_d;
+	double Sd;
 
   // triton
   double** pop_t;
   double** Ex_t;
   int* Ex_bin_t;
-	double S_t;
+	double St;
 
   // he3
   double** pop_h;
   double** Ex_h;
   int* Ex_bin_h;
-	double S_h;
-
+	double Sh;
+	
   const int array=100;
+	bool flag_s;
+	// 0 -> does not have sep E file
+	// 1 -> HAVE IT
+
+	private:
+	void Init();
 };
 #endif

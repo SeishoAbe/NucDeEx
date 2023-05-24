@@ -8,13 +8,30 @@
 
 using namespace std;
 
+///////////////
+Nucleus::Nucleus()
+///////////////
+{
+	Init();
+}
 
-nucleus::nucleus(const char* name, int z, int n){
+///////////////
+Nucleus::Nucleus(const char* name, int z, int n)
+///////////////
+{
   strcpy(Name,name);
   Z=z;
   N=n;
   A=z+n;
-  total_pop=0.0;
+	Init();
+}
+
+///////////////
+void Nucleus::Init()
+///////////////
+{
+	flag_s=0;
+	total_pop=0.0;
 
   pop = new double[array];
   Ex = new double[array];
@@ -72,12 +89,13 @@ nucleus::nucleus(const char* name, int z, int n){
         = Ex_d[i][j] = Ex_t[i][j] = Ex_h[i][j] = 0.;
     }
   }
-  index=0;
-	S_g=S_n=S_p=S_a=S_d=S_t=S_h=0.;
+  id=0;
+	Sg=Sn=Sp=Sa=Sd=St=Sh=-1;
 }
 
 
-nucleus::~nucleus(){
+Nucleus::~Nucleus(){
+	/*
 	delete[] pop;
 	delete[] Ex;
 
@@ -120,4 +138,6 @@ nucleus::~nucleus(){
 	delete[] Ex_d;
 	delete[] Ex_t;
 	delete[] Ex_h;
+	*/
+	;
 }

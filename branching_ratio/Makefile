@@ -14,7 +14,7 @@ LDFLAGS         += $(shell root-config --glibs)
 
 LIBNAME=lib/libNucleusTable.a
 
-AOBJS = Nucleus.o NucleusTable.o
+AOBJS = ReadTALYS.o NucleusTable.o Nucleus.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))

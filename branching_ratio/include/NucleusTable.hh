@@ -1,18 +1,29 @@
-#ifndef __nucleustable__HH__
-#define __nucleustable__HH__
+#ifndef __NucleusTable__HH__
+#define __NucleusTable__HH__
 
 #include <map>
-#include <vector>
 #include <Nucleus.hh>
 
+using namespace std;
 
 class NucleusTable{
   public:
-  virtual ~NucleusTable(){}
+	NucleusTable(){num_of_nuc=-1;};
+  virtual ~NucleusTable(){;};
 
-  static NucleusTable* getPointer(){return _NucleusTable;};
-  bool ReadTable(const char* filename);
+  bool ReadTables();
+	int getID(const char* name);
+	
+	Nucleus* GetNucleusPtr(const char* name);
+	Nucleus* GetNucleusPtr(int id);
 
+  private:
+	int num_of_nuc;
+	Nucleus* _nucleus;
+	map<string, int> _nucleus_id;
+	map<string, int> :: iterator _p_id;
+
+/*
   int getZ(const char* name);
   int getN(const char* name);
   int getA(const char* name);
@@ -109,13 +120,12 @@ class NucleusTable{
   const double ** getExH(const char* name);
   double getExH(const char* name, int i, int j);
   void setExH(const char* name, int i, int j, double Ex);
+*/
 
-
-  private:
-  NucleusTable(){};
-  static NucleusTable* _NucleusTable;
-  std::map<std::string, nucleus> _nucleus_table;
-  std::map<std::string, nucleus> :: iterator _p;
+/*
+  map<string, nucleus> _nucleus_table;
+  map<string, nucleus> :: iterator _p;
+*/
 };
 
 #endif
