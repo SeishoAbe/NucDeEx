@@ -3,63 +3,8 @@
 
 #include <map>
 #include <vector>
+#include <Nucleus.hh>
 
-using namespace std;
-
-class nucleus{
-  public :
-  nucleus(const char* name,
-          int z,
-          int n);
-  virtual ~nucleus(){}
-
-  char Name[5];
-  int Z;
-  int N;
-  int A;
-  double total_pop;
-  double* pop;
-  double* Ex;
-  int Ex_bin;
-  int index;
-  
-  // gamma
-  double** pop_g;
-  double** Ex_g;
-  int* Ex_bin_g;
-
-  // neutron
-  double** pop_n;
-  double** Ex_n;
-  int* Ex_bin_n;
-
-  // proton
-  double** pop_p;
-  double** Ex_p;
-  int* Ex_bin_p;
-
-  // alpha
-  double** pop_a;
-  double** Ex_a;
-  int* Ex_bin_a;
-
-  // deuteron
-  double** pop_d;
-  double** Ex_d;
-  int* Ex_bin_d;
-
-  // triton
-  double** pop_t;
-  double** Ex_t;
-  int* Ex_bin_t;
-
-  // he2
-  double** pop_h;
-  double** Ex_h;
-  int* Ex_bin_h;
-
-  static const int array;
-};
 
 class NucleusTable{
   public:
