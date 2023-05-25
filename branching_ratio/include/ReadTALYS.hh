@@ -4,6 +4,7 @@
 #include <string>
 #include <ostream>
 #include "NucleusTable.hh"
+#include "consts.hh"
 
 using namespace std;
 
@@ -22,20 +23,18 @@ class ReadTALYS{
 
 	void SetKeywords();
 
-	bool ReadPopulation();
-	bool ReadDecay();
-
 	string* keyword_multiple_emission;
 	string* keyword_population;
 	string* keyword_N;
 	string* keyword_parity;
 	string* keyword_before_decay;
 	string* keyword_decay;
+	string* keyword_total;
 	string* keyword_bin_mother;
-	int skip_after_population=4;
+	string* keyword_parity_mother;
+	string* keyword_parity_daughter;
+	//int skip_after_population=4;
 
-	const int num_particle=7;
-	string*  particle_name;
 
 	ostringstream* os;
 };
