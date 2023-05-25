@@ -46,8 +46,13 @@ class Nucleus{
 	float* S; // separtion energy [particle]
 	float min_S(); // minimum separation energy
 
-	float GetPopP(int p,int mb); // return  sum_(daughter_bin) pop[p][mb][daughter_bin]
+	float GetPopDaughterBinSum(int p,int mb); // return  sum_(daughter_bin) pop[p][mb][daughter_bin]
+		// (particle, mother ex bin)
+	float GetPopParticleDaughterBinSum(int mb);
 
+	float GetTotalPopParitySum();
+
+	bool CheckTotalPop();
 	bool CheckPop();
 	
 
