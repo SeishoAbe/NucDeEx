@@ -84,7 +84,7 @@ float Nucleus::min_S()
 
 
 //////////////////
-float Nucleus::GetPopP(int p,int mb)
+float Nucleus::GetPopDaughterBinSum(int p,int mb)
 //////////////////
 {
 	float population=0;
@@ -94,6 +94,46 @@ float Nucleus::GetPopP(int p,int mb)
 	}
 
 	return population;
+}
+
+//////////////////
+float Nucleus::GetPopParticleDaughterBinSum(int mb)
+//////////////////
+{
+	float population=0;
+	for(int p=0;p<num_particle;p++){
+		population += GetPopDaughterBinSum(p,mb);
+	}
+	return population;
+}
+
+//////////////////
+bool Nucleus::CheckTotalPop()
+//////////////////
+{
+	float sum_pop_check=0;
+	for(int par=0;par<parity;par++){// parity loop
+		float total_pop_check=0;
+		//for(int i=0;i<=Ex_bin[par];i++){ // ex bin loop
+		for(int i=0;i<bins;i++){
+			total_pop_check += pop[par][i];
+		}
+		if(!(total_pop[par]>0)) continue;
+		if( abs(total_pop[par]-total_pop_check)/total_pop[par] > 0.01 ){
+			cerr << "ERROR: pality dependent total population is not reproduced" << endl;
+			cerr << name << " parity=" << par << endl;
+			cerr << "total population= " << total_pop[par] << "  summed population=" << total_pop_check << endl;
+			return 0;
+		}
+		sum_pop_check += total_pop[par];
+	}
+
+	if( abs(sum_pop-sum_pop_check)/sum_pop > 0.01 ){
+		cerr << "ERROR: pality sum total population is not reproduced" << endl;
+		cerr << name << endl;
+		cerr << "sum population= " << sum_pop << "  summed sum population=" << sum_pop_check << endl;
+		return 0;
+	}
 }
 
 //////////////////
@@ -109,10 +149,7 @@ bool Nucleus::CheckPop()
 		if(!(population>0)) continue; // skip
 
 		// sum population for daughter 
-		float population_check=0; 
-		for(int p=0;p<num_particle;p++){ // particle loop
-			population_check += GetPopP(p,i);
-		}
+		float population_check=GetPopParticleDaughterBinSum(i);
 		
 		if( abs(population_check-population)/population > 0.01 ){
 			cerr << "ERROR: population is not reproduced" << endl;

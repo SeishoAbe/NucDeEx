@@ -54,7 +54,7 @@ int main(int argc, char* argv[]){
 	}
 	cout << "# nuclei that has population data = " << num_nuc_data << endl;
 	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
-	if(!nuc_target->CheckPop()) return 0;
+	if(! (nuc_target->CheckTotalPop() && nuc_target->CheckPop()) ) return 0;
 	int bin_target = nuc_target->Ex_bin[parity_bin];
 
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]){
 				else g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
 				index_br[p]++;
 			}else if(pop_target>0){
-				float population = nuc_target->GetPopP(p,i);
+				float population = nuc_target->GetPopDaughterBinSum(p,i);//  (particle, exbin)
 				g_target_br[p]->SetPoint(index_br[p],Ex_target,population/pop_target);
 				index_br[p]++;
 			}
