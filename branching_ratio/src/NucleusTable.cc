@@ -66,9 +66,9 @@ bool NucleusTable::ReadTables()
 			_nucleus[index].flag_s = 1;
 			while(ifs2.getline(buf,sizeof(buf))){
 				if(buf[0]=='#') continue;
-				istringstream(buf) >> _nucleus[index].Sg >> _nucleus[index].Sn 
-					>> _nucleus[index].Sp >> _nucleus[index].Sd >> _nucleus[index].St 
-					>> _nucleus[index].Sh >> _nucleus[index].Sa;
+				istringstream(buf) >> _nucleus[index].S[0] >> _nucleus[index].S[1]
+					>> _nucleus[index].S[2] >> _nucleus[index].S[4] >> _nucleus[index].S[5]
+					>> _nucleus[index].S[6] >> _nucleus[index].S[3];
 			}
 			ifs2.close();
 		}
