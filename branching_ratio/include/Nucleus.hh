@@ -19,9 +19,9 @@ class Nucleus{
   int A;
   int id;
 
-	bool flag_s;
-	// 0 -> does not have separation energy file
-	// 1 -> HAVE IT
+	bool flag_s; // 1 -> have separation energy file
+	bool flag_target; // 1 -> target nucleus
+	bool flag_data; // 1 -> have data in talys output (population)
 
 	float sum_pop; // will be sum(total_pop[])
 
@@ -44,6 +44,9 @@ class Nucleus{
 	int** Ex_bin_p;
 
 	float* S; // separtion energy [particle]
+	float min_S(); // minimum separation energy
+
+	float GetPopP(int p,int mb); // return  sum_(daughter_bin) pop[p][mb][daughter_bin]
 	
 
 	private:

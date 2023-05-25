@@ -31,7 +31,7 @@ Nucleus::Nucleus(const char* Name, int z, int n)
 void Nucleus::Init()
 ///////////////
 {
-	flag_s=0;
+	flag_s=flag_target=flag_data=0;
 	id=0;
 	sum_pop = 0;
 	total_pop = new float[parity];
@@ -65,9 +65,34 @@ void Nucleus::Init()
 
 	}
 }
+//////////////////
+float Nucleus::min_S()
+//////////////////
+{
+	float min=1e9;
+	for(int i=0;i<num_particle;i++){
+		if(i==0) continue; // remove gamma
+		if(min>S[i]) min=S[i];
+	}
+	return min;
+}
 
 
+//////////////////
+float Nucleus::GetPopP(int p,int mb)
+//////////////////
+{
+	float population=0;
+	for(int i=0;i<Ex_bin_p[p][mb];i++){
+		population += pop_p[p][mb][i];
+	}
+
+	return population;
+}
+
+//////////////////
 Nucleus::~Nucleus(){
+//////////////////
 	/*
 	delete[] pop;
 	delete[] Ex;
