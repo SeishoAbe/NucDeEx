@@ -221,6 +221,7 @@ bool ReadTALYS::Read()
 					if(parity_array_daughter==1 && max_bin_r==bin){
 						nuc->Ex_bin_p[daughter_id][bin_mother] = max_bin_r;
 						float pop_total_decay_r=0;
+						//for(int i=0;i<=max_bin_r;i++){
 						for(int i=0;i<bins;i++){
 							nuc->pop_p[daughter_id][bin_mother][i] = pop_r[i];
 							nuc->Ex_p[daughter_id][bin_mother][i] = Ex_r[i];
@@ -230,7 +231,7 @@ bool ReadTALYS::Read()
 						// check total pop for 
 						if( (pop_total_decay_r==0 && pop_total_decay!=0)
 								|| (pop_total_decay_r!=0 && abs(pop_total_decay-pop_total_decay_r)/pop_total_decay_r>0.01)){
-							cerr << "total pop for decay (transition pop) is not reproduced!" << endl;
+							cerr << "WARNING: total pop for decay (transition pop) is not reproduced!" << endl;
 							cerr << "Total pop (decay): " << pop_total_decay << endl;
 							cerr << "Check total pop (decay): " << pop_total_decay_r << endl;
 							cerr << nuc->name << " " << bin_mother << " " << particle_name[daughter_id] << endl;

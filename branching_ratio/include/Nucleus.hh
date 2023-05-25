@@ -47,6 +47,8 @@ class Nucleus{
 	float min_S(); // minimum separation energy
 
 	float GetPopP(int p,int mb); // return  sum_(daughter_bin) pop[p][mb][daughter_bin]
+
+	bool CheckPop();
 	
 
 	private:

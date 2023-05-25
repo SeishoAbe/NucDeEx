@@ -45,6 +45,7 @@ void Nucleus::Init()
 		Ex[i] = new float[bins];
 		for(int j=0;j<bins;j++){
 			Ex[i][j] = -1;
+			pop[i][j] = 0;
 		}
 	}
 
@@ -59,8 +60,12 @@ void Nucleus::Init()
 		Ex_p[i] = new float*[bins];
 		Ex_bin_p[i] = new int[bins];
 		for(int j=0;j<bins;j++){
+			Ex_bin_p[i][j]=0;
 			pop_p[i][j] = new float[bins];
 			Ex_p[i][j] = new float[bins];
+			for(int k=0;k<bins;k++){
+				pop_p[i][j][k] = Ex_p[i][j][k] =0;
+			}
 		}
 
 	}
@@ -83,11 +88,42 @@ float Nucleus::GetPopP(int p,int mb)
 //////////////////
 {
 	float population=0;
-	for(int i=0;i<Ex_bin_p[p][mb];i++){
+	//for(int i=0;i<=Ex_bin_p[p][mb];i++){
+	for(int i=0;i<bins;i++){
 		population += pop_p[p][mb][i];
 	}
 
 	return population;
+}
+
+//////////////////
+bool Nucleus::CheckPop()
+//////////////////
+{
+	for(int i=0;i<Ex_bin[0];i++){ // ex bin loop
+		if(Ex[0][i]<min_S()) continue;
+		float population=0;
+		for(int par=0;par<parity;par++){ // parity loop
+			population += pop[par][i]; // population obtained from "population"
+		}
+		if(!(population>0)) continue; // skip
+
+		// sum population for daughter 
+		float population_check=0; 
+		for(int p=0;p<num_particle;p++){ // particle loop
+			population_check += GetPopP(p,i);
+		}
+		
+		if( abs(population_check-population)/population > 0.01 ){
+			cerr << "ERROR: population is not reproduced" << endl;
+			cerr << name << " bin=" << i << endl;
+			cerr << "population= " << population << "  summed population=" << population_check << endl;
+			return 0;
+		}
+	}
+
+	cout << "Population for " << name << " looks OK" << endl;
+	return 1;
 }
 
 //////////////////
