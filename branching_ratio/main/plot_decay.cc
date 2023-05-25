@@ -25,19 +25,9 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
   // --- FIXME  --- //
-  std::string parent="11C";
-  const int maxlevelstar=8;
-  const int maxlevelsbin_g=8;
-  const int maxlevelsbin_n=10;
-  const int maxlevelsbin_p=10;
-  const int maxlevelsbin_a=10;
-  const int maxlevelsbin_d=5;
-  const int maxlevelsbin_t=5;
-  const int maxlevelsbin_h=5;
-
   const int Ex_max=60000; // keV
   const int Ex_bin_width=100; // keV
-  const float max_Ex_plot=80;
+  const float max_Ex_plot=50;
   // ---------------//
   
   std::ostringstream os;
@@ -64,6 +54,7 @@ int main(int argc, char* argv[]){
 	}
 	cout << "# nuclei that has population data = " << num_nuc_data << endl;
 	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
+	if(!nuc_target->CheckPop()) return 0;
 	int bin_target = nuc_target->Ex_bin[parity_bin];
 
 
