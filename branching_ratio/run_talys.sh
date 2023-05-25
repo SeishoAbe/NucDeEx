@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ### FIXME ###
-TARGET=11C
-#FILE=energy.1.2.p.txt
-FILE=energy
+TARGET=11B
+FILE=energy.1.2.p.txt
+#FILE=energy
 #############
 
 OUTDIR=output

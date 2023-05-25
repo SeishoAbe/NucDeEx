@@ -69,6 +69,7 @@ bool ReadTALYS::Read()
 	float pop_r[bins], Ex_r[bins];
 	int max_bin_r;
 	float pop_total_decay; // pop for specific mother -> daughter
+	bool flag_first_population=1;
   while(_ifs->getline(buf,sizeof(buf))){
 		string st = string(buf);
 		
@@ -99,6 +100,11 @@ bool ReadTALYS::Read()
 			name.erase(std::remove_if(name.begin(), name.end(), ::isspace), name.end()); // remove space
 
 			nuc = _nucleus_table->GetNucleusPtr(name.c_str());
+			nuc->flag_data = 1; // this nucleus has population data
+			if(flag_first_population==1){ // first population -> target nucleus
+				nuc->flag_target=1;
+				flag_first_population=0;//turn off
+			}
 			int find_parity= st.find(keyword_parity->c_str());
 			if(find_parity == string::npos){ // parity plus & minus
 				int find_before_decay = st.find(keyword_before_decay->c_str());
@@ -133,9 +139,6 @@ bool ReadTALYS::Read()
 			}
 			//line_population=0;
 		}else{ // cannot find total population 
-			//line_population++; // count line after total pop info
-			//if(line_population<skip_after_population) continue;
-
 			int bin_mother, parity_mother, parity_daughter, daughter_id;
 			int find_decay = st.find(keyword_decay->c_str());
 			int find_total = st.find(keyword_total->c_str());
@@ -157,8 +160,8 @@ bool ReadTALYS::Read()
 						nuc->Ex_bin[parity_array] = bin;
 						nuc->Ex[parity_array][bin]=Ex;
 						nuc->pop[parity_array][bin]=pop_p;
-						cout << "Parity(" << parity_array << ")" << ": excitation & pop: " << nuc->name << " " << nuc->Ex_bin[parity_array] 
-								 << " " << setw(9) << nuc->Ex[parity_array][bin] << " " << setw(9) << nuc->pop[parity_array][bin]  << endl;
+						//cout << "Parity(" << parity_array << ")" << ": excitation & pop: " << nuc->name << " " << nuc->Ex_bin[parity_array] 
+						//		 << " " << setw(9) << nuc->Ex[parity_array][bin] << " " << setw(9) << nuc->pop[parity_array][bin]  << endl;
 					}
 				}
 			}else if (find_decay!=string::npos){ // decay info was found

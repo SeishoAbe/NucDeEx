@@ -33,8 +33,6 @@ class ReadTALYS{
 	string* keyword_bin_mother;
 	string* keyword_parity_mother;
 	string* keyword_parity_daughter;
-	//int skip_after_population=4;
-
 
 	ostringstream* os;
 };

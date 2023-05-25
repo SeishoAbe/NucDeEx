@@ -13,6 +13,7 @@ class NucleusTable{
 
   bool ReadTables();
 	int getID(const char* name);
+	int GetNumofNuc(){return num_of_nuc;};
 	
 	Nucleus* GetNucleusPtr(const char* name);
 	Nucleus* GetNucleusPtr(int id);
