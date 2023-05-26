@@ -117,7 +117,7 @@ bool ReadTALYS::Read()
 
 				// Fill params
 				nuc->sum_pop = total_pop;
-				cout <<  "total population: " << nuc->name << " " << nuc->Z << " " << nuc->N << " " << nuc->A << " " << nuc->sum_pop << endl;
+				//cout <<  "total population: " << nuc->name << " " << nuc->Z << " " << nuc->N << " " << nuc->A << " " << nuc->sum_pop << endl;
 			}else{ // parity dependent
 				st = st.substr(find_parity+keyword_parity->length());
 				int parity;
@@ -134,8 +134,8 @@ bool ReadTALYS::Read()
 				st = st.substr(find_before_decay+keyword_before_decay->length());
 				istringstream(st) >> pop;
 				nuc->total_pop[parity_array] = pop;
-				cout <<  "parity dependent population: " << nuc->name << " (" << nuc->Z << "," << nuc->N << "," << nuc->A 
-						 << ") " << nuc->total_pop[parity_array] << endl;
+				//cout <<  "parity dependent population: " << nuc->name << " (" << nuc->Z << "," << nuc->N << "," << nuc->A 
+				//		 << ") " << nuc->total_pop[parity_array] << endl;
 			}
 			//line_population=0;
 		}else{ // cannot find total population 
@@ -174,6 +174,8 @@ bool ReadTALYS::Read()
 				st = st.substr(find_bin_mother+keyword_bin_mother->length());
 				istringstream(st) >> bin_mother; // obtain mother's bin
 
+				nuc->flag_pop_data[bin_mother]=1;
+
 				int find_parity_mother = st.find(keyword_parity_mother->c_str());
 				st = st.substr(find_parity_mother+keyword_parity_mother->length());
 				istringstream(st) >> parity_mother;
@@ -203,6 +205,13 @@ bool ReadTALYS::Read()
 				if(istringstream(st) >> bin >> Ex >> pop_spin[0] >> pop_spin[1] >> pop_spin[2]
 							>> pop_spin[3] >> pop_spin[4] >> pop_spin[5] >> pop_spin[6]
 							>> pop_spin[7] >> pop_spin[8] >> pop_spin[9]){
+
+					// reject junk sentense
+					int junk;
+					float junkf;
+					if(istringstream(st) >> junk >> junkf >> junkf >> junk >> junkf >> junkf
+							>> junkf >> junkf >> junkf >> junkf >> junkf >> junkf >> junkf >> junkf) continue;
+		
 					// init if this is the first time to read...
 					for(int i=0;i<bins && bin==0 && parity_array_daughter==0;i++){
 						pop_r[i] = 0;
@@ -230,7 +239,7 @@ bool ReadTALYS::Read()
 
 						// check total pop for 
 						if( (pop_total_decay_r==0 && pop_total_decay!=0)
-								|| (pop_total_decay_r!=0 && abs(pop_total_decay-pop_total_decay_r)/pop_total_decay_r>0.01)){
+								|| (pop_total_decay_r!=0 && abs(pop_total_decay-pop_total_decay_r)/pop_total_decay_r>check_criteria)){
 							cerr << "WARNING: total pop for decay (transition pop) is not reproduced!" << endl;
 							cerr << "Total pop (decay): " << pop_total_decay << endl;
 							cerr << "Check total pop (decay): " << pop_total_decay_r << endl;
