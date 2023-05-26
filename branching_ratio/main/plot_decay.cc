@@ -84,6 +84,7 @@ int main(int argc, char* argv[]){
 	TGraph* g_target_br[num_particle];
 	int	index_br[num_particle]={0};
 	for(int p=0;p<num_particle;p++){
+		index_br[p]=0;
 		g_target_br[p] = new TGraph();
 		os.str("");
 		os << "g_target_br_" << p;
@@ -109,6 +110,7 @@ int main(int argc, char* argv[]){
 			g_target_br_ex[p][i]->SetMarkerColor(color_root[p]);
 			g_target_br_ex[p][i]->SetLineWidth(2);
 			g_target_br_ex[p][i]->SetLineColor(color_root[p]);
+			index_br_ex[p][i]=0;
 		}
 	}
 
@@ -136,12 +138,11 @@ int main(int argc, char* argv[]){
 				float population = nuc_target->GetPopDaughterBinSum(p,i);//  (particle, exbin)
 				g_target_br[p]->SetPoint(index_br[p],Ex_target,population/pop_target_sum);
 				index_br[p]++;
-				for(int j=0;j<nuc_target->Ex_bin_p[p][i];j++){ // daughter ex bin loop
-					double br_ex=0;
-					if(population>0) br_ex = nuc_target->pop_p[p][i][j]/population;
-					cout << i << " " << p << " " << br_ex << endl;
+				for(int j=0;j<nuc_target->Ex_bin_p[p][i] && population>0;j++){ // daughter ex bin loop
+					float br_ex = nuc_target->pop_p[p][i][j]/population;
+					//if(br_ex==0) cout << i << " " << p << " " << j << " " << br_ex << endl;
 					g_target_br_ex[p][i]->SetPoint(index_br_ex[p][i],
-									nuc_target->Ex_p[p][i][j],br_ex);
+									                       nuc_target->Ex_p[p][i][j],br_ex);
 					index_br_ex[p][i]++;
 				}
 			}
@@ -150,14 +151,18 @@ int main(int argc, char* argv[]){
 
 
 	// --- Draw --- // 
+	gStyle->SetTextSize(0.08);
 	gStyle->SetTitleSize(0.045);
+	gStyle->SetTitleXSize(0.045);
+	gStyle->SetTitleYSize(0.045);
+	gStyle->SetTitleYOffset(0.95);
 	
 	// --- Canvas --- //
 	TCanvas* c_target_pop = new TCanvas("c_target_pop","",0,0,1200,600);
 	c_target_pop->Divide(2);
 	for(int par=0;par<parity;par++){
 		c_target_pop->cd(par+1);
-		TH1F* waku_target_pop = c_target_pop->DrawFrame(0,0,max_Ex_plot,max_total_pop[par]*1.1);
+		TH1F* waku_target_pop = gPad->DrawFrame(0,0,max_Ex_plot,max_total_pop[par]*1.1);
 		os.str("");
 		os << "Population (normarized), " << argv[1];
 		waku_target_pop->SetTitle(os.str().c_str());
@@ -168,6 +173,7 @@ int main(int argc, char* argv[]){
 		g_target_pop[par]->SetMarkerStyle(7);
 		g_target_pop[par]->Draw("PLsame");
 	}
+	gPad->RedrawAxis();
 	os.str("");
 	os << "fig/fig_target_pop.pdf";
 	c_target_pop->Print(os.str().c_str());
@@ -188,6 +194,14 @@ int main(int argc, char* argv[]){
 	for(int p=0;p<num_particle;p++){
 		g_target_br[p]->Draw("PLsame");
 	}
+	TLegend* leg_target_br = new TLegend(0.4,0.7,0.9,0.9);
+	leg_target_br->SetNColumns(3);
+	for(int p=0;p<num_particle;p++){
+		leg_target_br->AddEntry(g_target_br[p],particle_name[p].c_str(),"PL");
+	}
+	leg_target_br->Draw("same");
+	gPad->RedrawAxis();
+	//
 	os.str("");
 	os << "fig/fig_target_br.pdf";
 	c_target_br->Print(os.str().c_str());
@@ -197,21 +211,48 @@ int main(int argc, char* argv[]){
 
 
 	TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
+	string pdfname="fig/fig_target_br_ex.pdf";
+	c_target_br_ex->Print( (pdfname+(string)"[").c_str() );
+	c_target_br_ex->Update();
+	c_target_br_ex->Clear();
 	for(int i=0;i<bin_target;i++){ // target bin loop
+		if(nuc_target->Ex[0][i]<nuc_target->min_S()) continue;
 		c_target_br_ex->Divide(4,2);
 		for(int p=0;p<num_particle;p++){ // particle loop
 			c_target_br_ex->cd(p+1);
 			gPad->SetGrid();
 			TH1F* waku = gPad->DrawFrame(0,0,max_Ex_plot,1.05);
+			os.str("");
+			os << particle_name[p];
+			waku->SetTitle(os.str().c_str());
 			waku->GetXaxis()->SetTitle("Excitation energy of daughter nucleus");
-			waku->GetYaxis()->SetTitle("Branching ratio");
-			g_target_br_ex[p][i]->Draw("PLsame");
+			waku->GetYaxis()->SetTitle("Relative branching ratio");
+			if(g_target_br_ex[p][i]->GetN()==0){
+				TText* text = new TText(max_Ex_plot*0.25,0.8,"NO DATA");
+				text->SetTextColor(kGray+1);
+				text->Draw("same");
+			}else{
+				g_target_br_ex[p][i]->Draw("PLsame");
+				os.str("");
+				os << "BR: " << scientific << setprecision(2) 
+					 << nuc_target->GetPopDaughterBinSum(p,i)/nuc_target->GetPopParitySum(i);
+				TText* text = new TText(max_Ex_plot*0.25,0.8,os.str().c_str());
+				text->Draw("same");
+			}
 		}
+		c_target_br_ex->cd(8);
 		os.str("");
-		if(i==0) os << "fig/fig_target_br_ex.pdf[";
-		else if(i==bin_target-1) os << "fig/fig_target_br_ex.pdf]";
-		else os << "fig/fig_target_br_ex.pdf";
+		os << nuc_target->name << ", Ex[" << i << "] = " << fixed << nuc_target->Ex[0][i] << " (MeV)";
+		TText* text_Ex = new TText(0.1,0.9,os.str().c_str());
+		text_Ex->Draw("same");
+		//
+		gPad->RedrawAxis();
+		os.str("");
+		if(i==bin_target-1) os << (pdfname+(string)"]").c_str();
+		else os << pdfname.c_str();
 		c_target_br_ex->Print(os.str().c_str());
+		c_target_br_ex->Update();
+		c_target_br_ex->Clear();
 	}
 
 

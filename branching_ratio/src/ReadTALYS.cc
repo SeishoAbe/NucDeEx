@@ -235,7 +235,7 @@ bool ReadTALYS::Read()
 							cerr << "Total pop (decay): " << pop_total_decay << endl;
 							cerr << "Check total pop (decay): " << pop_total_decay_r << endl;
 							cerr << nuc->name << " " << bin_mother << " " << particle_name[daughter_id] << endl;
-							//return 0;
+							//return 0; // this sometimes happens.. due to bugs in TALYS
 						}
 						flag_mode=-1; // turn off decay mode
 					}
@@ -243,5 +243,7 @@ bool ReadTALYS::Read()
 			}
 		}// end of "cannot find total population info"
 	} // end of getline loop
+	_ifs->close();
+	delete _ifs;
 	return 1;
 }
