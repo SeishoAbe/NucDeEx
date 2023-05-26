@@ -31,6 +31,8 @@ class Nucleus{
   int* Ex_bin;
 	// [parity] [mother E bin]
 	//		[parity] : 0 (negative), 1 (positive)
+	bool* flag_pop_data; // does it have pop (decay) data?
+	 //[mother E bin]
 
 	// NOTATION
 	// pop[p][mb][db]: population
@@ -54,6 +56,7 @@ class Nucleus{
 
 	bool CheckTotalPop();
 	bool CheckPop();
+	bool CheckPop(int i);
 	bool CheckEx();
 	
 

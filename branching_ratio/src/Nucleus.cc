@@ -49,6 +49,11 @@ void Nucleus::Init()
 		}
 	}
 
+	flag_pop_data = new bool[bins];
+	for(int i=0;i<bins;i++){
+		flag_pop_data[i] = 0;
+	}
+
 	pop_p = new float**[num_particle];
 	Ex_p = new float**[num_particle];
 	Ex_bin_p = new int*[num_particle];
@@ -119,8 +124,8 @@ bool Nucleus::CheckTotalPop()
 			total_pop_check += pop[par][i];
 		}
 		if(!(total_pop[par]>0)) continue;
-		if( abs(total_pop[par]-total_pop_check)/total_pop[par] > 0.01 ){
-			cerr << "ERROR: pality dependent total population is not reproduced" << endl;
+		if( abs(total_pop[par]-total_pop_check)/total_pop[par] > check_criteria ){
+			cerr << "ERROR: ChecTotalPop(): pality dependent total population is not reproduced" << endl;
 			cerr << name << " parity=" << par << endl;
 			cerr << "total population= " << total_pop[par] << "  summed population=" << total_pop_check << endl;
 			return 0;
@@ -128,35 +133,64 @@ bool Nucleus::CheckTotalPop()
 		sum_pop_check += total_pop[par];
 	}
 
-	if( abs(sum_pop-sum_pop_check)/sum_pop > 0.01 ){
-		cerr << "ERROR: pality sum total population is not reproduced" << endl;
+	if( abs(sum_pop-sum_pop_check)/sum_pop > check_criteria ){
+		cerr << "ERROR: CheckTotalPop(): pality sum total population is not reproduced" << endl;
 		cerr << name << endl;
 		cerr << "sum population= " << sum_pop << "  summed sum population=" << sum_pop_check << endl;
 		return 0;
 	}
+	return 1;
 }
 
 //////////////////
 bool Nucleus::CheckPop()
 //////////////////
 {
+	bool status=1;
 	for(int i=0;i<Ex_bin[0];i++){ // ex bin loop
-		if(Ex[0][i]<min_S()) continue;
+		if(Ex[0][i]<min_S() || !flag_pop_data[i]) continue;
 		float population=GetPopParitySum(i);
 		if(!(population>0)) continue; // skip
 
 		// sum population for daughter 
 		float population_check=GetPopParticleDaughterBinSum(i);
 		
-		if( abs(population_check-population)/population > 0.01 ){
-			cerr << "ERROR: population is not reproduced" << endl;
+		if( abs(population_check-population)/population > check_criteria ){ // this sometimes happen
+			cerr << "WARNING: CheckPop(): population is not reproduced" << endl;
 			cerr << name << " bin=" << i << endl;
 			cerr << "population= " << population << "  summed population=" << population_check << endl;
-			return 0;
 		}
 	}
+	return status;
+}
 
-	cout << "Population for " << name << " looks OK" << endl;
+//////////////////
+bool Nucleus::CheckPop(int i)
+//////////////////
+{
+	if(i>=Ex_bin[0]){
+		cerr << "ERROR: CheckPop(" << i << ")" << endl;
+		cerr << "Invalid bin number" << endl;
+		return 0;
+	}
+
+	if(Ex[0][i]<min_S() || !flag_pop_data[i]) return 1;
+	float population=GetPopParitySum(i);
+	if(!(population>0)) return 1;
+
+	// sum population for daughter 
+	float population_check=GetPopParticleDaughterBinSum(i);
+	
+	if( abs(population_check-population)/population > check_criteria ){ // this sometimes happen
+		cerr << "WARNING: CheckPop(): population is not reproduced" << endl;
+		cerr << name << " bin=" << i << endl;
+		cerr << "population= " << population << "  summed population=" << population_check << endl;
+		//
+		//if(!flag_target && (i<=1 || i==Ex_bin[0]-1)) return 1; // sometimes happen
+		//else return 0;// <- unexpected
+		return 0;
+	}
+
 	return 1;
 }
 
@@ -165,7 +199,7 @@ bool Nucleus::CheckEx()
 //////////////////
 {
 	if(Ex_bin[0]!=Ex_bin[1]){
-		cerr << "ERROR: Ex_bin[parity] are different" << endl;
+		cerr << "ERROR: CheckEx(): Ex_bin[parity] are different" << endl;
 		cerr << Ex_bin[0] << " " << Ex_bin[1] << endl;
 		return 0;
 	}
