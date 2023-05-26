@@ -157,7 +157,7 @@ bool Nucleus::CheckPop()
 		
 		if( abs(population_check-population)/population > check_criteria ){ // this sometimes happen
 			cerr << "WARNING: CheckPop(): population is not reproduced" << endl;
-			cerr << name << " bin=" << i << endl;
+			cerr << name << " bin=" << i << " Ex=" << Ex[0][i] << " (MeV)" << endl;
 			cerr << "population= " << population << "  summed population=" << population_check << endl;
 			if(strcmp(name,"8Be")==0){ // known issue
 				//HOGE
@@ -190,7 +190,7 @@ bool Nucleus::CheckPop(int i)
 	if( abs(population_check-population)/population > check_criteria ){ // this sometimes happen
 		if(flag_pop_data[i]){
 			cerr << "WARNING: CheckPop(int): population is not reproduced" << endl;
-			cerr << name << " bin=" << i << endl;
+			cerr << name << " bin=" << i << " Ex=" << Ex[0][i] << " (MeV)" << endl;
 			cerr << "population= " << population << "  summed population=" << population_check << endl;
 		}
 		//
