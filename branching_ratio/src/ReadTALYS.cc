@@ -157,7 +157,7 @@ bool ReadTALYS::Read()
 					// Usually it is negative parity.
 					// the distribution is the same as positive parity
 					if(nuc->Ex[parity_array][bin]<0.){
-						nuc->Ex_bin[parity_array] = bin;
+						nuc->Ex_bin[parity_array] = bin+1;
 						nuc->Ex[parity_array][bin]=Ex;
 						nuc->pop[parity_array][bin]=pop_p;
 						//cout << "Parity(" << parity_array << ")" << ": excitation & pop: " << nuc->name << " " << nuc->Ex_bin[parity_array] 
@@ -219,7 +219,7 @@ bool ReadTALYS::Read()
 					if(parity_array_daughter==0 && max_bin_r<bin) max_bin_r = bin;
 					// fill values if the end of positve parity (last!)
 					if(parity_array_daughter==1 && max_bin_r==bin){
-						nuc->Ex_bin_p[daughter_id][bin_mother] = max_bin_r;
+						nuc->Ex_bin_p[daughter_id][bin_mother] = max_bin_r+1;
 						float pop_total_decay_r=0;
 						//for(int i=0;i<=max_bin_r;i++){
 						for(int i=0;i<bins;i++){

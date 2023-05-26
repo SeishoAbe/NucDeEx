@@ -142,10 +142,7 @@ bool Nucleus::CheckPop()
 {
 	for(int i=0;i<Ex_bin[0];i++){ // ex bin loop
 		if(Ex[0][i]<min_S()) continue;
-		float population=0;
-		for(int par=0;par<parity;par++){ // parity loop
-			population += pop[par][i]; // population obtained from "population"
-		}
+		float population=GetPopParitySum(i);
 		if(!(population>0)) continue; // skip
 
 		// sum population for daughter 
