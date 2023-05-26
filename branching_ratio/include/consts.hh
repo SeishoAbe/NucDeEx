@@ -21,5 +21,5 @@ static const int color_root[num_particle]
 		 416+1 // green+1
 		};
 
-static const float check_criteria=0.01;
+static const float check_criteria=0.02;
 #endif

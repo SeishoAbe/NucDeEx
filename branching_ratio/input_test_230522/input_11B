@@ -16,7 +16,8 @@ maxlevelsbin a 1 #7Li
 maxlevelsbin d 1 #9Be
 maxlevelsbin t 1 #8Be
 maxlevelsbin h 1 #8Li
-maxlevelsres 1 # others
+#maxlevelsres 1 # others
+maxlevelsres 0 # others
 ejectiles g n p a d t h
 #
 

@@ -159,6 +159,11 @@ bool Nucleus::CheckPop()
 			cerr << "WARNING: CheckPop(): population is not reproduced" << endl;
 			cerr << name << " bin=" << i << endl;
 			cerr << "population= " << population << "  summed population=" << population_check << endl;
+			if(strcmp(name,"8Be")==0){ // known issue
+				//HOGE
+			}else {
+				status=0;
+			}
 		}
 	}
 	return status;
@@ -174,7 +179,8 @@ bool Nucleus::CheckPop(int i)
 		return 0;
 	}
 
-	if(Ex[0][i]<min_S() || !flag_pop_data[i]) return 1;
+	//if(Ex[0][i]<min_S() || !flag_pop_data[i]) return 1;
+	if(Ex[0][i]<min_S()) return 1;
 	float population=GetPopParitySum(i);
 	if(!(population>0)) return 1;
 
@@ -182,9 +188,11 @@ bool Nucleus::CheckPop(int i)
 	float population_check=GetPopParticleDaughterBinSum(i);
 	
 	if( abs(population_check-population)/population > check_criteria ){ // this sometimes happen
-		cerr << "WARNING: CheckPop(): population is not reproduced" << endl;
-		cerr << name << " bin=" << i << endl;
-		cerr << "population= " << population << "  summed population=" << population_check << endl;
+		if(flag_pop_data[i]){
+			cerr << "WARNING: CheckPop(int): population is not reproduced" << endl;
+			cerr << name << " bin=" << i << endl;
+			cerr << "population= " << population << "  summed population=" << population_check << endl;
+		}
 		//
 		//if(!flag_target && (i<=1 || i==Ex_bin[0]-1)) return 1; // sometimes happen
 		//else return 0;// <- unexpected

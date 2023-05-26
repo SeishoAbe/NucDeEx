@@ -143,12 +143,13 @@ int main(int argc, char* argv[]){
 			
 			// calculate br
 			for(int p=0;p<num_particle;p++){ // particle loop
-				if(Ex_target<nuc_target->min_S() ){
-						//|| !nuc_target->CheckPop(i)){ // less than minimum separation E->gamma 100%
+				//if(Ex_target<nuc_target->min_S() ){
+				if(Ex_target<nuc_target->min_S() 
+						|| (!nuc_target->CheckPop(i) && !nuc_target->flag_pop_data[i] && i<=1)){ 
 					if(p==0) g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
 					else g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
 					index_br[p]++;
-				}else if(pop_target_sum>0){
+				}else if(pop_target_sum>0 && nuc_target->flag_pop_data[i]){
 					float population = nuc_target->GetPopDaughterBinSum(p,i);//  (particle, exbin)
 					g_target_br[p]->SetPoint(index_br[p],Ex_target,population/pop_target_sum);
 					index_br[p]++;
