@@ -65,9 +65,13 @@ int main(int argc, char* argv[]){
 	int bin_target = nuc_target->Ex_bin[0];
 
 
-	// ---- Draw --- // 
-	gStyle->SetTitleSize(0.045);
-	//
+
+	os.str("");
+	os << "output/Br_" << argv[1] << ".root";
+	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
+
+	// Prepare TGraph
+	// population TGraph
 	TGraph* g_target_pop[parity];
 	int index[parity]={0};
 	for(int par=0;par<parity;par++){
@@ -76,21 +80,36 @@ int main(int argc, char* argv[]){
 		os << "g_target_pop_" << par;
 		g_target_pop[par]->SetName(os.str().c_str());
 	}
+	// target br TGraph
 	TGraph* g_target_br[num_particle];
 	int	index_br[num_particle]={0};
-	TGraph* g_target_br_ex[num_particle][bin_target];
-
-
 	for(int p=0;p<num_particle;p++){
-		g_target_br[p] = new TGraph();// ((string)"g_target_br_" + particle_name[p]).c_str());
+		g_target_br[p] = new TGraph();
+		os.str("");
+		os << "g_target_br_" << p;
+		g_target_br[p]->SetName(os.str().c_str());
 		g_target_br[p]->SetMarkerStyle(7);
-		//g_target_br[p]->SetMarkerSize(2);
 		g_target_br[p]->SetMarkerColor(color_root[p]);
 		g_target_br[p]->SetLineWidth(2);
 		g_target_br[p]->SetLineColor(color_root[p]);
 		if(p==0) g_target_br[p]->SetPoint(index_br[p],0,1);
 		else     g_target_br[p]->SetPoint(index_br[p],0,0);
 		index_br[p]++;
+	}
+	// target br & ex of daugther
+	TGraph* g_target_br_ex[num_particle][bin_target];
+	int index_br_ex[num_particle][bin_target]={0};
+	for(int p=0;p<num_particle;p++){
+		for(int i=0;i<bin_target;i++){ // target bin loop
+			os.str("");
+			os << "g_target_br_ex_" << p << "_" << i;
+			g_target_br_ex[p][i] = new TGraph;
+			g_target_br_ex[p][i]->SetName(os.str().c_str());
+			g_target_br_ex[p][i]->SetMarkerStyle(7);
+			g_target_br_ex[p][i]->SetMarkerColor(color_root[p]);
+			g_target_br_ex[p][i]->SetLineWidth(2);
+			g_target_br_ex[p][i]->SetLineColor(color_root[p]);
+		}
 	}
 
 	float max_total_pop[parity]={0};
@@ -109,7 +128,7 @@ int main(int argc, char* argv[]){
 		
 		// calculate br
 		for(int p=0;p<num_particle;p++){ // particle loop
-			if(Ex_target<nuc_target->min_S()){
+			if(Ex_target<nuc_target->min_S()){ // less than minimum separation E->gamma 100%
 				if(p==0) g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
 				else g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
 				index_br[p]++;
@@ -117,12 +136,23 @@ int main(int argc, char* argv[]){
 				float population = nuc_target->GetPopDaughterBinSum(p,i);//  (particle, exbin)
 				g_target_br[p]->SetPoint(index_br[p],Ex_target,population/pop_target_sum);
 				index_br[p]++;
+				for(int j=0;j<nuc_target->Ex_bin_p[p][i];j++){ // daughter ex bin loop
+					double br_ex=0;
+					if(population>0) br_ex = nuc_target->pop_p[p][i][j]/population;
+					cout << i << " " << p << " " << br_ex << endl;
+					g_target_br_ex[p][i]->SetPoint(index_br_ex[p][i],
+									nuc_target->Ex_p[p][i][j],br_ex);
+					index_br_ex[p][i]++;
+				}
 			}
 		}
 	}
 
 
-
+	// --- Draw --- // 
+	gStyle->SetTitleSize(0.045);
+	
+	// --- Canvas --- //
 	TCanvas* c_target_pop = new TCanvas("c_target_pop","",0,0,1200,600);
 	c_target_pop->Divide(2);
 	for(int par=0;par<parity;par++){
@@ -145,6 +175,8 @@ int main(int argc, char* argv[]){
 	c_target_pop->Clear();
 	delete c_target_pop;
 
+
+
 	TCanvas* c_target_br = new TCanvas("c_target_br","",0,0,800,600);
 	TH1F* waku_target_br = gPad->DrawFrame(0,0,max_Ex_plot,1.05);
 	os.str("");
@@ -164,10 +196,27 @@ int main(int argc, char* argv[]){
 	delete c_target_br;
 
 
+	TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
+	for(int i=0;i<bin_target;i++){ // target bin loop
+		c_target_br_ex->Divide(4,2);
+		for(int p=0;p<num_particle;p++){ // particle loop
+			c_target_br_ex->cd(p+1);
+			gPad->SetGrid();
+			TH1F* waku = gPad->DrawFrame(0,0,max_Ex_plot,1.05);
+			waku->GetXaxis()->SetTitle("Excitation energy of daughter nucleus");
+			waku->GetYaxis()->SetTitle("Branching ratio");
+			g_target_br_ex[p][i]->Draw("PLsame");
+		}
+		os.str("");
+		if(i==0) os << "fig/fig_target_br_ex.pdf[";
+		else if(i==bin_target-1) os << "fig/fig_target_br_ex.pdf]";
+		else os << "fig/fig_target_br_ex.pdf";
+		c_target_br_ex->Print(os.str().c_str());
+	}
+
+
 	//
-	os.str("");
-	os << "output/Br_" << argv[1] << ".root";
-	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
+	rootf->cd();
 	for(int par=0;par<parity;par++){
 		g_target_pop[par]->Write();
 	}
