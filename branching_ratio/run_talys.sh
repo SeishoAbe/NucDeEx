@@ -2,8 +2,8 @@
 
 ### FIXME ###
 TARGET=11B
-FILE=energy.1.2.p.txt
-#FILE=energy
+#FILE=energy.1.2.p.txt
+FILE=energy
 #############
 
 OUTDIR=output
