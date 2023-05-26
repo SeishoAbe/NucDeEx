@@ -50,10 +50,11 @@ class Nucleus{
 		// (particle, mother ex bin)
 	float GetPopParticleDaughterBinSum(int mb);
 
-	float GetTotalPopParitySum();
+	float GetPopParitySum(int mb){ return pop[0][mb] + pop[1][mb];};
 
 	bool CheckTotalPop();
 	bool CheckPop();
+	bool CheckEx();
 	
 
 	private:

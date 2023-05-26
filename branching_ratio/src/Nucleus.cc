@@ -164,6 +164,24 @@ bool Nucleus::CheckPop()
 }
 
 //////////////////
+bool Nucleus::CheckEx()
+//////////////////
+{
+	if(Ex_bin[0]!=Ex_bin[1]){
+		cerr << "ERROR: Ex_bin[parity] are different" << endl;
+		cerr << Ex_bin[0] << " " << Ex_bin[1] << endl;
+		return 0;
+	}
+
+	for(int i=0;i<bins;i++){
+		if(Ex[0][i] != Ex[1][i]){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+//////////////////
 Nucleus::~Nucleus(){
 //////////////////
 	/*
