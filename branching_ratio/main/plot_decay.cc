@@ -52,7 +52,15 @@ int main(int argc, char* argv[]){
 		if(nucleus_table->GetNucleusPtr(i)->flag_data==1)  num_nuc_data++;
 	}
 	cout << "# nuclei that has population data = " << num_nuc_data << endl;
+	
+
+	// prepare output root file
+	os.str("");
+	os << "output/Br_" << argv[1] << ".root";
+	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
+
 	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
+	string name_target = (string)nuc_target->name;
 	// check info in Nucleus 
 	if(! (nuc_target->CheckTotalPop() && nuc_target->CheckPop()) ){
 		cerr << "ERROR: There was a bug in population info: " << nuc_target->name << endl;
@@ -66,9 +74,6 @@ int main(int argc, char* argv[]){
 
 
 
-	os.str("");
-	os << "output/Br_" << argv[1] << ".root";
-	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
 
 	// Prepare TGraph
 	// population TGraph
@@ -175,7 +180,7 @@ int main(int argc, char* argv[]){
 	}
 	gPad->RedrawAxis();
 	os.str("");
-	os << "fig/fig_target_pop.pdf";
+	os << "fig/" << argv[1] << "/fig_" << name_target.c_str() << "_pop.pdf";
 	c_target_pop->Print(os.str().c_str());
 	c_target_pop->Update();
 	c_target_pop->Clear();
@@ -203,7 +208,7 @@ int main(int argc, char* argv[]){
 	gPad->RedrawAxis();
 	//
 	os.str("");
-	os << "fig/fig_target_br.pdf";
+	os << "fig/" << argv[1] << "/fig_" << name_target.c_str() << "_br.pdf";
 	c_target_br->Print(os.str().c_str());
 	c_target_br->Update();
 	c_target_br->Clear();
@@ -211,7 +216,7 @@ int main(int argc, char* argv[]){
 
 
 	TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
-	string pdfname="fig/fig_target_br_ex.pdf";
+	string pdfname= (string)"fig/" + (string)argv[1] + (string)"/fig_" + name_target + (string)"_target_br_ex.pdf";
 	c_target_br_ex->Print( (pdfname+(string)"[").c_str() );
 	c_target_br_ex->Update();
 	c_target_br_ex->Clear();
@@ -260,6 +265,12 @@ int main(int argc, char* argv[]){
 	rootf->cd();
 	for(int par=0;par<parity;par++){
 		g_target_pop[par]->Write();
+	}
+	for(int p=0;p<num_particle;p++){
+		g_target_br[p]->Write();
+		for(int i=0;i<bin_target;i++){ // target bin loop
+			g_target_br_ex[p][i]->Write();
+		}
 	}
 	rootf->Close();
 	delete rootf;

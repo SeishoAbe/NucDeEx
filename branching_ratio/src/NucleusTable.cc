@@ -60,7 +60,7 @@ bool NucleusTable::ReadTables()
 														+ (string)".txt";
 		ifstream ifs2(filename2);
 		if(!ifs2.is_open()){
-			cerr << "We do not have separation energy file: " << filename2 << endl;
+			cerr << "We do not have separation energy file for " << Name << endl;
 		}else{
 			cout << "Read: " << filename2 << endl;
 			_nucleus[index].flag_s = 1;
