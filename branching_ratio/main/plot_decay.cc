@@ -145,7 +145,7 @@ int main(int argc, char* argv[]){
 			for(int p=0;p<num_particle;p++){ // particle loop
 				//if(Ex_target<nuc_target->min_S() ){
 				if(Ex_target<nuc_target->min_S() 
-						|| (!nuc_target->CheckPop(i) && !nuc_target->flag_pop_data[i] && i<=1)){ 
+						|| (!nuc_target->flag_pop_data[i] && i<=1)){ 
 					if(p==0) g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
 					else g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
 					index_br[p]++;
