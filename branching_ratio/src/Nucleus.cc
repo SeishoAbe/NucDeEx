@@ -160,8 +160,22 @@ bool Nucleus::CheckPop()
 			cerr << name << " bin=" << i << " Ex=" << Ex[0][i] << " (MeV)" << endl;
 			cerr << "population= " << population << "  summed population=" << population_check << endl;
 			if(strcmp(name,"8Be")==0){ // known issue
-				//HOGE
-			}else {
+				if(population_check>population){
+					float gamma_population = GetPopDaughterBinSum(0,i); // gamma pop
+					float others_population = population_check - gamma_population; // others pop
+					float gamma_target_population = population - others_population;// gamma pop should be this
+					cout << "gamma_population=" << gamma_population << endl;
+					cout << "gamma_target_population=" << gamma_target_population << endl;
+					if(gamma_target_population<0 || 
+							(gamma_target_population>gamma_target_population)) status = 0; // unknown. return bad flag
+					float scale_factor = gamma_target_population/gamma_population; // usually 0 < x < 1
+					for(int j=0;j<bins;j++){
+						pop_p[0][i][j] *= scale_factor;
+					}
+				}else { // unkonwn. return bad flag
+					status=0;
+				}
+			}else { // unkonwn. return bad flag
 				status=0;
 			}
 		}
@@ -169,6 +183,7 @@ bool Nucleus::CheckPop()
 	return status;
 }
 
+/*
 //////////////////
 bool Nucleus::CheckPop(int i)
 //////////////////
@@ -201,6 +216,7 @@ bool Nucleus::CheckPop(int i)
 
 	return 1;
 }
+*/
 
 //////////////////
 bool Nucleus::CheckEx()

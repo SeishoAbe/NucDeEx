@@ -56,7 +56,7 @@ class Nucleus{
 
 	bool CheckTotalPop();
 	bool CheckPop();
-	bool CheckPop(int i);
+	//bool CheckPop(int i);
 	bool CheckEx();
 	
 
