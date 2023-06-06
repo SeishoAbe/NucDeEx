@@ -64,11 +64,12 @@ bool NucleusTable::ReadTables()
 		}else{
 			cout << "Read: " << filename2 << endl;
 			_nucleus[index].flag_s = 1;
+			int particle_index=0;
 			while(ifs2.getline(buf,sizeof(buf))){
 				if(buf[0]=='#') continue;
-				istringstream(buf) >> _nucleus[index].S[0] >> _nucleus[index].S[1]
-					>> _nucleus[index].S[2] >> _nucleus[index].S[4] >> _nucleus[index].S[5]
-					>> _nucleus[index].S[6] >> _nucleus[index].S[3];
+				istringstream(buf) >> _nucleus[index].S[particle_index];
+				cout << "SE: " << particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << endl;
+				particle_index++;
 			}
 			ifs2.close();
 		}
