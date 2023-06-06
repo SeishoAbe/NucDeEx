@@ -3,7 +3,7 @@
 FILE=energy
 OUTDIR=output
 INDIR=input
-EXE_NUCLEUS=../read_nucleus.sh
+NUCLEUSTABLE=$TALYS_WORK_TABLES/nucleus/nucleus.txt
 
 cd /home/seisho/talys_1.96
 . setup_talys_1.96.sh
@@ -20,9 +20,13 @@ fi
 rm -v $FILE
 ln -sv $TALYS_WORK_TABLES/energy_distribution/$FILE ./
 
-$EXE_NUCLEUS | while read TARGET
+cat $NUCLEUSTABLE | while read line
 do
-	#echo $TARGET
+	check=${line:0:1}
+	if [ $check = "#" ] ; then
+		continue
+	fi
+	TARGET=`echo $line |cut -d ' ' -f 1`
 	INPUTFILE=../$INDIR/input_$TARGET
 	OUTPUTFILE=output_$TARGET
 
