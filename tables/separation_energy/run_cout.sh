@@ -1,11 +1,16 @@
 #!/bin/bash
 
 EXE=./cout_separation_energy
-EXE_NUCLEUS=./read_nucleus.sh
 OUTDIR=output
+NUCLEUSTABLE=$TALYS_WORK_TABLES/nucleus/nucleus.txt
 
-$EXE_NUCLEUS | while read TARGET
+cat $NUCLEUSTABLE | while read line
 do
+	check=${line:0:1}
+	if [ $check = "#" ] ; then
+		continue
+	fi
+	TARGET=`echo $line |cut -d ' ' -f 1`
 	#check file
 	OUTPUTFILE=output/output_$TARGET
 

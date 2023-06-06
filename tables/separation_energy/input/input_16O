@@ -1,6 +1,6 @@
 projectile 0
-element 6
-mass 9
+element 8
+mass 16
 energy energy
 bins 0
 ejectiles g n p a d t h

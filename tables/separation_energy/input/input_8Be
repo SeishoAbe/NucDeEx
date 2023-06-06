@@ -1,10 +1,6 @@
-#
-# General
-#
 projectile 0
 element 4
 mass 8
 energy energy
-
 bins 0
 ejectiles g n p a d t h
