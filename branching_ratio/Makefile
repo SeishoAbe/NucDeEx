@@ -12,7 +12,7 @@ CXXFLAGS        += $(shell root-config --cflags)
 LDFLAGS         += $(shell root-config --libs)
 LDFLAGS         += $(shell root-config --glibs)
 
-LIBNAME=lib/libNucleusTable.a
+LIBNAME=lib/libTALYStool.a
 
 AOBJS = ReadTALYS.o NucleusTable.o Nucleus.o
 
