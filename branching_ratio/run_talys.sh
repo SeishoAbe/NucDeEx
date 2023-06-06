@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ### FIXME ###
-TARGET=11B
+#TARGET=11B
+TARGET=11C
 FILE=energy.1.2.p.txt
 #FILE=energy
 #############
