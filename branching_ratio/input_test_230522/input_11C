@@ -16,6 +16,8 @@ maxlevelsbin a 1 #10B
 maxlevelsbin d 1 
 maxlevelsbin t 1 
 maxlevelsbin h 1 
+#maxlevelsres 1 # others
+maxlevelsres 0 # others
 ejectiles g n p a d t h
 #
 
