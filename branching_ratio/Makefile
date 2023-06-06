@@ -1,4 +1,4 @@
-PROGRAMS = plot_decay
+PROGRAMS = plot_decay cout_input
 
 CXX=g++ 
 CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
@@ -21,14 +21,14 @@ OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
 
 EXEDIR=main
 EXEOBJDIR=obj
-EXEOBJ=$(EXEOBJDIR)/$(PROGRAMS).o
+EXEOBJS=$(addsuffix .o,$(addprefix $(EXEOBJDIR)/,$(PROGRAMS)))
 BINDIR=bin
 BIN=$(addprefix $(BINDIR)/,$(PROGRAMS))
 
 all: $(BIN) lib
 
-$(BIN): $(OBJS) $(EXEOBJ)
-	$(CXX) $(CXXFLAGS) -o $(BIN) $(EXEOBJ) ${OBJS} $(LDFLAGS)
+$(BIN): $(OBJS) $(EXEOBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(filter %$(notdir $@).o,$(EXEOBJS)) ${OBJS} $(LDFLAGS)
 
 $(OBJDIR)/%.o: src/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
