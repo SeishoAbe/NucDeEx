@@ -5,7 +5,6 @@ projectile 0
 element 5
 mass 11
 energy energy.1.2.p.txt
-#energy energy
 
 bins 0
 maxlevelstar 8 #  7.4997
@@ -16,10 +15,8 @@ maxlevelsbin a 1 #7Li
 maxlevelsbin d 1 #9Be
 maxlevelsbin t 1 #8Be
 maxlevelsbin h 1 #8Li
-#maxlevelsres 1 # others
 maxlevelsres 0 # others
 ejectiles g n p a d t h
-#
 
 #
 # Output

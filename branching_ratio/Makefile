@@ -20,7 +20,7 @@ OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
 
 EXEDIR=main
-EXEOBJDIR=main
+EXEOBJDIR=obj
 EXEOBJ=$(EXEOBJDIR)/$(PROGRAMS).o
 BINDIR=bin
 BIN=$(addprefix $(BINDIR)/,$(PROGRAMS))
