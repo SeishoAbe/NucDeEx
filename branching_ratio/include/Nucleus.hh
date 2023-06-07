@@ -18,6 +18,7 @@ class Nucleus{
   int N;
   int A;
   int id;
+	int maxlevelsbin;
 
 	bool flag_s; // 1 -> have separation energy file
 	bool flag_target; // 1 -> target nucleus

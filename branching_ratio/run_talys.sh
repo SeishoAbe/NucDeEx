@@ -1,10 +1,8 @@
 #!/bin/bash
 
 ### FIXME ###
-#TARGET=11B
-TARGET=11C
-FILE=energy.1.2.p.txt
-#FILE=energy
+TARGET_TMP="11B 11C 15N 15O"
+FILE_TMP="energy.1.2.p.txt energy"
 #############
 
 OUTDIR=output
@@ -22,7 +20,12 @@ else
   cd $OUTDIR
 fi
 
-rm -v $FILE
-ln -sv $TALYS_WORK_TABLES/energy_distribution/$FILE ./
+for FILE in $FILE_TMP
+do
+	ln -sv $TALYS_WORK_TABLES/energy_distribution/$FILE ./
+done
 
-talys < ../$INDIR/input_$TARGET > output_$TARGET
+for TARGET in $TARGET_TMP
+do
+	talys < ../$INDIR/input_$TARGET > output_$TARGET
+done

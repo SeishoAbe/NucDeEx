@@ -35,5 +35,5 @@ static const int color_root[num_particle]
 		};
 
 */
-static const float check_criteria=0.02;
+static const float check_criteria=0.05;
 #endif
