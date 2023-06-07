@@ -307,7 +307,7 @@ int main(int argc, char* argv[]){
 			if(Ex<nuc_target->min_S()) continue;
 
 			// 1st line of G4Rad (Ex info)
-			ofs << "P" << setw(25) << Ex*1e3 << "  - 0" << endl; // MeV2keV
+			ofs << "P" << setw(20) << right << Ex*1e3 << "  - 0" << endl; // MeV2keV
 
 			// 2nd line of G4 (Mode & total BR info)
 			float BR[num_particle]={0};
@@ -315,11 +315,17 @@ int main(int argc, char* argv[]){
 				BR[p] = g_target_br[p]->Eval(Ex);
 				if(BR[p]<=0) continue;
 				if(BR[p]>=1) BR[p]=1.0;
-				ofs << setw(30) << decay_name[p].c_str() << setw(15) << "0" << setw(15) << BR[p] << endl;
+				ofs << setw(20) << " " << setw(8) << left << decay_name[p].c_str() << setw(7) << right << "0" 
+						<< setw(5) << " " << left << BR[p] << endl;
 			}
 
 			// 3rd line of G4 (daughter BR info)
 			for(int p=0;p<num_particle;p++){
+
+				// we do not need to prepare 3rd line for gamma (IT)
+				// It will be automatically calculated by PhotonEvapolation
+				if(p==0) continue;
+
 				for(int j=0;j<nuc_target->Ex_bin_p[p][i];j++){ // daughter ex bin loop
 					double RBR,Ex_daughter;//relative Br
 					g_target_br_ex[p][i]->GetPoint(j,Ex_daughter,RBR); // MeV
@@ -327,8 +333,8 @@ int main(int argc, char* argv[]){
 					RBR *= BR[p]*100; // relative Br -> absolute BR in %
 					float Qvalue = Ex - nuc_target->S[p] - Ex_daughter; // MeV 
 					if(Qvalue<0) continue;
-					ofs << setw(35) << decay_name[p].c_str() << setw(15) << Ex_daughter*1e3
-							<< "   - " << setw(15) << RBR << setw(15) << Qvalue*1e3 << endl;
+					ofs << setw(21) << " " << setw(8) << left << decay_name[p].c_str() << setw(16) << right << Ex_daughter*1e3
+							<< "   - " << setw(20) << RBR << setw(20) << Qvalue*1e3 << endl;
 
 				}
 			}
