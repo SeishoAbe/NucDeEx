@@ -25,9 +25,9 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
   // --- FIXME  --- //
-  const int Ex_max=60000; // keV
-  const int Ex_bin_width=100; // keV
-  const float max_Ex_plot=50;
+  const float max_Ex_plot=50; // <- plot
+  const float Ex_max=100*1e3; // keV <- G4Rad
+  const int Ex_bin_width=0.2*1e3; // keV <- G4Rad
   // ---------------//
   
   std::ostringstream os;
@@ -48,8 +48,8 @@ int main(int argc, char* argv[]){
 	//
 	const int num_of_nuc = nucleus_table->GetNumofNuc();
 	int num_nuc_data=0;
-	for(int i=0;i<num_of_nuc;i++){
-		if(nucleus_table->GetNucleusPtr(i)->flag_data==1)  num_nuc_data++;
+	for(int inuc=0;inuc<num_of_nuc;inuc++){
+		if(nucleus_table->GetNucleusPtr(inuc)->flag_data==1)  num_nuc_data++;
 	}
 	cout << "# nuclei that has population data = " << num_nuc_data << endl;
 	
@@ -61,10 +61,10 @@ int main(int argc, char* argv[]){
 
 
 	// start Nucleus loop in NucleusTable
-	for(int i=0;i<num_of_nuc;i++){
-		if(!nucleus_table->GetNucleusPtr(i)->flag_data) continue; // no data -> continue
+	for(int inuc=0;inuc<num_of_nuc;inuc++){
+		if(!nucleus_table->GetNucleusPtr(inuc)->flag_data) continue; // no data -> continue
 
-		Nucleus* nuc_target = nucleus_table->GetNucleusPtr(i); // get pointer of Nulceus
+		Nucleus* nuc_target = nucleus_table->GetNucleusPtr(inuc); // get pointer of Nulceus
 		string name_target = (string)nuc_target->name;
 
 		// check info in Nucleus 
@@ -106,9 +106,6 @@ int main(int argc, char* argv[]){
 			g_target_br[p]->SetMarkerColor(color_root[p]);
 			g_target_br[p]->SetLineWidth(2);
 			g_target_br[p]->SetLineColor(color_root[p]);
-			if(p==0) g_target_br[p]->SetPoint(index_br[p],0,1);
-			else     g_target_br[p]->SetPoint(index_br[p],0,0);
-			index_br[p]++;
 		}
 		// target br & ex of daugther
 		TGraph* g_target_br_ex[num_particle][bin_target];
@@ -143,7 +140,6 @@ int main(int argc, char* argv[]){
 			
 			// calculate br
 			for(int p=0;p<num_particle;p++){ // particle loop
-				//if(Ex_target<nuc_target->min_S() ){
 				if(Ex_target<nuc_target->min_S() 
 						|| (!nuc_target->flag_pop_data[i] && i<=1)){ 
 					if(p==0) g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
@@ -155,7 +151,7 @@ int main(int argc, char* argv[]){
 					index_br[p]++;
 					for(int j=0;j<nuc_target->Ex_bin_p[p][i] && population>0;j++){ // daughter ex bin loop
 						float br_ex = nuc_target->pop_p[p][i][j]/population;
-						//if(br_ex==0) cout << i << " " << p << " " << j << " " << br_ex << endl;
+						if(br_ex<=0) br_ex=0;
 						g_target_br_ex[p][i]->SetPoint(index_br_ex[p][i],
 																					 nuc_target->Ex_p[p][i][j],br_ex);
 						index_br_ex[p][i]++;
@@ -272,7 +268,7 @@ int main(int argc, char* argv[]){
 		delete c_target_br_ex;
 
 
-		//
+		// --- Save TGraph in TFile --- //
 		rootf->cd();
 		for(int par=0;par<parity;par++){
 			g_target_pop[par]->Write();
@@ -283,7 +279,65 @@ int main(int argc, char* argv[]){
 				g_target_br_ex[p][i]->Write();
 			}
 		}
+
+		// --- Create RadioactiveDecay file --- //
+		os.str("");
+		os << "output/" << argv[1] << "/z" << nuc_target->Z << ".a" << nuc_target->A;
+		ofstream ofs(os.str().c_str());
+
+		// at first copy original RaioactiveDecay file if it exists
+		os.str("");
+		os << getenv("G4RADIOACTIVEDATA_ORIGINAL") << "/z" << nuc_target->Z << ".a" << nuc_target->A;
+		ifstream ifs(os.str().c_str());
+		if(ifs.is_open()){
+			cout << "Copy original G4RadioactiveData" << endl;
+			char buf[500];
+			while(ifs.getline(buf,sizeof(buf))){
+				ofs << buf << endl;
+			}
+		}else{
+			cout << "There is no original G4RadioactiveData" << endl;
+		}
+		ifs.close();
+
+		// then output BR of talys
+		for(int i=0;i<bin_target;i++){
+			double Ex,junk;
+			g_target_br[0]->GetPoint(i,Ex,junk); // Ex (MeV)
+			if(Ex<nuc_target->min_S()) continue;
+
+			// 1st line of G4Rad (Ex info)
+			ofs << "P" << setw(25) << Ex*1e3 << "  - 0" << endl; // MeV2keV
+
+			// 2nd line of G4 (Mode & total BR info)
+			float BR[num_particle]={0};
+			for(int p=0;p<num_particle;p++){
+				BR[p] = g_target_br[p]->Eval(Ex);
+				if(BR[p]<=0) continue;
+				if(BR[p]>=1) BR[p]=1.0;
+				ofs << setw(30) << decay_name[p].c_str() << setw(15) << "0" << setw(15) << BR[p] << endl;
+			}
+
+			// 3rd line of G4 (daughter BR info)
+			for(int p=0;p<num_particle;p++){
+				for(int j=0;j<nuc_target->Ex_bin_p[p][i];j++){ // daughter ex bin loop
+					double RBR,Ex_daughter;//relative Br
+					g_target_br_ex[p][i]->GetPoint(j,Ex_daughter,RBR); // MeV
+					if(RBR<=0) continue;
+					RBR *= BR[p]*100; // relative Br -> absolute BR in %
+					float Qvalue = Ex - nuc_target->S[p] - Ex_daughter; // MeV 
+					if(Qvalue<0) continue;
+					ofs << setw(35) << decay_name[p].c_str() << setw(15) << Ex_daughter*1e3
+							<< "   - " << setw(15) << RBR << setw(15) << Qvalue*1e3 << endl;
+
+				}
+			}
+		}
+		ofs.close();
+
+
 	}
+	// end of Nucleus loop in NucleusTable
 
 
 	rootf->Close();
