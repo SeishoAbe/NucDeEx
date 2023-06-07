@@ -1,17 +1,17 @@
 projectile 0
-element 5
-mass 11
+element 8
+mass 15
 energy energy.1.2.p.txt
 
 bins 0
-maxlevelstar 8
-maxlevelsbin g 8
-maxlevelsbin n 4
-maxlevelsbin p 5
+maxlevelstar 6
+maxlevelsbin g 6
+maxlevelsbin n 0
+maxlevelsbin p 9
 maxlevelsbin d 0
 maxlevelsbin t 0
 maxlevelsbin h 1
-maxlevelsbin a 1
+maxlevelsbin a 8
 maxlevelsres 0
 ejectiles g n p a d t h
 

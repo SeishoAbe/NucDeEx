@@ -33,6 +33,7 @@ void Nucleus::Init()
 {
 	flag_s=flag_target=flag_data=0;
 	id=0;
+	maxlevelsbin=0;
 	sum_pop = 0;
 	total_pop = new float[parity];
   pop = new float*[parity];

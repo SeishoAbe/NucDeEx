@@ -39,12 +39,13 @@ bool NucleusTable::ReadTables()
 	// then read again
   char Name[5];
   int z,n;
+	int maxlevelsbin;
 	index=0;
   ifs.clear();
   ifs.seekg(0);
   while(ifs.getline(buf,sizeof(buf))){
     if(buf[0]=='#') continue;
-    istringstream(buf) >> Name >> z >> n;
+    istringstream(buf) >> Name >> z >> n >> maxlevelsbin;
 		_nucleus_id.insert(make_pair(Name,index));
 		//_nucleus[index].name = Name;
 		strcpy(_nucleus[index].name,Name);
@@ -52,6 +53,7 @@ bool NucleusTable::ReadTables()
 		_nucleus[index].N = n;
 		_nucleus[index].A = z+n;
 		_nucleus[index].id = index;
+		_nucleus[index].maxlevelsbin = maxlevelsbin;
 
 		// read separation energy table
 		string filename2= (string)getenv("TALYS_WORK_TABLES")
