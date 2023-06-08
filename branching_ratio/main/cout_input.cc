@@ -70,7 +70,7 @@ int main(int argc, char* argv[]){
 	ofs << endl;
 	ofs << "outdiscrete y" << endl;
 	ofs << "outpopulation y" << endl;
-	ofs << "outspectra y" << endl;
+	//ofs << "outspectra y" << endl;
 	ofs << "outdecay y" << endl;
 
 	ofs.close();
