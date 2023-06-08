@@ -39,6 +39,7 @@ int main(int argc, char* argv[]){
 	os.str("");
 	os << "output/output_" << argv[1];
 	ReadTALYS* read_talys = new ReadTALYS(os.str().c_str(), nucleus_table);
+	read_talys->SetVerboseLevel(1);
 	if(!read_talys->Read()){
 		cerr << "something wrong happend..." << endl;
 		return 0;
@@ -222,7 +223,7 @@ int main(int argc, char* argv[]){
 
 
 		TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
-		string pdfname= (string)"fig/" + (string)argv[1] + (string)"/fig_" + name_target + (string)"_target_br_ex.pdf";
+		string pdfname= (string)"fig/" + (string)argv[1] + (string)"/fig_" + name_target + (string)"_br_ex.pdf";
 		c_target_br_ex->Print( (pdfname+(string)"[").c_str() );
 		c_target_br_ex->Update();
 		c_target_br_ex->Clear();
