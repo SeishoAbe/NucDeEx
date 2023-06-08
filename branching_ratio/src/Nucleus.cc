@@ -73,7 +73,17 @@ void Nucleus::Init()
 				pop_p[i][j][k] = Ex_p[i][j][k] =0;
 			}
 		}
+	}
 
+	level_Ex_bin = 0;
+	level_br = new float*[bins];
+	level_Ex = new float[bins];
+	for(int i=0;i<bins;i++){
+		level_br[i] = new float[bins];
+		level_Ex[i] = 0;
+		for(int j=0;j<bins;j++){
+			level_br[i][j]=0;
+		}
 	}
 }
 //////////////////

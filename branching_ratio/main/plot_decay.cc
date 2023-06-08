@@ -141,18 +141,32 @@ int main(int argc, char* argv[]){
 			
 			// calculate br
 			for(int p=0;p<num_particle;p++){ // particle loop
-				if(Ex_target<nuc_target->min_S() 
-						|| (!nuc_target->flag_decay_data[i] && i<=1)){ 
-					if(p==0) g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
-					else g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
-					index_br[p]++;
-				}else if(pop_target_sum>0 && nuc_target->flag_decay_data[i]){
+				if((!nuc_target->flag_decay_data[i] && i<=10)){ 
+					if(p==0){
+						g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
+						index_br[p]++;
+						// Fill level info only for gamma
+						for(int li=0;li<=i;li++){
+							g_target_br_ex[p][i]->SetPoint(index_br_ex[p][i],	
+																						 nuc_target->level_Ex[li],
+																						 nuc_target->level_br[i][li]*1e-2); // % to frac
+							index_br_ex[p][i]++;
+						}
+					}else{
+						g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
+						index_br[p]++;
+					}
+				}else if(pop_target_sum>0 && nuc_target->flag_decay_data[i]){ // have continuous data
 					float population = nuc_target->GetPopDaughterBinSum(p,i);//  (particle, exbin)
-					g_target_br[p]->SetPoint(index_br[p],Ex_target,population/pop_target_sum);
+					float br = population/pop_target_sum;
+					if(br<=0) br=0;
+					if(br>=1) br=1;
+					g_target_br[p]->SetPoint(index_br[p],Ex_target,br);
 					index_br[p]++;
 					for(int j=0;j<nuc_target->Ex_bin_p[p][i] && population>0;j++){ // daughter ex bin loop
 						float br_ex = nuc_target->pop_p[p][i][j]/population;
 						if(br_ex<=0) br_ex=0;
+						if(br_ex>=1) br_ex=1;
 						g_target_br_ex[p][i]->SetPoint(index_br_ex[p][i],
 																					 nuc_target->Ex_p[p][i][j],br_ex);
 						index_br_ex[p][i]++;
@@ -229,7 +243,8 @@ int main(int argc, char* argv[]){
 		c_target_br_ex->Clear();
 		for(int i=0;i<bin_target;i++){ // target bin loop
 			//if(nuc_target->Ex[0][i]<nuc_target->min_S()) continue;
-			if(nuc_target->Ex[0][i]==0) continue;
+			float Ex_target = nuc_target->Ex[0][i];
+			if(Ex_target==0) continue;
 			c_target_br_ex->Divide(4,2);
 			for(int p=0;p<num_particle;p++){ // particle loop
 				c_target_br_ex->cd(p+1);
@@ -247,8 +262,16 @@ int main(int argc, char* argv[]){
 				}else{
 					g_target_br_ex[p][i]->Draw("PLsame");
 					os.str("");
-					os << "BR: " << scientific << setprecision(2) 
-						 << nuc_target->GetPopDaughterBinSum(p,i)/nuc_target->GetPopParitySum(i);
+					//if((Ex_target<nuc_target->min_S() 
+					//		|| (!nuc_target->flag_decay_data[i] && i<=1)) && p==0){ 
+					if((!nuc_target->flag_decay_data[i] && i<=10)){ 
+						os << "BR: " << scientific << setprecision(2) << 1;
+					}else{
+						double br,ex;
+						g_target_br[p]->GetPoint(i,ex,br);
+						os << "BR: " << scientific << setprecision(2) << br;
+							 //<< nuc_target->GetPopDaughterBinSum(p,i)/nuc_target->GetPopParitySum(i);
+					}
 					TText* text = new TText(max_Ex_plot*0.25,0.8,os.str().c_str());
 					text->Draw("same");
 				}
@@ -258,6 +281,18 @@ int main(int argc, char* argv[]){
 			os << name_target.c_str() << ", Ex[" << i << "] = " << fixed << setprecision(2) << nuc_target->Ex[0][i] << " (MeV)";
 			TText* text_Ex = new TText(0.1,0.9,os.str().c_str());
 			text_Ex->Draw("same");
+			TText* text_S[num_particle];
+			for(int p=1;p<num_particle;p++){ // particle loop
+				os.str("");
+				os << "S_" << particle_name[p].substr(0,1) << " = " << fixed << setprecision(2) << nuc_target->S[p] << " (MeV)";
+				text_S[p] = new TText(0.1,0.9-0.1*p,os.str().c_str());
+				if(nuc_target->S[p]>Ex_target) text_S[p]->SetTextColor(kGray+1);
+				text_S[p]->Draw("same");
+			}
+			if((!nuc_target->flag_decay_data[i] && i<=10)){ 
+				TText* text_level = new TText(0.1,0.1,"From level data");
+				text_level->Draw("same");
+			}
 			//
 			gPad->RedrawAxis();
 			os.str("");
@@ -309,7 +344,7 @@ int main(int argc, char* argv[]){
 		for(int i=0;i<bin_target;i++){
 			double Ex,junk;
 			g_target_br[0]->GetPoint(i,Ex,junk); // Ex (MeV)
-			if(Ex<nuc_target->min_S()) continue;
+			//if(Ex<nuc_target->min_S()) continue;
 
 			// 1st line of G4Rad (Ex info)
 			ofs << "P" << setw(20) << right << Ex*1e3 << "  - 0" << endl; // MeV2keV
