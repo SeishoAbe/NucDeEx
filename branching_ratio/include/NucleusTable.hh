@@ -17,6 +17,7 @@ class NucleusTable{
 	
 	Nucleus* GetNucleusPtr(const char* name);
 	Nucleus* GetNucleusPtr(int id);
+	Nucleus* GetNucleusPtr(int Z,int N);
 
   private:
 	int num_of_nuc;
@@ -24,5 +25,4 @@ class NucleusTable{
 	map<string, int> _nucleus_id;
 	map<string, int> :: iterator _p_id;
 };
-
 #endif
