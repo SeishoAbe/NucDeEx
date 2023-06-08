@@ -287,18 +287,21 @@ int main(int argc, char* argv[]){
 
 		// at first copy original RaioactiveDecay file if it exists
 		os.str("");
-		os << getenv("G4RADIOACTIVEDATA_ORIGINAL") << "/z" << nuc_target->Z << ".a" << nuc_target->A;
-		ifstream ifs(os.str().c_str());
-		if(ifs.is_open()){
-			cout << "Copy original G4RadioactiveData" << endl;
-			char buf[500];
-			while(ifs.getline(buf,sizeof(buf))){
-				ofs << buf << endl;
+		char* env = getenv("G4RADIOACTIVEDATA_ORIGINAL");
+		if(env!=NULL){
+			os << env << "/z" << nuc_target->Z << ".a" << nuc_target->A;
+			ifstream ifs(os.str().c_str());
+			if(ifs.is_open()){
+				cout << "Copy original G4RadioactiveData" << endl;
+				char buf[500];
+				while(ifs.getline(buf,sizeof(buf))){
+					ofs << buf << endl;
+				}
+			}else{
+				cout << "There is no original G4RadioactiveData" << endl;
 			}
-		}else{
-			cout << "There is no original G4RadioactiveData" << endl;
+			ifs.close();
 		}
-		ifs.close();
 
 		// then output BR of talys
 		for(int i=0;i<bin_target;i++){
