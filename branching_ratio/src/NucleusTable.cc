@@ -8,6 +8,7 @@
 #include <cstdlib>
 
 #include "NucleusTable.hh"
+#include "consts.hh"
 using namespace std;
 
 ///////////////
@@ -95,6 +96,15 @@ Nucleus* NucleusTable::GetNucleusPtr(const char* name)
 ///////////////
 {
 	return GetNucleusPtr(getID(name));
+}
+
+///////////////
+Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
+///////////////
+{
+	ostringstream os;
+	os << Z+N << nuc_name[Z];
+	return GetNucleusPtr(os.str().c_str());
 }
 
 ///////////////
