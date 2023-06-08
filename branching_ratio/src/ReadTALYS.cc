@@ -95,24 +95,22 @@ bool ReadTALYS::Read()
 			int find_discrete_br = st.find(keyword_discrete_br->c_str());
 
 			int d_bin;
-			double d_energy, d_spin;
+			float d_energy, d_spin;
 			string d_parity;
-			double d_br[bins][bins]; // [mother bin][daughter bin]
-			for(int j=0;j<bins;j++){
-				for(int k=0;k<bins;k++){
-					d_br[j][k]=0;
-				}
-			}
 			if(find_discrete_br == string::npos){ // level info
-				istringstream(st) >> d_bin >> d_energy >> d_spin >> d_parity;
-			}else{
+				if(st.find("Number") != string::npos) continue;
+				if(istringstream(st) >> d_bin >> d_energy >> d_spin >> d_parity){
+					if(nuc->level_Ex_bin<d_bin) nuc->level_Ex_bin = d_bin;
+					nuc->level_Ex[d_bin]=d_energy;
+				}
+			}else{ // br info
 				st = st.substr(find_discrete_br+keyword_discrete_br->length());
 				int d_bin_daughter;
-				double tmp_br; // br (%)
+				float tmp_br; // br (%)
 				istringstream(st) >> d_bin_daughter >> tmp_br;
-				d_br[d_bin][d_bin_daughter] = tmp_br;
+				nuc->level_br[d_bin][d_bin_daughter] = tmp_br;
 				if(_verbose>0){
-					cout << d_bin << " ---> " << d_bin_daughter  << " : " << d_br[d_bin][d_bin_daughter] << endl;
+					cout << d_bin << " ---> " << d_bin_daughter  << " : " << nuc->level_br[d_bin][d_bin_daughter] << endl;
 				}
 			}
 		}
@@ -222,7 +220,7 @@ bool ReadTALYS::Read()
 				st = st.substr(find_bin_mother+keyword_bin_mother->length());
 				istringstream(st) >> bin_mother; // obtain mother's bin
 
-				nuc->flag_decay_data[bin_mother]=1;
+				nuc->flag_decay_data[bin_mother]=1; // this nucleus have decay data!
 
 				int find_parity_mother = st.find(keyword_parity_mother->c_str());
 				st = st.substr(find_parity_mother+keyword_parity_mother->length());

@@ -24,6 +24,12 @@ class Nucleus{
 	bool flag_target; // 1 -> target nucleus
 	bool flag_data; // 1 -> have data in talys output (population)
 
+	float** level_br;
+	float* level_Ex;
+	int level_Ex_bin;
+	// [Ex bin][daughter Ex bin]
+	// For (gamma) level info
+
 	float sum_pop; // will be sum(total_pop[])
 
   float* total_pop;
