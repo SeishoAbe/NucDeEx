@@ -32,7 +32,7 @@ class Nucleus{
   int* Ex_bin;
 	// [parity] [mother E bin]
 	//		[parity] : 0 (negative), 1 (positive)
-	bool* flag_pop_data; // does it have pop (decay) data?
+	bool* flag_decay_data; // does it have decay data?
 	 //[mother E bin]
 
 	// NOTATION
