@@ -72,6 +72,7 @@ int main(int argc, char* argv[]){
 	ofs << "outpopulation y" << endl;
 	//ofs << "outspectra y" << endl;
 	ofs << "outdecay y" << endl;
+	ofs << "outlevels y" << endl;
 
 	ofs.close();
 
