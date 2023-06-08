@@ -1,4 +1,4 @@
-PROGRAMS = plot_decay cout_input
+PROGRAMS = plot_decay cout_input simulation
 
 CXX=g++ 
 CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
@@ -14,7 +14,7 @@ LDFLAGS         += $(shell root-config --glibs)
 
 LIBNAME=lib/libTALYStool.a
 
-AOBJS = ReadTALYS.o NucleusTable.o Nucleus.o
+AOBJS = ReadTALYS.o NucleusTable.o Nucleus.o Deexcitation.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
