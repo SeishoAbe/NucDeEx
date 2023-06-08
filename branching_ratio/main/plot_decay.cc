@@ -16,6 +16,7 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TText.h>
+#include <TTree.h>
 
 using namespace std;
 
@@ -59,6 +60,14 @@ int main(int argc, char* argv[]){
 	os.str("");
 	os << "output/Br_" << argv[1] << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
+	TTree* tree = new TTree("tree","tree");
+	int Z,N, Ex_bin;
+	string name;
+	tree->Branch("name",&name);
+	tree->Branch("Z",&Z,"Z/I");
+	tree->Branch("N",&N,"N/I");
+	tree->Branch("Ex_bin",&Ex_bin,"Ex_bin/I");
+
 
 
 	// start Nucleus loop in NucleusTable
@@ -66,7 +75,6 @@ int main(int argc, char* argv[]){
 		if(!nucleus_table->GetNucleusPtr(inuc)->flag_data) continue; // no data -> continue
 
 		Nucleus* nuc_target = nucleus_table->GetNucleusPtr(inuc); // get pointer of Nulceus
-		string name_target = (string)nuc_target->name;
 
 		// check info in Nucleus 
 		if(! (nuc_target->CheckTotalPop() && nuc_target->CheckPop()) ){
@@ -81,8 +89,12 @@ int main(int argc, char* argv[]){
 		}
 		int bin_target = nuc_target->Ex_bin[0];
 
-
-
+		// for ttree
+		name = (string)nuc_target->name;
+		Z = nuc_target->Z;
+		N = nuc_target->N;
+		Ex_bin=bin_target;
+		tree->Fill();
 
 		// Prepare TGraph
 		// population TGraph
@@ -91,7 +103,7 @@ int main(int argc, char* argv[]){
 		for(int par=0;par<parity;par++){
 			g_target_pop[par] = new TGraph;
 			os.str("");
-			os << "g_" << name_target.c_str() << "_pop_" << par;
+			os << "g_" << name.c_str() << "_pop_" << par;
 			g_target_pop[par]->SetName(os.str().c_str());
 		}
 		// target br TGraph
@@ -101,7 +113,7 @@ int main(int argc, char* argv[]){
 			index_br[p]=0;
 			g_target_br[p] = new TGraph();
 			os.str("");
-			os << "g_" << name_target.c_str() << "_br_" << p;
+			os << "g_" << name.c_str() << "_br_" << p;
 			g_target_br[p]->SetName(os.str().c_str());
 			g_target_br[p]->SetMarkerStyle(7);
 			g_target_br[p]->SetMarkerColor(color_root[p]);
@@ -114,7 +126,7 @@ int main(int argc, char* argv[]){
 		for(int p=0;p<num_particle;p++){
 			for(int i=0;i<bin_target;i++){ // target bin loop
 				os.str("");
-				os << "g_" << name_target << "_br_ex_" << p << "_" << i;
+				os << "g_" << name << "_br_ex_" << p << "_" << i;
 				g_target_br_ex[p][i] = new TGraph;
 				g_target_br_ex[p][i]->SetName(os.str().c_str());
 				g_target_br_ex[p][i]->SetMarkerStyle(7);
@@ -190,7 +202,7 @@ int main(int argc, char* argv[]){
 			c_target_pop->cd(par+1);
 			TH1F* waku_target_pop = gPad->DrawFrame(0,0,max_Ex_plot,max_total_pop[par]*1.1);
 			os.str("");
-			os << "Population (normarized), " << name_target.c_str();
+			os << "Population (normarized), " << name.c_str();
 			waku_target_pop->SetTitle(os.str().c_str());
 			waku_target_pop->GetXaxis()->SetTitle("Excitation energy [MeV]");
 			waku_target_pop->GetYaxis()->SetTitle("Population (A.U.)");
@@ -201,7 +213,7 @@ int main(int argc, char* argv[]){
 		}
 		gPad->RedrawAxis();
 		os.str("");
-		os << "fig/" << argv[1] << "/fig_" << name_target.c_str() << "_pop.pdf";
+		os << "fig/" << argv[1] << "/fig_" << name.c_str() << "_pop.pdf";
 		c_target_pop->Print(os.str().c_str());
 		c_target_pop->Update();
 		c_target_pop->Clear();
@@ -212,7 +224,7 @@ int main(int argc, char* argv[]){
 		TCanvas* c_target_br = new TCanvas("c_target_br","",0,0,800,600);
 		TH1F* waku_target_br = gPad->DrawFrame(0,0,max_Ex_plot,1.05);
 		os.str("");
-		os << "Branching ratio: target: " << name_target.c_str();
+		os << "Branching ratio: target: " << name.c_str();
 		waku_target_br->SetTitle(os.str().c_str());
 		waku_target_br->GetXaxis()->SetTitle("Excitation energy [MeV]");
 		waku_target_br->GetYaxis()->SetTitle("Branching ratio");
@@ -229,7 +241,7 @@ int main(int argc, char* argv[]){
 		gPad->RedrawAxis();
 		//
 		os.str("");
-		os << "fig/" << argv[1] << "/fig_" << name_target.c_str() << "_br.pdf";
+		os << "fig/" << argv[1] << "/fig_" << name.c_str() << "_br.pdf";
 		c_target_br->Print(os.str().c_str());
 		c_target_br->Update();
 		c_target_br->Clear();
@@ -237,7 +249,7 @@ int main(int argc, char* argv[]){
 
 
 		TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
-		string pdfname= (string)"fig/" + (string)argv[1] + (string)"/fig_" + name_target + (string)"_br_ex.pdf";
+		string pdfname= (string)"fig/" + (string)argv[1] + (string)"/fig_" + name + (string)"_br_ex.pdf";
 		c_target_br_ex->Print( (pdfname+(string)"[").c_str() );
 		c_target_br_ex->Update();
 		c_target_br_ex->Clear();
@@ -278,7 +290,7 @@ int main(int argc, char* argv[]){
 			}
 			c_target_br_ex->cd(8);
 			os.str("");
-			os << name_target.c_str() << ", Ex[" << i << "] = " << fixed << setprecision(2) << nuc_target->Ex[0][i] << " (MeV)";
+			os << name.c_str() << ", Ex[" << i << "] = " << fixed << setprecision(2) << nuc_target->Ex[0][i] << " (MeV)";
 			TText* text_Ex = new TText(0.1,0.9,os.str().c_str());
 			text_Ex->Draw("same");
 			TText* text_S[num_particle];
@@ -383,7 +395,7 @@ int main(int argc, char* argv[]){
 	}
 	// end of Nucleus loop in NucleusTable
 
-
+	tree->Write();
 	rootf->Close();
 	delete rootf;
 
