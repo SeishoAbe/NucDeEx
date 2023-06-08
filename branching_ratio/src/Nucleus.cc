@@ -50,9 +50,9 @@ void Nucleus::Init()
 		}
 	}
 
-	flag_pop_data = new bool[bins];
+	flag_decay_data = new bool[bins];
 	for(int i=0;i<bins;i++){
-		flag_pop_data[i] = 0;
+		flag_decay_data[i] = 0;
 	}
 
 	pop_p = new float**[num_particle];
@@ -149,7 +149,7 @@ bool Nucleus::CheckPop()
 {
 	bool status=1;
 	for(int i=0;i<Ex_bin[0];i++){ // ex bin loop
-		if(Ex[0][i]<min_S() || !flag_pop_data[i]) continue;
+		if(Ex[0][i]<min_S() || !flag_decay_data[i]) continue;
 		float population=GetPopParitySum(i);
 		if(!(population>0)) continue; // skip
 
@@ -195,7 +195,7 @@ bool Nucleus::CheckPop(int i)
 		return 0;
 	}
 
-	//if(Ex[0][i]<min_S() || !flag_pop_data[i]) return 1;
+	//if(Ex[0][i]<min_S() || !flag_decay_data[i]) return 1;
 	if(Ex[0][i]<min_S()) return 1;
 	float population=GetPopParitySum(i);
 	if(!(population>0)) return 1;
@@ -204,7 +204,7 @@ bool Nucleus::CheckPop(int i)
 	float population_check=GetPopParticleDaughterBinSum(i);
 	
 	if( abs(population_check-population)/population > check_criteria ){ // this sometimes happen
-		if(flag_pop_data[i]){
+		if(flag_decay_data[i]){
 			cerr << "WARNING: CheckPop(int): population is not reproduced" << endl;
 			cerr << name << " bin=" << i << " Ex=" << Ex[0][i] << " (MeV)" << endl;
 			cerr << "population= " << population << "  summed population=" << population_check << endl;

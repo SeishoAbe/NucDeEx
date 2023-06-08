@@ -142,11 +142,11 @@ int main(int argc, char* argv[]){
 			// calculate br
 			for(int p=0;p<num_particle;p++){ // particle loop
 				if(Ex_target<nuc_target->min_S() 
-						|| (!nuc_target->flag_pop_data[i] && i<=1)){ 
+						|| (!nuc_target->flag_decay_data[i] && i<=1)){ 
 					if(p==0) g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
 					else g_target_br[p]->SetPoint(index_br[p],Ex_target,0);
 					index_br[p]++;
-				}else if(pop_target_sum>0 && nuc_target->flag_pop_data[i]){
+				}else if(pop_target_sum>0 && nuc_target->flag_decay_data[i]){
 					float population = nuc_target->GetPopDaughterBinSum(p,i);//  (particle, exbin)
 					g_target_br[p]->SetPoint(index_br[p],Ex_target,population/pop_target_sum);
 					index_br[p]++;
@@ -228,7 +228,8 @@ int main(int argc, char* argv[]){
 		c_target_br_ex->Update();
 		c_target_br_ex->Clear();
 		for(int i=0;i<bin_target;i++){ // target bin loop
-			if(nuc_target->Ex[0][i]<nuc_target->min_S()) continue;
+			//if(nuc_target->Ex[0][i]<nuc_target->min_S()) continue;
+			if(nuc_target->Ex[0][i]==0) continue;
 			c_target_br_ex->Divide(4,2);
 			for(int p=0;p<num_particle;p++){ // particle loop
 				c_target_br_ex->cd(p+1);
@@ -254,7 +255,7 @@ int main(int argc, char* argv[]){
 			}
 			c_target_br_ex->cd(8);
 			os.str("");
-			os << name_target.c_str() << ", Ex[" << i << "] = " << fixed << nuc_target->Ex[0][i] << " (MeV)";
+			os << name_target.c_str() << ", Ex[" << i << "] = " << fixed << setprecision(2) << nuc_target->Ex[0][i] << " (MeV)";
 			TText* text_Ex = new TText(0.1,0.9,os.str().c_str());
 			text_Ex->Draw("same");
 			//

@@ -137,18 +137,6 @@ bool ReadTALYS::Read()
 			st = st.substr(find_N+keyword_N->length());
 			istringstream(st) >> n; // obtain n
 
-/*
-			int find_name_s = st.find("(");
-			int find_name_e = st.find(")");
-			if(find_name_s == string::npos||find_name_e==string::npos){
-				cerr << "something wrong in finding name" << endl;
-				return 0;
-			}
-			string name = st.substr(find_name_s+1,find_name_e-find_name_s-1); // obtain name
-			name.erase(std::remove_if(name.begin(), name.end(), ::isspace), name.end()); // remove space
-
-			nuc = _nucleus_table->GetNucleusPtr(name.c_str());
-			*/
 			nuc = _nucleus_table->GetNucleusPtr(z, n);
 			nuc->flag_data = 1; // this nucleus has population data
 			if(flag_first_population==1){ // first population -> target nucleus
@@ -234,7 +222,7 @@ bool ReadTALYS::Read()
 				st = st.substr(find_bin_mother+keyword_bin_mother->length());
 				istringstream(st) >> bin_mother; // obtain mother's bin
 
-				nuc->flag_pop_data[bin_mother]=1;
+				nuc->flag_decay_data[bin_mother]=1;
 
 				int find_parity_mother = st.find(keyword_parity_mother->c_str());
 				st = st.substr(find_parity_mother+keyword_parity_mother->length());
