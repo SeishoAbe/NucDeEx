@@ -141,7 +141,7 @@ int main(int argc, char* argv[]){
 			
 			// calculate br
 			for(int p=0;p<num_particle;p++){ // particle loop
-				if((!nuc_target->flag_decay_data[i] && i<=10)){ 
+				if((!nuc_target->flag_decay_data[i] && i<=20)){ 
 					if(p==0){
 						g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
 						index_br[p]++;
@@ -264,7 +264,7 @@ int main(int argc, char* argv[]){
 					os.str("");
 					//if((Ex_target<nuc_target->min_S() 
 					//		|| (!nuc_target->flag_decay_data[i] && i<=1)) && p==0){ 
-					if((!nuc_target->flag_decay_data[i] && i<=10)){ 
+					if((!nuc_target->flag_decay_data[i] && i<=20)){ 
 						os << "BR: " << scientific << setprecision(2) << 1;
 					}else{
 						double br,ex;
@@ -289,7 +289,7 @@ int main(int argc, char* argv[]){
 				if(nuc_target->S[p]>Ex_target) text_S[p]->SetTextColor(kGray+1);
 				text_S[p]->Draw("same");
 			}
-			if((!nuc_target->flag_decay_data[i] && i<=10)){ 
+			if((!nuc_target->flag_decay_data[i] && i<=20)){ 
 				TText* text_level = new TText(0.1,0.1,"From level data");
 				text_level->Draw("same");
 			}
@@ -380,8 +380,6 @@ int main(int argc, char* argv[]){
 			}
 		}
 		ofs.close();
-
-
 	}
 	// end of Nucleus loop in NucleusTable
 
