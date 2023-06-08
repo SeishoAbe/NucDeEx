@@ -22,13 +22,13 @@ ReadTALYS::ReadTALYS(const char* filename, NucleusTable* nuc)
 	_filename = filename;
 	_nucleus_table = nuc;
 	os = new ostringstream;
+	_verbose=0;
 }
 
 ///////////////////////////
 void ReadTALYS::SetKeywords()
 ///////////////////////////
 {
-	keyword_multiple_emission = new string("MULTIPLE EMISSION");
 	keyword_population = new string("Population of Z=");
 	keyword_N = new string("N=");
 	keyword_parity = new string("Parity=");
@@ -38,6 +38,8 @@ void ReadTALYS::SetKeywords()
 	keyword_bin_mother = new string("Bin=");
 	keyword_parity_mother = new string("P=");
 	keyword_parity_daughter = new string("P=");
+	keyword_discrete = new string("Discrete levels of Z=");
+	keyword_discrete_br = new string("--->");
 }
 
 ///////////////////////////
@@ -53,17 +55,12 @@ bool ReadTALYS::Read()
 
 	cout << "ReadTALYS::Read()" << endl;
   char buf[500];
-	// skip untill ...
-  while(_ifs->getline(buf,sizeof(buf))){
-		if(strstr(buf,keyword_multiple_emission->c_str())!=NULL) break;
-    else continue; 
-	}
 
-	// read continued sentences
 	int flag_mode=-1;
-	// 0 -> population mode
-	// 1 -> decay mode
-	//int line_population=0;
+		// 0 -> population mode
+		// 1 -> decay mode
+		// 2 -> discrete level mode
+
 	Nucleus* nuc;
 	int parity_array=0, parity_array_daughter=0;
 	float pop_r[bins], Ex_r[bins];
@@ -72,11 +69,61 @@ bool ReadTALYS::Read()
 	bool flag_first_population=1;
   while(_ifs->getline(buf,sizeof(buf))){
 		string st = string(buf);
+
+		// --- Find discrete level info 
+		int find_discrete = st.find(keyword_discrete->c_str());
+		if(find_discrete != string::npos){
+			flag_mode=2;
+			if(_verbose>0){
+				cout << "### Discrete mode ###" << endl;
+			}
+			st = st.substr(find_discrete+keyword_discrete->length());
+			int z,n;
+			istringstream(st) >> z;
+			int find_N = st.find(keyword_N->c_str());
+			if(find_N == string::npos){
+				cerr << "something wrong in finding " << keyword_N << endl;
+				return 0;
+			}
+			st = st.substr(find_N+keyword_N->length());
+			istringstream(st) >> n; // obtain n
+			nuc = _nucleus_table->GetNucleusPtr(z, n);
+			if(_verbose>0){
+				cout << nuc->name << " " << z << " " << n << endl;
+			}
+		}else if(flag_mode==2){// discrete mode
+			int find_discrete_br = st.find(keyword_discrete_br->c_str());
+
+			int d_bin;
+			double d_energy, d_spin;
+			string d_parity;
+			double d_br[bins][bins]; // [mother bin][daughter bin]
+			for(int j=0;j<bins;j++){
+				for(int k=0;k<bins;k++){
+					d_br[j][k]=0;
+				}
+			}
+			if(find_discrete_br == string::npos){ // level info
+				istringstream(st) >> d_bin >> d_energy >> d_spin >> d_parity;
+			}else{
+				st = st.substr(find_discrete_br+keyword_discrete_br->length());
+				int d_bin_daughter;
+				double tmp_br; // br (%)
+				istringstream(st) >> d_bin_daughter >> tmp_br;
+				d_br[d_bin][d_bin_daughter] = tmp_br;
+				if(_verbose>0){
+					cout << d_bin << " ---> " << d_bin_daughter  << " : " << d_br[d_bin][d_bin_daughter] << endl;
+				}
+			}
+		}
 		
 		// --- Find total population info (starting from 'keyword_population')
 		// ->  get total population
 		int find_population = st.find(keyword_population->c_str());
 		if(find_population != string::npos){
+			if(_verbose>0 && flag_mode!=0){
+				cout << "### Population mode ###" << endl;
+			}
 			flag_mode=0;
 			st = st.substr(find_population+keyword_population->length()); // remove the keyword
 			int z, n;
@@ -90,6 +137,7 @@ bool ReadTALYS::Read()
 			st = st.substr(find_N+keyword_N->length());
 			istringstream(st) >> n; // obtain n
 
+/*
 			int find_name_s = st.find("(");
 			int find_name_e = st.find(")");
 			if(find_name_s == string::npos||find_name_e==string::npos){
@@ -100,6 +148,8 @@ bool ReadTALYS::Read()
 			name.erase(std::remove_if(name.begin(), name.end(), ::isspace), name.end()); // remove space
 
 			nuc = _nucleus_table->GetNucleusPtr(name.c_str());
+			*/
+			nuc = _nucleus_table->GetNucleusPtr(z, n);
 			nuc->flag_data = 1; // this nucleus has population data
 			if(flag_first_population==1){ // first population -> target nucleus
 				nuc->flag_target=1;
@@ -117,7 +167,10 @@ bool ReadTALYS::Read()
 
 				// Fill params
 				nuc->sum_pop = total_pop;
-				//cout <<  "total population: " << nuc->name << " " << nuc->Z << " " << nuc->N << " " << nuc->A << " " << nuc->sum_pop << endl;
+				if(_verbose>0){
+					cout <<  "total population: " << nuc->name << " " << nuc->Z << " " << nuc->N << " " 
+							 << nuc->A << " " << nuc->sum_pop << endl;
+				}
 			}else{ // parity dependent
 				st = st.substr(find_parity+keyword_parity->length());
 				int parity;
@@ -134,8 +187,10 @@ bool ReadTALYS::Read()
 				st = st.substr(find_before_decay+keyword_before_decay->length());
 				istringstream(st) >> pop;
 				nuc->total_pop[parity_array] = pop;
-				//cout <<  "parity dependent population: " << nuc->name << " (" << nuc->Z << "," << nuc->N << "," << nuc->A 
-				//		 << ") " << nuc->total_pop[parity_array] << endl;
+				if(_verbose>0){
+					cout <<  "parity dependent population: " << nuc->name << " (" << nuc->Z << "," << nuc->N 
+							 << "," << nuc->A << ") " << nuc->total_pop[parity_array] << endl;
+				}
 			}
 			//line_population=0;
 		}else{ // cannot find total population 
@@ -160,11 +215,16 @@ bool ReadTALYS::Read()
 						nuc->Ex_bin[parity_array] = bin+1;
 						nuc->Ex[parity_array][bin]=Ex;
 						nuc->pop[parity_array][bin]=pop_p;
-						//cout << "Parity(" << parity_array << ")" << ": excitation & pop: " << nuc->name << " " << nuc->Ex_bin[parity_array] 
-						//		 << " " << setw(9) << nuc->Ex[parity_array][bin] << " " << setw(9) << nuc->pop[parity_array][bin]  << endl;
+						if(_verbose>1){
+							cout << "Parity(" << parity_array << ")" << ": excitation & pop: " << nuc->name << " " << nuc->Ex_bin[parity_array] 
+									 << " " << setw(9) << nuc->Ex[parity_array][bin] << " " << setw(9) << nuc->pop[parity_array][bin]  << endl;
+						}
 					}
 				}
 			}else if (find_decay!=string::npos){ // decay info was found
+				//if(_verbose>0){
+				//	cout << "### Decay mode ###" << endl;
+				//}
 				flag_mode=1;
 				int find_bin_mother = st.find(keyword_bin_mother->c_str());
 				if(find_bin_mother == string::npos){
@@ -198,7 +258,9 @@ bool ReadTALYS::Read()
 				st = st.substr(find_total+keyword_total->length());
 				istringstream(st) >> pop_total_decay; // obtain pop for the decay
 						// this parameter wil be sum of transition pop for both parity (negative + positive)
-				//cout << "Total pop (decay): " << pop_total_decay << endl;
+				if(_verbose>1){
+					cout << "Total pop (decay): " << pop_total_decay << endl;
+				}
 			}else if(flag_mode==1){ // not decay info, but decay mode -> decay pop info
 				int bin;
 				float Ex,pop_spin[10]; 

@@ -2,6 +2,7 @@
 
 ### FIXME ###
 TARGET_TMP="11B 11C 15N 15O"
+#TARGET_TMP="11B"
 FILE_TMP="energy.1.2.p.txt energy"
 #############
 
