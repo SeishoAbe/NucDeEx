@@ -181,9 +181,10 @@ int Deexcitation::DecayMode(double Ex)
 	}
 	nuc_daughter = _nucleus_table->GetNucleusPtr(Z_daughter,N_daughter);
 
-	if(verbose>0 && nuc_daughter!=NULL){
-		cout << "Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode]
-				  << " + " << nuc_daughter->name << endl;
+	if(verbose>0){ 
+		cout << "Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode] << " + ";
+		if(nuc_daughter!=NULL) cout << nuc_daughter->name << endl;
+		else cout << Z_daughter+N_daughter << nuc_name[Z_daughter] << endl;
 	}
 
 	return decay_mode;
