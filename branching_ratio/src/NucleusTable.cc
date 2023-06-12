@@ -87,6 +87,7 @@ bool NucleusTable::ReadTables()
 Nucleus* NucleusTable::GetNucleusPtr(int id)
 ///////////////
 {
+	if(id<0) return NULL;
 	Nucleus* ptr = _nucleus;
 	return ptr+id;
 }
@@ -115,7 +116,7 @@ int NucleusTable::getID(const char* name)
   if(_p_id!=_nucleus_id.end()){
     return (int) ((_p_id->second));
   }else{
-    cerr << "ERROR : Cannnot find such nucleus " << name << endl;
-    abort();
+    cerr << "Warning @ NucleusTable: Cannot find such nucleus " << name << endl;
+		return -1;
   }
 }

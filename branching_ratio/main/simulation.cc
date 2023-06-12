@@ -19,14 +19,18 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 	// paremater 
-	double Ex=22; // MeV
+	double Ex=23; // MeV
 	int Z=5;
 	int N=6;
 
 	Deexcitation* deex = new Deexcitation();
-	deex->SetSeed(0); // 0 -> time
+	//deex->SetSeed(0); // 0 -> time
+	deex->SetSeed(1);
 	deex->SetVerbose(1);
-	deex->DoDeex(Z,N,Ex);
+
+	for(int i=0;i<10;i++){
+		deex->DoDeex(Z,N,Ex);
+	}
 
 
 	return 0;

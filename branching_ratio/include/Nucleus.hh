@@ -45,7 +45,6 @@ class Nucleus{
 	// pop[p][mb][db]: population
 	// Ex[p][mb][db]:  Daughter excitation energy
 	// Ex_bin[p][mb]: number of daughter excitation energy bin
-	// S[p]: Separation energy
 	//		[particle][mother E bin][daughter bin]
 
 	float***  pop_p;

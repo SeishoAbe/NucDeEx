@@ -14,6 +14,10 @@ static const int num_particle=7;
 static const string particle_name[num_particle]
 	= {"gamma","neutron","proton",
 		 "deuteron", "triton","helium-3","alpha"};
+
+static const int PDG_particle[num_particle]
+	= {22, 2112, 2212,
+		 1000010020, 1000010030, 1000020030,1000020040};
 static const int color_root[num_particle]
 	= {880+1, // violet+1
 		 600, // bule
@@ -23,6 +27,8 @@ static const int color_root[num_particle]
 		 416+1,// green+1
 		 616 // magenta
 		};
+
+			
 
 static const string decay_name[num_particle] // for G4
 	= {"IT","Neutron","Proton",
