@@ -15,30 +15,37 @@ using namespace std;
 class Deexcitation{
 	public:
 	Deexcitation();
-	virtual ~Deexcitation(){;};
+	virtual ~Deexcitation();
 
 	void DoDeex(int Z,int N, double Ex);
 
-	void SetSeed(int s){ ran->SetSeed(s) ;};
-	int GetSeed(){ran->GetSeed();};
+	void SetSeed(int s){ rndm->SetSeed(s) ;};
+	int  GetSeed(){return rndm->GetSeed();};
 	void SetVerbose(int v){ verbose=v; };
 
 	private:
-	// root 
-	bool ReadROOT();
+	// Simulation method called by DoDeex()
+	int DecayMode(double Ex);
+	int NearestExPoint(double Ex, int decay_mode);
+	bool DaughterExPoint(double &d_Ex, int &d_point);
+
+	// ROOT related methods & members
+	bool ReadROOT(const char* name);
 	TFile* rootf;
 	TTree* tree;
 	TGraph* g_br[num_particle];
 	TGraph* g_br_ex;
 
-	// target info
+	// Target info
 	int Z_target, N_target;
+	double Ex_target;
 	string name_target;
 
+	// nucleus table
 	NucleusTable* _nucleus_table;
 
-	// rand
-	TRandom3* ran;
+	// Random generator
+	TRandom3* rndm;
 
 	// others
 	int verbose;

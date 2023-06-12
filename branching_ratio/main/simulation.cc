@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
 	int N=6;
 
 	Deexcitation* deex = new Deexcitation();
-	deex->SetSeed(0); // time
+	deex->SetSeed(0); // 0 -> time
 	deex->SetVerbose(1);
 	deex->DoDeex(Z,N,Ex);
 
