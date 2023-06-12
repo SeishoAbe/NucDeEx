@@ -56,7 +56,6 @@ class Deexcitation{
 	double Ex_target;
 	Nucleus* nuc_target;
 	double mass_target;
-	TGeoElementRN* e_target;
 	string name_target;
 
 	// daughter info
@@ -64,7 +63,6 @@ class Deexcitation{
 	double Ex_daughter;
 	Nucleus* nuc_daughter;
 	double mass_daughter;
-	TGeoElementRN* e_daughter;
 
 	// particle info
 	double mass_particle;

@@ -87,7 +87,7 @@ void Deexcitation::DoDeex(int Z,int N, double Ex)
 		int Ex_daughter_point;
 		DaughterExPoint(Ex_daughter,Ex_daughter_point);
 
-		// get mass info using ROOT libraries
+		// --- Get mass using ROOT libraries
 		if(decay_mode<=2){ // obtained from TDatabasePDG
 			mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/TGeoUnit::MeV;//GeV2MeV
 		}else{ // obtained from TGeoElementRN
@@ -120,8 +120,6 @@ void Deexcitation::DoDeex(int Z,int N, double Ex)
 		name_target = (string)nuc_target->name;
 	}
 		
-
-
 	rootf->Close();
 	delete rootf;
 }
@@ -254,7 +252,32 @@ vector<TParticle*> Deexcitation::Decay()
 	cout << "mass_target (MeV)   = " << mass_target << endl;
 	cout << "mass_particle (MeV) = " << mass_particle << endl;
 	cout << "mass_daughter (MeV) = " << mass_daughter << endl;
-	// HOGEHOGE //
+	
+	// --- calculate cm momentum
+	//		mass used in the following calculation should include excitation energy
+	double mass_ex_target = mass_target + Ex_target;
+	double mass_ex_daughter = mass_daughter + Ex_daughter;
+
+	double cmMomentum = std::sqrt(Qvalue*(Qvalue + 2.*mass_particle)*
+															(Qvalue + 2.*mass_ex_daughter)*
+															(Qvalue + 2.*mass_particle + 2.*mass_ex_daughter) )/
+															(Qvalue + mass_particle + mass_ex_daughter)/2.;
+	double kE_particle = sqrt( pow(cmMomentum,2) + pow(mass_particle,2) ) - mass_particle;
+	double kE_daughter = sqrt( pow(cmMomentum,2) + pow(mass_ex_daughter,2) ) - mass_ex_daughter;
+	double kE_sum = kE_particle + kE_daughter;
+	cout << "cmMomentum (MeV)  = " << cmMomentum << endl;
+	cout << "kE_particle (MeV) = " << kE_particle << endl;
+	cout << "kE_daughter (MeV) = " << kE_daughter << endl;
+	cout << "kE_sum (MeV)      = " << kE_sum << endl;
+
+	// Check kinetmatics 
+	if( (kE_sum - Qvalue)/Qvalue > 1e-3 ){
+	//if(kE_sum != Qvalue){
+		cerr << "Error @ Deexcitationi: Something wroing in kinematics calculation" << endl;
+		abort();
+	}
+
+
 
 
 	vector<TParticle*> particle;
@@ -266,7 +289,7 @@ double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 /////////////////////////////////////////////
 {
 	double mass = ele->MassNo()*(TGeoUnit::amu_c2/TGeoUnit::MeV)
-									 + ele->MassEx();
+									 + ele->MassEx(); // (MeV)
 	double mass_amu = mass/(TGeoUnit::amu_c2/TGeoUnit::MeV);
 	if(verbose>0){
 		cout << "mass (MeV) = " << mass 
