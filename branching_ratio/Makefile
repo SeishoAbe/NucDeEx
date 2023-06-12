@@ -9,12 +9,13 @@ ARFLAGS=
 
 ## for cern root
 CXXFLAGS        += $(shell root-config --cflags)
-LDFLAGS         += $(shell root-config --libs)
-LDFLAGS         += $(shell root-config --glibs)
+#LDFLAGS         += $(shell root-config --libs) # <- Print regular ROOT libraries
+#LDFLAGS         += $(shell root-config --glibs) # <- Print regular + GUI ROOT libraries
+LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries (Eve is necessary)
 
 LIBNAME=lib/libTALYStool.a
 
-AOBJS = ReadTALYS.o NucleusTable.o Nucleus.o Deexcitation.o
+AOBJS = Deexcitation.o ReadTALYS.o NucleusTable.o Nucleus.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
