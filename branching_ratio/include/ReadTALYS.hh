@@ -23,6 +23,8 @@ class ReadTALYS{
 	ifstream* _ifs;
 	int _verbose;
 
+	const float check_criteria=0.05;
+
 	void SetKeywords();
 
 	string* keyword_population;
