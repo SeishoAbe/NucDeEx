@@ -201,7 +201,7 @@ int Deexcitation::DecayMode(const double Ex)
 	if(verbose>0){ 
 		cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode] << " + ";
 		if(nuc_daughter!=NULL) cout << nuc_daughter->name << endl;
-		else cout << Z_daughter+N_daughter << nuc_name[Z_daughter] << endl;
+		else cout << Z_daughter+N_daughter << _nucleus_table->nuc_name[Z_daughter] << endl;
 	}
 
 	return decay_mode;

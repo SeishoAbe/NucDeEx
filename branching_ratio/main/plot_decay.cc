@@ -20,6 +20,10 @@
 
 using namespace std;
 
+const string decay_name[num_particle] // for G4
+	= {"IT","Neutron","Proton",
+		 "Deuteron","Triton","He3","Alpha"};
+
 int main(int argc, char* argv[]){
 	if(argc!=2){
 		cerr << argv[0] << " [Target nucleus]" << endl;

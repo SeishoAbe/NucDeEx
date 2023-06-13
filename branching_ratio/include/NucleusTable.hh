@@ -18,6 +18,8 @@ class NucleusTable{
 	Nucleus* GetNucleusPtr(const char* name);
 	Nucleus* GetNucleusPtr(int id);
 	Nucleus* GetNucleusPtr(int Z,int N);
+	const char* nuc_name[9]
+		= {"","H","He","Li","Be","B","C","N","O"}; // [Z]
 
   private:
 	int num_of_nuc;
