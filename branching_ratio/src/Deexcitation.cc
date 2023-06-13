@@ -63,7 +63,6 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 	if(mom==0) mom_target.SetXYZ(0,0,0); // decay at rest
 	else       mom_target.SetXYZ(mom->X(),mom->Y(),mom->Z());
 
-	cout << "mom_target: "; mom_target.Print();
 	
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
@@ -82,7 +81,8 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 	// Loop until zero excitation energy or null nuc_daughter ptr
 	// Use private members (parameters) named as "_target"
 	while(true){// <- infinite loop. There is break point
-		cout << endl << "### " << name_target << ",   Ex = " << Ex_target << endl;
+		cout << "### " << name_target << ",   Ex = " << Ex_target << endl;
+		cout << "mom_target: "; mom_target.Print();
 
 		// --- Get (TGraph*) br based on name_target
 		GetBrTGraph(name_target); 
@@ -129,11 +129,15 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		if(breakflag) break;
 
 		// end of while loop: daughter -> target 
-		Ex_target = Ex_daughter;
 		Z_target  = Z_daughter;
 		N_target  = N_daughter;
+		Ex_target = Ex_daughter;
+		mass_target = mass_daughter;
+		mom_target  += mom_daughter;
+		//kE_target  = kE_daughter;
 		nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
 		name_target = (string)nuc_target->name;
+		cout << endl;
 	}
 		
 	rootf->Close();
@@ -248,7 +252,7 @@ void Deexcitation::Decay(bool breakflag)
 	
 	// --- Calculate kinematics (cm momentum)
 	//		mass used in the following calculation should include excitation energy
-	double mass_ex_target = mass_target + Ex_target;
+	//double mass_ex_target = mass_target + Ex_target;
 	double mass_ex_daughter = mass_daughter + Ex_daughter;
 
 	double cmMomentum = std::sqrt(Qvalue*(Qvalue + 2.*mass_particle)*
@@ -257,45 +261,44 @@ void Deexcitation::Decay(bool breakflag)
 															(Qvalue + mass_particle + mass_ex_daughter)/2.;
 	double kE_particle = sqrt( pow(cmMomentum,2) + pow(mass_particle,2) ) - mass_particle;
 	double kE_daughter = sqrt( pow(cmMomentum,2) + pow(mass_ex_daughter,2) ) - mass_ex_daughter;
-	double kE_sum = kE_particle + kE_daughter;
-	cout << "cmMomentum  = " << cmMomentum << endl;
-	cout << "kE_particle = " << kE_particle << endl;
-	cout << "kE_daughter = " << kE_daughter << endl;
-	cout << "kE_sum      = " << kE_sum << endl;
-
-	// check kinetmatics 
+	double kE_sum = kE_particle + kE_daughter; // just for check
 	if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > 1e-3 ){
-	//if(kE_sum != Qvalue){
 		cerr << "Error @ Deexcitationi: Something wroing in kinematics calculation" << endl;
 		abort();
 	}
+	if(verbose>0){
+		cout << "cmMomentum  = " << cmMomentum << endl;
+		cout << "kE_particle = " << kE_particle << endl;
+		cout << "kE_daughter = " << kE_daughter << endl;
+		cout << "kE_sum      = " << kE_sum << endl;
+	}
+
 	
-	// --- Detemine direction (uniform)
+	// --- Detemine momentum direction (uniform)
+	// --- Then set momentum vectors
 	double costheta = 2.*rndm->Rndm()-1.; // [-1, 1]
 	double sintheta = sqrt( 1. - pow(costheta,2) );
 	double phi      = 2*TMath::Pi()*rndm->Rndm(); // [0,2pi]
 	TVector3 dir( sintheta*cos(phi), sintheta*sin(phi), costheta );
 	cout << "dir: "; dir.Print();
 	
+	mom_particle = -1*cmMomentum*dir; // -P
+	cout << "mom_particle: ";mom_particle.Print();
+	mom_daughter = cmMomentum*dir; // P
+	cout << "mom_daughter: ";mom_daughter.Print();
+
 	// --- Save info
-	TVector3 mom_particle(dir);
-	mom_particle *= -1*cmMomentum;
 	Particle p_particle(PDG_particle[decay_mode],
 											mass_particle,
 											mom_particle);
-	cout << "mom_particle: ";mom_particle.Print();
 	_particle.push_back(p_particle);
 
 	if(!breakflag) return;
 
-	// DoDeex loop will be end -> Save daughter
-	TVector3 mom_daughter(dir);
-	mom_daughter *= cmMomentum;
-	cout << PDGion(Z_daughter,N_daughter) << endl;
+	// --- DoDeex loop will be end -> Save daughter
 	Particle p_daughter(PDGion(Z_daughter,N_daughter),
 											mass_daughter, // w/o excitation E
 											mom_daughter);
-	cout << "mom_daughter: ";mom_daughter.Print();
 	_particle.push_back(p_daughter);
 }
 
@@ -313,21 +316,14 @@ double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 	return mass;
 }
 
-
 /////////////////////////////////////////////
 //const char* Deexcitation::PDGion(int Z, int N)
 int Deexcitation::PDGion(int Z, int N)
 /////////////////////////////////////////////
 {
 	int pdg= 1e9 + Z*1e4 + (Z+N)*1e1;
-	//os.str("");
-	//os << "10" << setw(3) << setfill('0') << Z
-	//					 << setw(3) << setfill('0') << Z+N << "0";
-	//return os.str().c_str();
 	return pdg;
 }
-
-
 
 /////////////////////////////////////////////
 bool Deexcitation::OpenROOT(const char* name)
@@ -381,5 +377,4 @@ void Deexcitation::InitParticleVector()
 {
 	_particle.clear();
 	vector<Particle>().swap(_particle); // memory release
-	//cout << _particle.size() << endl;
 }

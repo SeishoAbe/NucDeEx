@@ -57,29 +57,34 @@ class Deexcitation{
 	int decay_mode;
 	double S;
 	double Qvalue;
+
 	// target nucleus info
 	int Z_target, N_target;
 	double Ex_target;
 	double mass_target;
-	int PDG_target;
+	TVector3 mom_target;
+	//double kE_target;
+	//int PDG_target;
 	Nucleus* nuc_target;
 	string name_target;
-	TVector3 mom_target;
 
 	// daughter nucleus info
 	int Z_daughter, N_daughter;
 	double Ex_daughter;
 	double mass_daughter;
-	int PDG_daughter;
+	TVector3 mom_daughter;
+	//double kE_daughter;
+	//int PDG_daughter;
 	Nucleus* nuc_daughter;
 
 	// decay particle info
 	double mass_particle;
+	TVector3 mom_particle;
+	//double kE_particle;
 
 	// for output
 	void InitParticleVector();
 	vector<Particle> _particle;
-	//const char* PDGion(int Z,int N);
 	int PDGion(int Z,int N);
 
 	// others

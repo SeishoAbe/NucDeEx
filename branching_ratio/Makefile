@@ -15,7 +15,8 @@ LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve
 
 LIBNAME=lib/libTALYStool.a
 
-AOBJS = Deexcitation.o Particle.o ReadTALYS.o NucleusTable.o Nucleus.o
+AOBJS =  Nucleus.o NucleusTable.o ReadTALYS.o 
+AOBJS += Particle.o Deexcitation.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
