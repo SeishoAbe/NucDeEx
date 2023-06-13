@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cstdlib>
 #include <algorithm>
+#include <vector>
 
 #include "Deexcitation.hh"
 #include "Nucleus.hh"
@@ -34,6 +35,7 @@ Deexcitation::Deexcitation()
 	pdg = new TDatabasePDG();
 	geo = new TGeoManager("test","test");
 	element_table = geo->GetElementTable();
+	eventID=0;
 }
 
 ///////////////////////////
@@ -47,18 +49,21 @@ Deexcitation::~Deexcitation()
 }
 
 /////////////////////////////////////////////
-void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVector3* dir)
+void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVector3* mom)
 /////////////////////////////////////////////
 {
 	cout << endl << "###################################" << endl;
 	cout << "Deexcitation::DoDeex(" << Z << "," << N << "," 
-			 << Ex << ")" << endl;
+			 << Ex << ")  eventID=" << eventID << endl;
 	cout << "###################################" << endl;
-	
-	dir_target = new TVector3(0,0,0);
-	if(dir!=0) dir_target->SetXYZ(dir->X(),dir->Y(),dir->Z());
-	cout << "dir_target: ";
-	dir_target->Print();
+
+	// --- Init 
+	InitParticleVector();
+
+	if(mom==0) mom_target.SetXYZ(0,0,0); // decay at rest
+	else       mom_target.SetXYZ(mom->X(),mom->Y(),mom->Z());
+
+	cout << "mom_target: "; mom_target.Print();
 	
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
@@ -74,9 +79,9 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		return;
 	}
 	
-	// Loop until zero excitation energy
+	// Loop until zero excitation energy or null nuc_daughter ptr
 	// Use private members (parameters) named as "_target"
-	while(Ex_target>0){
+	while(true){// <- infinite loop. There is break point
 		cout << endl << "### " << name_target << ",   Ex = " << Ex_target << endl;
 
 		// --- Get (TGraph*) br based on name_target
@@ -116,10 +121,14 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 			cout << "Qvalue = " << Qvalue << endl;
 		}
 
-		Decay();
+		bool breakflag=0;
+		if(nuc_daughter==NULL || Ex_daughter==0) breakflag=1;
+
+		Decay(breakflag);
+
+		if(breakflag) break;
 
 		// end of while loop: daughter -> target 
-		if(nuc_daughter==NULL) break;
 		Ex_target = Ex_daughter;
 		Z_target  = Z_daughter;
 		N_target  = N_daughter;
@@ -129,11 +138,12 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		
 	rootf->Close();
 	delete rootf;
+	eventID++;
 }
 
 
 /////////////////////////////////////////////
-int Deexcitation::DecayMode(double Ex)
+int Deexcitation::DecayMode(const double Ex)
 /////////////////////////////////////////////
 {
 	// --- Determine decay mode 
@@ -153,7 +163,8 @@ int Deexcitation::DecayMode(double Ex)
 	double random = rndm->Rndm();
 	int decay_mode;
 	for(int p=0;p<num_particle;p++){
-		Br[p] /= Br_sum; // Normalize Br just in case.  Br_integ += Br[p];
+		Br[p] /= Br_sum; // Normalize Br just in case.  
+		Br_integ += Br[p];
 		if(verbose>0){
 			cout << "Br_integ(" << particle_name[p].substr(0,1) << ") = " << Br_integ << endl;
 		}
@@ -226,7 +237,7 @@ bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 }
 
 /////////////////////////////////////////////
-void Deexcitation::Decay()
+void Deexcitation::Decay(bool breakflag)
 /////////////////////////////////////////////
 {
 	cout << "Deexcitation::Decay()" << endl;
@@ -259,22 +270,33 @@ void Deexcitation::Decay()
 		abort();
 	}
 	
-
 	// --- Detemine direction (uniform)
 	double costheta = 2.*rndm->Rndm()-1.; // [-1, 1]
 	double sintheta = sqrt( 1. - pow(costheta,2) );
 	double phi      = 2*TMath::Pi()*rndm->Rndm(); // [0,2pi]
-	TVector3* dir = new TVector3( sintheta*cos(phi), sintheta*sin(phi), costheta );
-	cout << "dir: ";
-	dir->Print();
+	TVector3 dir( sintheta*cos(phi), sintheta*sin(phi), costheta );
+	cout << "dir: "; dir.Print();
+	
+	// --- Save info
+	TVector3 mom_particle(dir);
+	mom_particle *= -1*cmMomentum;
+	Particle p_particle(PDG_particle[decay_mode],
+											mass_particle,
+											mom_particle);
+	cout << "mom_particle: ";mom_particle.Print();
+	_particle.push_back(p_particle);
 
-	//Particle* p_particle = new Particle(PDG_particle[decay_mode],
+	if(!breakflag) return;
 
-
-
-
-
-
+	// DoDeex loop will be end -> Save daughter
+	TVector3 mom_daughter(dir);
+	mom_daughter *= cmMomentum;
+	cout << PDGion(Z_daughter,N_daughter) << endl;
+	Particle p_daughter(PDGion(Z_daughter,N_daughter),
+											mass_daughter, // w/o excitation E
+											mom_daughter);
+	cout << "mom_daughter: ";mom_daughter.Print();
+	_particle.push_back(p_daughter);
 }
 
 /////////////////////////////////////////////
@@ -293,13 +315,16 @@ double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 
 
 /////////////////////////////////////////////
-const char* Deexcitation::PDGion(int Z, int N)
+//const char* Deexcitation::PDGion(int Z, int N)
+int Deexcitation::PDGion(int Z, int N)
 /////////////////////////////////////////////
 {
-	os.str("");
-	os << "10" << setw(3) << setfill('0') << Z
-						 << setw(3) << setfill('0') << Z+N << "0";
-	return os.str().c_str();
+	int pdg= 1e9 + Z*1e4 + (Z+N)*1e1;
+	//os.str("");
+	//os << "10" << setw(3) << setfill('0') << Z
+	//					 << setw(3) << setfill('0') << Z+N << "0";
+	//return os.str().c_str();
+	return pdg;
 }
 
 
@@ -316,7 +341,7 @@ bool Deexcitation::OpenROOT(const char* name)
 }
 
 /////////////////////////////////////////////
-bool Deexcitation::GetBrTGraph(string st)
+bool Deexcitation::GetBrTGraph(const string st)
 /////////////////////////////////////////////
 {
 	for(int p=0;p<num_particle;p++){
@@ -328,7 +353,7 @@ bool Deexcitation::GetBrTGraph(string st)
 }
 
 /////////////////////////////////////////////
-int Deexcitation::GetBrExTGraph(string st, double ex_t, int mode)
+int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mode)
 /////////////////////////////////////////////
 { 
 	double ex,br;
@@ -348,4 +373,13 @@ int Deexcitation::GetBrExTGraph(string st, double ex_t, int mode)
 	g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
 
 	return point;
+}
+
+/////////////////////////////////////////////
+void Deexcitation::InitParticleVector()
+/////////////////////////////////////////////
+{
+	_particle.clear();
+	vector<Particle>().swap(_particle); // memory release
+	//cout << _particle.size() << endl;
 }

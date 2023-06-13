@@ -28,8 +28,10 @@ int main(int argc, char* argv[]){
 	deex->SetSeed(1);
 	deex->SetVerbose(1);
 
+	TVector3* momentum = new TVector3(0,0,0);
+
 	for(int i=0;i<10;i++){
-		deex->DoDeex(Z,N,Ex);
+		deex->DoDeex(Z,N,Ex,momentum);
 	}
 
 

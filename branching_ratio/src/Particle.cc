@@ -12,24 +12,16 @@ Particle::Particle()
 {
 	_PDG=0;
 	_mass=0;
-	_momentum = new TVector3(0,0,0);
+	_momentum.SetXYZ(0,0,0);
 }
 
 ///////////////
-Particle::Particle(int PDG,double mass, TVector3* momentum)
+Particle::Particle(const int PDG, const double mass, const TVector3& mom)
 ///////////////
 {
 	_PDG=PDG;
 	_mass=mass;
-	_momentum = new TVector3(0,0,0);
-	_momentum->SetXYZ(momentum->X(), momentum->Y(), momentum->Z());
-}
-
-///////////////
-Particle::~Particle()
-///////////////
-{
-	delete _momentum;
+	_momentum.SetXYZ(mom.X(), mom.Y(), mom.Z());
 }
 
 
@@ -37,7 +29,7 @@ Particle::~Particle()
 double Particle::KineticE()
 ///////////////
 {
-	return sqrt( pow(_momentum->Mag(),2) + pow(_mass,2) ) - _mass;
+	return sqrt( pow(_momentum.Mag(),2) + pow(_mass,2) ) - _mass;
 }
 
 ///////////////
