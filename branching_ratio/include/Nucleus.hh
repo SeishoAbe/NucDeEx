@@ -65,8 +65,8 @@ class Nucleus{
 	//bool CheckPop(int i);
 	bool CheckEx();
 	
-
 	private:
 	void Init();
+	const float check_criteria=0.05;
 };
 #endif
