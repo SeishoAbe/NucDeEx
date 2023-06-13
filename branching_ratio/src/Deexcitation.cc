@@ -328,7 +328,7 @@ void Deexcitation::Decay(bool breakflag)
 	cout << "totalE_ex_bef = " << totalE_ex_bef << endl;
 	cout << "totalE_ex_aft = " << totalE_ex_aft << endl;
 
-	// --- Check Energy conservation
+	// --- Check Energy conservation (4dim energy including momentum)
 	//       Fundamental energy conservation 
 	//		   (Total energy in LAB) = (Total energy in CM after boost)
 	// i.e., (Total energy of target w/ ex in LAB) 
@@ -338,7 +338,6 @@ void Deexcitation::Decay(bool breakflag)
 		cerr << "ERROR: @ Deexcitation:Decay(): Energy is not conserved..." << endl;
 		abort();
 	}
-
 	_particle.push_back(p_particle);
 
 	// DoDeex loop will be end -> Save daughter
