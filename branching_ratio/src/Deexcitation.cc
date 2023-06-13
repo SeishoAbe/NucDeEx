@@ -47,7 +47,7 @@ Deexcitation::~Deexcitation()
 }
 
 /////////////////////////////////////////////
-void Deexcitation::DoDeex(int Z,int N, double Ex, TVector3* dir)
+void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVector3* dir)
 /////////////////////////////////////////////
 {
 	cout << endl << "###################################" << endl;
@@ -60,7 +60,7 @@ void Deexcitation::DoDeex(int Z,int N, double Ex, TVector3* dir)
 	cout << "dir_target: ";
 	dir_target->Print();
 	
-	// store target info. we don't want to change original value...
+	// store target info. we don't want to change original value.
 	Z_target   = Z;
 	N_target   = N;
 	Ex_target  = Ex;
@@ -74,23 +74,25 @@ void Deexcitation::DoDeex(int Z,int N, double Ex, TVector3* dir)
 		return;
 	}
 	
-	// loop until zero excitation energy
-	// Use parameters named as "_target"
+	// Loop until zero excitation energy
+	// Use private members (parameters) named as "_target"
 	while(Ex_target>0){
 		cout << endl << "### " << name_target << ",   Ex = " << Ex_target << endl;
-		GetBrTGraph(); // get TGraph based on name_target
+
+		// --- Get (TGraph*) br based on name_target
+		GetBrTGraph(name_target); 
 		
 		// --- Determine decay mode 
 		//     Return: The same as array in consts.hh
 		//     It also sets Z_daughter, Z_daughter
-		int decay_mode = DecayMode(Ex_target); 
+		decay_mode = DecayMode(Ex_target); 
 
-		// --- Get nearest Ex bin (TGraph point) & get (TGraph*) br_ex
-		int Ex_target_point = NearestExPoint(Ex_target,decay_mode); 
+		// --- Get nearest Ex bin (TGraph point) and then get (TGraph*) br_ex
+		GetBrExTGraph(name_target, Ex_target, decay_mode);
 
 		// --- Determine daughter excitation energy
 		int Ex_daughter_point;
-		DaughterExPoint(Ex_daughter,Ex_daughter_point);
+		DaughterExPoint(&Ex_daughter,&Ex_daughter_point);
 
 		// --- Get mass using ROOT libraries
 		if(decay_mode<=2){ // obtained from TDatabasePDG
@@ -140,7 +142,7 @@ int Deexcitation::DecayMode(double Ex)
 	double Br[num_particle]={0};
 	double Br_sum=0;
 	for(int p=0;p<num_particle;p++){
-		Br[p] = g_br[p]->Eval(Ex_target);
+		Br[p] = g_br[p]->Eval(Ex);
 		Br_sum += Br[p];
 		if(verbose>0){
 			cout << "Br(" << particle_name[p].substr(0,1) << ") = " << Br[p] << endl;
@@ -151,8 +153,7 @@ int Deexcitation::DecayMode(double Ex)
 	double random = rndm->Rndm();
 	int decay_mode;
 	for(int p=0;p<num_particle;p++){
-		Br[p] /= Br_sum; // Normalize Br just in case.
-		Br_integ += Br[p];
+		Br[p] /= Br_sum; // Normalize Br just in case.  Br_integ += Br[p];
 		if(verbose>0){
 			cout << "Br_integ(" << particle_name[p].substr(0,1) << ") = " << Br_integ << endl;
 		}
@@ -185,7 +186,7 @@ int Deexcitation::DecayMode(double Ex)
 	nuc_daughter = _nucleus_table->GetNucleusPtr(Z_daughter,N_daughter);
 
 	if(verbose>0){ 
-		cout << "Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode] << " + ";
+		cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode] << " + ";
 		if(nuc_daughter!=NULL) cout << nuc_daughter->name << endl;
 		else cout << Z_daughter+N_daughter << nuc_name[Z_daughter] << endl;
 	}
@@ -195,31 +196,7 @@ int Deexcitation::DecayMode(double Ex)
 
 
 /////////////////////////////////////////////
-int Deexcitation::NearestExPoint(double Ex, int decay_mode)
-/////////////////////////////////////////////
-{
-	double ex,br;
-	double diff_ex=0;
-	int point=0;
-	for(point=0;point<g_br[decay_mode]->GetN();point++){
-		g_br[decay_mode]->GetPoint(point,ex,br);
-		if(ex>Ex_target) break;
-		diff_ex = abs(ex-Ex_target);
-	}
-	if(abs(ex-Ex_target)>diff_ex) point--;
-	if(verbose>0){
-		cout << "nearest_point = " << point << ",  diff_Ex = " << abs(ex-Ex_target) << ", diff_ex(previous) = " << diff_ex << endl;
-	}
-	os.str("");
-	os << "g_" << name_target.c_str() << "_br_ex_" << decay_mode << "_" << point;
-	g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
-
-	return point;
-}
-
-
-/////////////////////////////////////////////
-bool Deexcitation::DaughterExPoint(double &d_Ex, int &d_point)
+bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 /////////////////////////////////////////////
 {
 	double ex, br;
@@ -238,25 +215,25 @@ bool Deexcitation::DaughterExPoint(double &d_Ex, int &d_point)
 		if(Br_integ>random) break;
 	}
 	if(verbose>0){
-		cout << "Random = " << random << " : ex = " << ex
+		cout << "DaughterExPoint: Random = " << random << " : ex = " << ex
 		     << ",   point = " << point << endl;
 	}
 
-	d_Ex=ex;
-	d_point=point;
+	*d_Ex=ex;
+	*d_point=point;
 
 	return 1;
 }
 
 /////////////////////////////////////////////
-vector<TParticle*> Deexcitation::Decay()
+void Deexcitation::Decay()
 /////////////////////////////////////////////
 {
 	cout << "Deexcitation::Decay()" << endl;
 
-	cout << "mass_target (MeV)   = " << mass_target << endl;
-	cout << "mass_particle (MeV) = " << mass_particle << endl;
-	cout << "mass_daughter (MeV) = " << mass_daughter << endl;
+	cout << "mass_target   = " << mass_target << endl;
+	cout << "mass_particle = " << mass_particle << endl;
+	cout << "mass_daughter = " << mass_daughter << endl;
 	
 	// --- Calculate kinematics (cm momentum)
 	//		mass used in the following calculation should include excitation energy
@@ -270,10 +247,10 @@ vector<TParticle*> Deexcitation::Decay()
 	double kE_particle = sqrt( pow(cmMomentum,2) + pow(mass_particle,2) ) - mass_particle;
 	double kE_daughter = sqrt( pow(cmMomentum,2) + pow(mass_ex_daughter,2) ) - mass_ex_daughter;
 	double kE_sum = kE_particle + kE_daughter;
-	cout << "cmMomentum (MeV)  = " << cmMomentum << endl;
-	cout << "kE_particle (MeV) = " << kE_particle << endl;
-	cout << "kE_daughter (MeV) = " << kE_daughter << endl;
-	cout << "kE_sum (MeV)      = " << kE_sum << endl;
+	cout << "cmMomentum  = " << cmMomentum << endl;
+	cout << "kE_particle = " << kE_particle << endl;
+	cout << "kE_daughter = " << kE_daughter << endl;
+	cout << "kE_sum      = " << kE_sum << endl;
 
 	// check kinetmatics 
 	if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > 1e-3 ){
@@ -291,13 +268,13 @@ vector<TParticle*> Deexcitation::Decay()
 	cout << "dir: ";
 	dir->Print();
 
+	//Particle* p_particle = new Particle(PDG_particle[decay_mode],
 
 
 
 
 
-	vector<TParticle*> particle;
-	return particle;
+
 }
 
 /////////////////////////////////////////////
@@ -339,13 +316,36 @@ bool Deexcitation::OpenROOT(const char* name)
 }
 
 /////////////////////////////////////////////
-bool Deexcitation::GetBrTGraph()
+bool Deexcitation::GetBrTGraph(string st)
 /////////////////////////////////////////////
 {
 	for(int p=0;p<num_particle;p++){
 		os.str("");
-		os << "g_" << name_target.c_str() << "_br_" << p;
+		os << "g_" << st.c_str() << "_br_" << p;
 		g_br[p] = (TGraph*) rootf->Get(os.str().c_str());
 	}
 	return 1;
+}
+
+/////////////////////////////////////////////
+int Deexcitation::GetBrExTGraph(string st, double ex_t, int mode)
+/////////////////////////////////////////////
+{ 
+	double ex,br;
+	double diff_ex=0;
+	int point=0;
+	for(point=0;point<g_br[mode]->GetN();point++){
+		g_br[mode]->GetPoint(point,ex,br);
+		if(ex>ex_t) break;
+		diff_ex = abs(ex-ex_t);
+	}
+	if(abs(ex-ex_t)>diff_ex) point--;
+	if(verbose>0){
+		cout << "nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << endl;
+	}
+	os.str("");
+	os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
+	g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
+
+	return point;
 }
