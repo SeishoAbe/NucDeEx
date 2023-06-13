@@ -92,5 +92,6 @@ class Deexcitation{
 	int verbose;
 	int eventID;
 	ostringstream os;
+	const double check_criteria=1e-3;
 };
 #endif

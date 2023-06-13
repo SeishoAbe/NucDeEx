@@ -57,13 +57,10 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 			 << Ex << ")  eventID=" << eventID << endl;
 	cout << "###################################" << endl;
 
-	// --- Init 
+	// --- Initialization --- //
 	InitParticleVector();
-
 	if(mom==0) mom_target.SetXYZ(0,0,0); // decay at rest
 	else       mom_target.SetXYZ(mom->X(),mom->Y(),mom->Z());
-
-	
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
 	N_target   = N;
@@ -81,8 +78,8 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 	// Loop until zero excitation energy or null nuc_daughter ptr
 	// Use private members (parameters) named as "_target"
 	while(true){// <- infinite loop. There is break point
-		cout << "### " << name_target << ",   Ex = " << Ex_target << endl;
-		cout << "mom_target: "; mom_target.Print();
+		cout << "### " << name_target << ",   Ex = " << Ex_target;
+		cout << "     mom_target: "; mom_target.Print();
 
 		// --- Get (TGraph*) br based on name_target
 		GetBrTGraph(name_target); 
@@ -112,7 +109,7 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
 		mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
 
-		// get separation E & Qvalue 
+		// --- Get separation E and Qvalue 
 		S = nuc_target->S[decay_mode];
 		Qvalue = Ex_target - S - Ex_daughter;
 		if(Qvalue<0) Qvalue=0;
@@ -123,8 +120,9 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 
 		bool breakflag=0;
 		if(nuc_daughter==NULL || Ex_daughter==0) breakflag=1;
-
-		Decay(breakflag);
+		
+		// --- Calculate kinematics --- //
+		Decay(breakflag); // if breakflag==0, it does not save daughter nucleus
 
 		if(breakflag) break;
 
@@ -250,9 +248,9 @@ void Deexcitation::Decay(bool breakflag)
 	cout << "mass_particle = " << mass_particle << endl;
 	cout << "mass_daughter = " << mass_daughter << endl;
 	
-	// --- Calculate kinematics (cm momentum)
+	// ---- CM frame --- //
+	// --- Calculate kinematics (CM)
 	//		mass used in the following calculation should include excitation energy
-	//double mass_ex_target = mass_target + Ex_target;
 	double mass_ex_daughter = mass_daughter + Ex_daughter;
 
 	double cmMomentum = std::sqrt(Qvalue*(Qvalue + 2.*mass_particle)*
@@ -262,44 +260,89 @@ void Deexcitation::Decay(bool breakflag)
 	double kE_particle = sqrt( pow(cmMomentum,2) + pow(mass_particle,2) ) - mass_particle;
 	double kE_daughter = sqrt( pow(cmMomentum,2) + pow(mass_ex_daughter,2) ) - mass_ex_daughter;
 	double kE_sum = kE_particle + kE_daughter; // just for check
-	if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > 1e-3 ){
-		cerr << "Error @ Deexcitationi: Something wroing in kinematics calculation" << endl;
+	if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > check_criteria){
+		cerr << "Error @ DeexcitationD::Decay: Something wroing in kinematics calculation" << endl;
 		abort();
 	}
 	if(verbose>0){
 		cout << "cmMomentum  = " << cmMomentum << endl;
 		cout << "kE_particle = " << kE_particle << endl;
 		cout << "kE_daughter = " << kE_daughter << endl;
-		cout << "kE_sum      = " << kE_sum << endl;
+		cout << "kE_sum      = " << kE_sum << " <- consistent with Qvalue = " << Qvalue << endl;
 	}
-
 	
-	// --- Detemine momentum direction (uniform)
+	// --- Detemine momentum direction (uniform) (CM)
 	// --- Then set momentum vectors
 	double costheta = 2.*rndm->Rndm()-1.; // [-1, 1]
 	double sintheta = sqrt( 1. - pow(costheta,2) );
 	double phi      = 2*TMath::Pi()*rndm->Rndm(); // [0,2pi]
 	TVector3 dir( sintheta*cos(phi), sintheta*sin(phi), costheta );
-	cout << "dir: "; dir.Print();
-	
 	mom_particle = -1*cmMomentum*dir; // -P
-	cout << "mom_particle: ";mom_particle.Print();
 	mom_daughter = cmMomentum*dir; // P
-	cout << "mom_daughter: ";mom_daughter.Print();
+	if(verbose>0){
+		cout << "dir:          "; dir.Print();
+		cout << "mom_particle: ";mom_particle.Print();
+		cout << "mom_daughter: ";mom_daughter.Print();
+	}
+	
 
-	// --- Save info
+	// ---- CM -> LAB --- //
+	// --- Get total energy of target (i.e., CM frame) in the LAB frame for boost
+	//     This is "Total CM energy" (in the LAB frame)
+	//		 This should not include excitation energy
+	double totalE_target = sqrt( pow(mom_target.Mag(),2) + pow(mass_target,2) );
+
+	// --- Store info as Particle. then boost it
 	Particle p_particle(PDG_particle[decay_mode],
 											mass_particle,
-											mom_particle);
-	_particle.push_back(p_particle);
+											mom_particle,
+											verbose);
+	double totalE_particle_bef = p_particle.totalE();
+	p_particle.Boost(totalE_target,mom_target);// BOOST!
+	double totalE_particle_aft = p_particle.totalE();
 
-	if(!breakflag) return;
-
-	// --- DoDeex loop will be end -> Save daughter
 	Particle p_daughter(PDGion(Z_daughter,N_daughter),
 											mass_daughter, // w/o excitation E
-											mom_daughter);
-	_particle.push_back(p_daughter);
+											mom_daughter,
+											verbose);
+	double totalE_daughter_bef = p_daughter.totalE();
+	p_daughter.Boost(totalE_target,mom_target);
+	double totalE_daughter_aft = p_daughter.totalE();
+
+	// 
+	double kE_target = totalE_target - mass_target;
+	double totalE_ex_target = totalE_target + Ex_target; // w/ excitation E
+	cout << "totalE_target = " << totalE_target << endl;
+	cout << "kE_target = " << kE_target << endl;
+	cout << "Ex_target = " << Ex_target << endl;
+	cout << "totalE_ex_target = " << totalE_ex_target << endl;
+
+	double totalE_bef = totalE_particle_bef + totalE_daughter_bef;
+	double totalE_aft = totalE_particle_aft + totalE_daughter_aft;
+	cout << "totalE_bef = " << totalE_bef << endl;
+	cout << "totalE_aft = " << totalE_aft << endl;
+	cout << "  diff = " << totalE_aft-totalE_bef << endl;
+
+	double totalE_ex_bef = totalE_bef + Ex_daughter; // w/ excitation E
+	double totalE_ex_aft = totalE_aft + Ex_daughter;
+	cout << "totalE_ex_bef = " << totalE_ex_bef << endl;
+	cout << "totalE_ex_aft = " << totalE_ex_aft << endl;
+
+	// --- Check Energy conservation
+	//       Fundamental energy conservation 
+	//		   (Total energy in LAB) = (Total energy in CM after boost)
+	// i.e., (Total energy of target w/ ex in LAB) 
+	//         = (Total energy of particle after boost) + (Total energy of daughter w/ ex after boost)
+	//						The last two terms are calculated from CM at first, and then boosted.
+	if(totalE_ex_target>0 && (totalE_ex_aft-totalE_ex_target)/totalE_ex_target>check_criteria){
+		cerr << "ERROR: @ Deexcitation:Decay(): Energy is not conserved..." << endl;
+		abort();
+	}
+
+	_particle.push_back(p_particle);
+
+	// DoDeex loop will be end -> Save daughter
+	if(breakflag)_particle.push_back(p_daughter);
 }
 
 /////////////////////////////////////////////
@@ -317,7 +360,6 @@ double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 }
 
 /////////////////////////////////////////////
-//const char* Deexcitation::PDGion(int Z, int N)
 int Deexcitation::PDGion(int Z, int N)
 /////////////////////////////////////////////
 {
@@ -362,7 +404,7 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 	}
 	if(abs(ex-ex_t)>diff_ex) point--;
 	if(verbose>0){
-		cout << "nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << endl;
+		cout << "GetBrExTGraph(): nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << endl;
 	}
 	os.str("");
 	os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
