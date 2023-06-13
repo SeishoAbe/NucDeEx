@@ -47,13 +47,18 @@ Deexcitation::~Deexcitation()
 }
 
 /////////////////////////////////////////////
-void Deexcitation::DoDeex(int Z,int N, double Ex)
+void Deexcitation::DoDeex(int Z,int N, double Ex, TVector3* dir)
 /////////////////////////////////////////////
 {
 	cout << endl << "###################################" << endl;
 	cout << "Deexcitation::DoDeex(" << Z << "," << N << "," 
 			 << Ex << ")" << endl;
 	cout << "###################################" << endl;
+	
+	dir_target = new TVector3(0,0,0);
+	if(dir!=0) dir_target->SetXYZ(dir->X(),dir->Y(),dir->Z());
+	cout << "dir_target: ";
+	dir_target->Print();
 	
 	// store target info. we don't want to change original value...
 	Z_target   = Z;
@@ -253,7 +258,7 @@ vector<TParticle*> Deexcitation::Decay()
 	cout << "mass_particle (MeV) = " << mass_particle << endl;
 	cout << "mass_daughter (MeV) = " << mass_daughter << endl;
 	
-	// --- calculate cm momentum
+	// --- Calculate kinematics (cm momentum)
 	//		mass used in the following calculation should include excitation energy
 	double mass_ex_target = mass_target + Ex_target;
 	double mass_ex_daughter = mass_daughter + Ex_daughter;
@@ -270,12 +275,23 @@ vector<TParticle*> Deexcitation::Decay()
 	cout << "kE_daughter (MeV) = " << kE_daughter << endl;
 	cout << "kE_sum (MeV)      = " << kE_sum << endl;
 
-	// Check kinetmatics 
-	if( (kE_sum - Qvalue)/Qvalue > 1e-3 ){
+	// check kinetmatics 
+	if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > 1e-3 ){
 	//if(kE_sum != Qvalue){
 		cerr << "Error @ Deexcitationi: Something wroing in kinematics calculation" << endl;
 		abort();
 	}
+	
+
+	// --- Detemine direction (uniform)
+	double costheta = 2.*rndm->Rndm()-1.; // [-1, 1]
+	double sintheta = sqrt( 1. - pow(costheta,2) );
+	double phi      = 2*TMath::Pi()*rndm->Rndm(); // [0,2pi]
+	TVector3* dir = new TVector3( sintheta*cos(phi), sintheta*sin(phi), costheta );
+	cout << "dir: ";
+	dir->Print();
+
+
 
 
 

@@ -22,7 +22,7 @@ class Deexcitation{
 	Deexcitation();
 	virtual ~Deexcitation();
 
-	void DoDeex(int Z,int N, double Ex);
+	void DoDeex(int Z,int N, double Ex, TVector3* dir=0);
 
 	void SetSeed(int s){ rndm->SetSeed(s) ;};
 	int  GetSeed(){return rndm->GetSeed();};
@@ -57,6 +57,7 @@ class Deexcitation{
 	Nucleus* nuc_target;
 	double mass_target;
 	string name_target;
+	TVector3* dir_target;
 
 	// daughter info
 	int Z_daughter, N_daughter;
