@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ostream>
+#include <vector>
 #include "consts.hh"
 #include "NucleusTable.hh"
 #include "Particle.hh"
@@ -24,23 +25,23 @@ class Deexcitation{
 	virtual ~Deexcitation();
 
 	void DoDeex(const int Z, const int N, const double Ex,
-							const TVector3* dir=0);
+							const TVector3* mom=0);
 
 	void SetSeed(int s){ rndm->SetSeed(s) ;};
 	int  GetSeed(){return rndm->GetSeed();};
 	void SetVerbose(int v){ verbose=v; };
+	void SetEventID(int id){ eventID=id;};
 
 	private:
 	// --- Simulation method called by DoDeex() --- //
-	int DecayMode(double Ex);
-	bool DaughterExPoint(double *d_Ex, int *d_point);
-	void Decay();
-
+	int DecayMode(const double Ex);
+	bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
+	void Decay(bool breakflag);
 
 	// --- ROOT related methods & members --- //
 	bool OpenROOT(const char* name);
-	bool GetBrTGraph(string st);
-	int  GetBrExTGraph(string st, double ex_t, int mode); 
+	bool GetBrTGraph(const string st);
+	int  GetBrExTGraph(const string st, const double ex_t, const int mode); 
 		// The nearest TGraph point will be returned
 	TFile* rootf;
 	TTree* tree;
@@ -54,32 +55,37 @@ class Deexcitation{
 
 	// --- Decay information (in MeV) --- //
 	int decay_mode;
+	double S;
+	double Qvalue;
 	// target nucleus info
 	int Z_target, N_target;
 	double Ex_target;
-	Nucleus* nuc_target;
 	double mass_target;
+	int PDG_target;
+	Nucleus* nuc_target;
 	string name_target;
-	TVector3* dir_target;
+	TVector3 mom_target;
 
 	// daughter nucleus info
 	int Z_daughter, N_daughter;
 	double Ex_daughter;
-	Nucleus* nuc_daughter;
 	double mass_daughter;
+	int PDG_daughter;
+	Nucleus* nuc_daughter;
 
 	// decay particle info
 	double mass_particle;
-	double S;
-	double Qvalue;
 
 	// for output
-	vector<Particle*> _particle;
-	const char* PDGion(int Z,int N);
+	void InitParticleVector();
+	vector<Particle> _particle;
+	//const char* PDGion(int Z,int N);
+	int PDGion(int Z,int N);
 
 	// others
 	NucleusTable* _nucleus_table;
 	int verbose;
+	int eventID;
 	ostringstream os;
 };
 #endif

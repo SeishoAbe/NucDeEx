@@ -9,8 +9,9 @@ using namespace std;
 class Particle{
 	public:
 	Particle();
-	Particle(int PDG,double mass, TVector3* momentum);
-	~Particle();
+	Particle(const int PDG,const double mass, const TVector3& mom);
+		// TVector3 is called by referecnce
+	~Particle(){;};
 	
 	//double momentum(){_momentum->Mag();};
 	double KineticE();
@@ -20,6 +21,6 @@ class Particle{
 	//private:
 	int _PDG;
 	double _mass;
-	TVector3* _momentum;
+	TVector3 _momentum;
 };
 #endif
