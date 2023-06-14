@@ -32,6 +32,7 @@ class Deexcitation{
 	TRandom3* GetTRandom3(){ return rndm; };
 	void SetVerbose(int v){ verbose=v; };
 	void SetEventID(int id){ eventID=id;};
+	int  GetEventID(){ return eventID; };
 	vector<Particle> GetParticleVector(){return _particle;};
 
 	private:

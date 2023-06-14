@@ -1,15 +1,15 @@
 # Prefix
-#txt*
 fig*
 old*
 output*
+sim_out*
 bin
 obj
 lib
 !.gitignore
 
 # Suffix
-*.root
+#*.root
 *.Linux
 *.o
 *.a
