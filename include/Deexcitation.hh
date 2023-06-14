@@ -31,6 +31,7 @@ class Deexcitation{
 	int  GetSeed(){return rndm->GetSeed();};
 	void SetVerbose(int v){ verbose=v; };
 	void SetEventID(int id){ eventID=id;};
+	vector<Particle> GetParticleVector(){return _particle;};
 
 	private:
 	// --- Simulation method called by DoDeex() --- //
