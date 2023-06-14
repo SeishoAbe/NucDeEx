@@ -197,11 +197,16 @@ int Deexcitation::DecayMode(const double Ex)
 		N_daughter-=2;
 	}
 	nuc_daughter = _nucleus_table->GetNucleusPtr(Z_daughter,N_daughter);
+	if(nuc_daughter!=NULL) name_daughter = nuc_daughter->name;
+	else{
+		os.str("");
+		os << Z_daughter+N_daughter << _nucleus_table->nuc_name[Z_daughter];
+		name_daughter = os.str();
+	}
 
 	if(verbose>0){ 
 		cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode] << " + ";
-		if(nuc_daughter!=NULL) cout << nuc_daughter->name << endl;
-		else cout << Z_daughter+N_daughter << _nucleus_table->nuc_name[Z_daughter] << endl;
+		cout << name_daughter.c_str() << endl;
 	}
 
 	return decay_mode;
@@ -296,7 +301,7 @@ void Deexcitation::Decay(bool breakflag)
 	Particle p_particle(PDG_particle[decay_mode],
 											mass_particle,
 											mom_particle,
-											verbose);
+											particle_name[decay_mode]);
 	double totalE_particle_bef = p_particle.totalE();
 	p_particle.Boost(totalE_target,mom_target);// BOOST!
 	double totalE_particle_aft = p_particle.totalE();
@@ -304,7 +309,8 @@ void Deexcitation::Decay(bool breakflag)
 	Particle p_daughter(PDGion(Z_daughter,N_daughter),
 											mass_daughter, // w/o excitation E
 											mom_daughter,
-											verbose);
+											name_daughter);
+
 	double totalE_daughter_bef = p_daughter.totalE();
 	p_daughter.Boost(totalE_target,mom_target);
 	double totalE_daughter_aft = p_daughter.totalE();

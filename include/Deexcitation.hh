@@ -79,6 +79,7 @@ class Deexcitation{
 	//double kE_daughter;
 	//int PDG_daughter;
 	Nucleus* nuc_daughter;
+	string name_daughter;
 
 	// decay particle info
 	double mass_particle;

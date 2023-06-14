@@ -9,7 +9,7 @@ using namespace std;
 class Particle{
 	public:
 	Particle();
-	Particle(const int PDG,const double mass, const TVector3& mom, int v=0);
+	Particle(const int PDG,const double mass, const TVector3& mom, const string name);
 		// TVector3 is called by referecnce
 	~Particle(){;};
 	
@@ -22,6 +22,7 @@ class Particle{
 	int _PDG;
 	double _mass;
 	TVector3 _momentum;
+	string _name;
 
 	private:
 	const double check_criteria=1e-3;
