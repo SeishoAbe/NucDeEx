@@ -14,17 +14,17 @@ Particle::Particle()
 	_PDG=0;
 	_mass=0;
 	_momentum.SetXYZ(0,0,0);
-	verbose=0;
+	verbose=1;
 }
 
 ///////////////
-Particle::Particle(const int PDG, const double mass, const TVector3& mom, int v)
+Particle::Particle(const int PDG, const double mass, const TVector3& mom, const string name)
 ///////////////
 {
 	_PDG=PDG;
 	_mass=mass;
 	_momentum.SetXYZ(mom.X(), mom.Y(), mom.Z());
-	verbose=v;
+	_name=name;
 }
 
 

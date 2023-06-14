@@ -14,6 +14,10 @@
 #include <TF2.h>
 #include <TCanvas.h>
 #include <TLine.h>
+#include <TArrow.h>
+#include <TText.h>
+#include <TPaveText.h>
+
 
 using namespace std;
 
@@ -29,6 +33,7 @@ int main(int argc, char* argv[]){
 	const int numofevent=1e4; // to be generated
 	const double Ex_min = 16.;
 	const double Ex_max = 35.;
+	const bool flag_fig=1;
 	// -------------- //
 
 	ostringstream os;
@@ -56,7 +61,7 @@ int main(int argc, char* argv[]){
 	os << "sim_out/output_" << argv[1] << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree",""); // LAB Freme, MeV
-	int eventID, size;
+	int eventID=0, size;
 	double MissE, Ex, S;
 	double PinitMag, PinitX,PinitY,PinitZ;
 	//
@@ -64,6 +69,7 @@ int main(int argc, char* argv[]){
 	double mass[bins];
 	double totalE[bins],kE[bins];
 	double PMag[bins], PX[bins],PY[bins],PZ[bins];
+	string name[bins];
 	tree->Branch("eventID",&eventID,"eventID/I");
 	tree->Branch("MissE",&MissE,"MissE/D");
 	tree->Branch("S",&S,"S/D");
@@ -81,6 +87,7 @@ int main(int argc, char* argv[]){
 	tree->Branch("PX",&PX,"PX[size]/D");
 	tree->Branch("PY",&PY,"PY[size]/D");
 	tree->Branch("PZ",&PZ,"PZ[size]/D");
+	tree->Branch("name",&name,"name[size]/C");
 
 	TH2D* h_sf_random = new TH2D("h_sf_random","",800,0,800,400,0,400);
 	TH1D* h_sf_E_random = new TH1D("h_sf_E_random","",400,0,400); // missing E
@@ -89,7 +96,7 @@ int main(int argc, char* argv[]){
 
 
 	// Set Ex and mom tables (sf)
-	os.str();
+	os.str("");	
 	if(Z+N==11){ // 12C
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
 		S = nucleus_table->GetNucleusPtr("12C")->S[2];
@@ -105,8 +112,21 @@ int main(int argc, char* argv[]){
 	gRandom->SetSeed(seed); // for TH2 GetRandom2
 
 
+
+	gStyle->SetTextSize(0.08);
+	gStyle->SetTitleSize(0.045);
+	gStyle->SetTitleXSize(0.045);
+	gStyle->SetTitleYSize(0.045);
+	gStyle->SetTitleYOffset(0.95);
+	TCanvas* c_detail = new TCanvas("c_detail","",0,0,800,800);
+	string pdfname = "fig_sim/fig_detail.pdf";
+	if(flag_fig){
+		c_detail->Print( (pdfname + (string)"[").c_str() );
+		c_detail->Update();
+		c_detail->Clear();
+	}
 	
-	while(deex->GetEventID()<numofevent){
+	while(eventID<numofevent){
 		// determine momentum (scalar) and missing E according to SF
 		h_sf_int->GetRandom2(PinitMag,MissE);
 		Ex=MissE-S;
@@ -133,7 +153,6 @@ int main(int argc, char* argv[]){
 
 		// scoling
 		vector<Particle> particle = deex->GetParticleVector();
-		eventID = deex->GetEventID();
 		PinitX   = Pinit.X();
 		PinitY   = Pinit.Y();
 		PinitZ   = Pinit.Z();
@@ -149,15 +168,114 @@ int main(int argc, char* argv[]){
 			PX[i]=p._momentum.X();
 			PY[i]=p._momentum.Y();
 			PZ[i]=p._momentum.Z();
+			name[i]=p._name;
 		}
 		tree->Fill();
-	}
 
-	gStyle->SetTextSize(0.08);
-	gStyle->SetTitleSize(0.045);
-	gStyle->SetTitleXSize(0.045);
-	gStyle->SetTitleYSize(0.045);
-	gStyle->SetTitleYOffset(0.95);
+		// prepare detail fig
+		if(flag_fig){
+			TArrow* lXY[size], *lYZ[size], *lXZ[size];
+			int color[size]={0};
+			for(int i=0;i<size;i++){
+				lXY[i] = new TArrow(0,0,PX[i],PY[i],0.01,"|>");
+				lYZ[i] = new TArrow(0,0,PY[i],PZ[i],0.01,"|>");
+				lXZ[i] = new TArrow(0,0,PX[i],PZ[i],0.01,"|>");
+				lXY[i]->SetLineWidth(1);
+				lYZ[i]->SetLineWidth(1);
+				lXZ[i]->SetLineWidth(1);
+				color[i]=400+1;
+				for(int p=0;p<num_particle;p++){
+					if(PDG[i] == PDG_particle[p]) color[i]=color_root[p];
+				}
+				lXY[i]->SetLineColor(color[i]);
+				lYZ[i]->SetLineColor(color[i]);
+				lXZ[i]->SetLineColor(color[i]);
+				lXY[i]->SetFillColor(color[i]);
+				lYZ[i]->SetFillColor(color[i]);
+				lXZ[i]->SetFillColor(color[i]);
+			}
+			TArrow* linitXY = new TArrow(0,0,PinitX,PinitY,0.015,"|>");
+			TArrow* linitYZ = new TArrow(0,0,PinitY,PinitZ,0.015,"|>");
+			TArrow* linitXZ = new TArrow(0,0,PinitX,PinitZ,0.015,"|>");
+			linitXY->SetLineWidth(2);
+			linitYZ->SetLineWidth(2);
+			linitXZ->SetLineWidth(2);
+			c_detail->Divide(2,2);
+			//
+			c_detail->cd(1);
+			TH1F* waku1= gPad->DrawFrame(-200,-200,200,200);
+			waku1->SetTitle("XY plane");
+			waku1->GetXaxis()->SetTitle("Px (MeV)");
+			waku1->GetYaxis()->SetTitle("Py (MeV)");
+			linitXY->Draw();
+			for(int i=0;i<size;i++){
+				lXY[i]->Draw();
+			}
+			//
+			c_detail->cd(2);
+			TH1F* waku2= gPad->DrawFrame(-200,-200,200,200);
+			waku2->SetTitle("YZ plane");
+			waku2->GetXaxis()->SetTitle("Py (MeV)");
+			waku2->GetYaxis()->SetTitle("Pz (MeV)");
+			linitYZ->Draw();
+			for(int i=0;i<size;i++){
+				lYZ[i]->Draw();
+			}
+			//
+			c_detail->cd(3);
+			TH1F* waku3= gPad->DrawFrame(-200,-200,200,200);
+			waku3->SetTitle("XZ plane");
+			waku3->GetXaxis()->SetTitle("Px (MeV)");
+			waku3->GetYaxis()->SetTitle("Pz (MeV)");
+			linitXZ->Draw();
+			for(int i=0;i<size;i++){
+				lXZ[i]->Draw();
+			}
+			//
+			c_detail->cd(4);
+			TPaveText* t = new TPaveText(0.1,0.1,0.9,0.9);
+			os.str("");
+			os << "eventID = " << eventID;
+			t->AddText(os.str().c_str());
+			os.str("");
+			os << argv[1] << ": Ex = " << fixed << setprecision(2) << Ex;
+			t->AddText(os.str().c_str());
+			os.str("");
+			os << "P=(" << setprecision(1) << PinitX
+				 << ", " << setprecision(1) << PinitY
+				 << ", " << setprecision(1) << PinitZ << ")";
+			t->AddText(os.str().c_str());
+			//
+			t->AddText("--- Decay products ---");
+			for(int i=0;i<size;i++){
+				os.str("");
+				if(name[i].length()>4) os << name[i].substr(0,1);
+				else os << name[i];
+				os << ": kE = " <<  kE[i];
+				//t->AddText(os.str().c_str());
+				//((TText*)t->GetListOfLines()->Last())->SetTextColor(color[i]);
+				os << ", P=(" << setprecision(1) << PX[i]
+					 << ", " << setprecision(1) << PY[i]
+					 << ", " << setprecision(1) << PZ[i] << ")";
+					t->AddText(os.str().c_str());
+				((TText*)t->GetListOfLines()->Last())->SetTextColor(color[i]);
+			}
+			t->AddText("---------------------");
+			t->AddText("LAB frame, MeV");
+			((TText*)t->GetListOfLines()->Last())->SetTextSize(0.045);
+			((TText*)t->GetListOfLines()->Last())->SetTextColor(kGray+1);
+			t->Draw("same");
+			//
+			c_detail->Print(pdfname.c_str());
+			c_detail->Update();
+			c_detail->Clear();
+		}
+
+		eventID++;
+	}
+	if(flag_fig)c_detail->Print( (pdfname + (string)"]").c_str() );
+	delete c_detail;
+
 
 	TCanvas* c = new TCanvas("c","c",0,0,800,600);
 	c->Divide(2,2);
