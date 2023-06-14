@@ -25,10 +25,11 @@ class Deexcitation{
 	virtual ~Deexcitation();
 
 	void DoDeex(const int Z, const int N, const double Ex,
-							const TVector3* mom=0);
+							const TVector3& mom=TVector3(0,0,0));
 
 	void SetSeed(int s){ rndm->SetSeed(s) ;};
 	int  GetSeed(){return rndm->GetSeed();};
+	TRandom3* GetTRandom3(){ return rndm; };
 	void SetVerbose(int v){ verbose=v; };
 	void SetEventID(int id){ eventID=id;};
 	vector<Particle> GetParticleVector(){return _particle;};
