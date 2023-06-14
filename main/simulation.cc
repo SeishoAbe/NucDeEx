@@ -29,10 +29,12 @@ int main(int argc, char* argv[]){
 	deex->SetVerbose(1);
 
 	TVector3* momentum = new TVector3(0,0,0);
-	momentum->SetXYZ(0,0,200); // in MeV
+	//momentum->SetXYZ(0,0,200); // in MeV
 
 	for(int i=0;i<10;i++){
 		deex->DoDeex(Z,N,Ex,momentum);
+		vector<Particle> particle = deex->GetParticleVector();
+		cout << "#particle = " << particle.size() << endl;
 	}
 
 
