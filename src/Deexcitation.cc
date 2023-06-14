@@ -371,7 +371,7 @@ bool Deexcitation::OpenROOT(const char* name)
 /////////////////////////////////////////////
 {
 	os.str("");
-	os << getenv("TALYS_WORK_BR") << "/output/Br_" << name << ".root"; 
+	os << getenv("TALYS_WORK") << "/output/Br_" << name << ".root"; 
 	rootf = new TFile(os.str().c_str(),"READ");
 	if(! rootf->IsOpen()) return 0;
 	return 1;
