@@ -49,7 +49,7 @@ Deexcitation::~Deexcitation()
 }
 
 /////////////////////////////////////////////
-void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVector3* mom)
+void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
 	cout << endl << "###################################" << endl;
@@ -59,12 +59,12 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 
 	// --- Initialization --- //
 	InitParticleVector();
-	if(mom==0) mom_target.SetXYZ(0,0,0); // decay at rest
-	else       mom_target.SetXYZ(mom->X(),mom->Y(),mom->Z());
+
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
 	N_target   = N;
 	Ex_target  = Ex;
+	mom_target = mom;
 	nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
 	name_target = (string)nuc_target->name;
 
