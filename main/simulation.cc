@@ -30,13 +30,13 @@ int main(int argc, char* argv[]){
 	if(argc==3) seed = atoi(argv[2]);
 
 	// ---- FIXME --- // 
-	const int numofevent=1e4; // to be generated
+	const int numofevent=1e5; // to be generated
 	const double Ex_min = 16.;
 	const double Ex_max = 35.;
-	const bool flag_fig=1;
+	const bool flag_fig=0;
 	// -------------- //
 
-	ostringstream os;
+	ostringstream os,os_remove_g;
 
 	// Get Z and N
   NucleusTable* nucleus_table = new NucleusTable();
@@ -69,8 +69,10 @@ int main(int argc, char* argv[]){
 	double mass[bins];
 	double totalE[bins],kE[bins];
 	double PMag[bins], PX[bins],PY[bins],PZ[bins];
-	string name[bins];
+	string decay, decay_remove_g;
 	tree->Branch("eventID",&eventID,"eventID/I");
+	tree->Branch("decay",&decay);
+	tree->Branch("decay_remove_g",&decay_remove_g);
 	tree->Branch("MissE",&MissE,"MissE/D");
 	tree->Branch("S",&S,"S/D");
 	tree->Branch("Ex",&Ex,"Ex/D");
@@ -87,7 +89,6 @@ int main(int argc, char* argv[]){
 	tree->Branch("PX",&PX,"PX[size]/D");
 	tree->Branch("PY",&PY,"PY[size]/D");
 	tree->Branch("PZ",&PZ,"PZ[size]/D");
-	tree->Branch("name",&name,"name[size]/C");
 
 	TH2D* h_sf_random = new TH2D("h_sf_random","",800,0,800,400,0,400);
 	TH1D* h_sf_E_random = new TH1D("h_sf_E_random","",400,0,400); // missing E
@@ -158,6 +159,8 @@ int main(int argc, char* argv[]){
 		PinitZ   = Pinit.Z();
 		
 		size=particle.size();
+		os.str("");
+		os_remove_g.str("");
 		for(int i=0;i<size;i++){
 			Particle p = particle.at(i);
 			PDG[i]=p._PDG;
@@ -168,8 +171,15 @@ int main(int argc, char* argv[]){
 			PX[i]=p._momentum.X();
 			PY[i]=p._momentum.Y();
 			PZ[i]=p._momentum.Z();
-			name[i]=p._name;
+			string pname;
+			if(p._name.length()>4) pname = p._name.substr(0,1);
+			else pname = p._name;
+			os << pname.c_str();
+			if(i!=0 && pname == "g") continue; // remove g if it is second
+			os_remove_g << pname.c_str();
 		}
+		decay = os.str();
+		decay_remove_g = os_remove_g.str();
 		tree->Fill();
 
 		// prepare detail fig
@@ -249,8 +259,7 @@ int main(int argc, char* argv[]){
 			t->AddText("--- Decay products ---");
 			for(int i=0;i<size;i++){
 				os.str("");
-				if(name[i].length()>4) os << name[i].substr(0,1);
-				else os << name[i];
+				os << decay.c_str();
 				os << ": kE = " <<  kE[i];
 				//t->AddText(os.str().c_str());
 				//((TText*)t->GetListOfLines()->Last())->SetTextColor(color[i]);
