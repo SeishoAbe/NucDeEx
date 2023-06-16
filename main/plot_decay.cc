@@ -312,12 +312,15 @@ int main(int argc, char* argv[]){
 			//
 			gPad->RedrawAxis();
 			os.str("");
-			if(i==bin_target-1) os << (pdfname+(string)"]").c_str();
-			else os << pdfname.c_str();
+			os << pdfname.c_str();
 			c_target_br_ex->Print(os.str().c_str());
 			c_target_br_ex->Update();
 			c_target_br_ex->Clear();
 		}
+		os.str("");
+		os << (pdfname+(string)"]").c_str();
+		c_target_br_ex->Print(os.str().c_str());
+		c_target_br_ex->Clear();
 		delete c_target_br_ex;
 
 
