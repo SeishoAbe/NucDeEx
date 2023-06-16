@@ -163,6 +163,7 @@ int main(int argc, char* argv[]){
 		size=particle.size();
 		os.str("");
 		os_remove_g.str("");
+		string pname[size];
 		for(int i=0;i<size;i++){
 			Particle p = particle.at(i);
 			PDG[i]=p._PDG;
@@ -173,12 +174,11 @@ int main(int argc, char* argv[]){
 			PX[i]=p._momentum.X();
 			PY[i]=p._momentum.Y();
 			PZ[i]=p._momentum.Z();
-			string pname;
-			if(p._name.length()>4) pname = p._name.substr(0,1);
-			else pname = p._name;
-			os << pname.c_str();
-			if(i!=0 && pname == "g") continue; // remove g if it is second
-			os_remove_g << pname.c_str();
+			if(p._name.length()>4) pname[i] = p._name.substr(0,1);
+			else pname[i] = p._name;
+			os << pname[i].c_str();
+			if(i!=0 && pname[i] == "g") continue; // remove g if it is second
+			os_remove_g << pname[i].c_str();
 		}
 		decay = os.str();
 		decay_remove_g = os_remove_g.str();
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]){
 			t->AddText("--- Decay products ---");
 			for(int i=0;i<size;i++){
 				os.str("");
-				os << decay.c_str();
+				os << pname[i].c_str();
 				os << ": kE = " <<  kE[i];
 				//t->AddText(os.str().c_str());
 				//((TText*)t->GetListOfLines()->Last())->SetTextColor(color[i]);
