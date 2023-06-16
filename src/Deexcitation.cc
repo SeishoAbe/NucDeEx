@@ -408,6 +408,7 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 		diff_ex = abs(ex-ex_t);
 	}
 	if(abs(ex-ex_t)>diff_ex) point--;
+	if(point==g_br[mode]->GetN()) point--;
 	if(verbose>0){
 		cout << "GetBrExTGraph(): nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << endl;
 	}
