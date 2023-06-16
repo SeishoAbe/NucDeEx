@@ -39,7 +39,7 @@ class Deexcitation{
 	// --- Simulation method called by DoDeex() --- //
 	int DecayMode(const double Ex);
 	bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
-	void Decay(bool breakflag);
+	void Decay(const bool breakflag);
 
 	// --- ROOT related methods & members --- //
 	bool OpenROOT(const char* name);

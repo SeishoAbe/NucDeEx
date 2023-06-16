@@ -57,6 +57,8 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 			 << Ex << ")  eventID=" << eventID << endl;
 	cout << "###################################" << endl;
 
+	RESET:
+
 	// --- Initialization --- //
 	InitParticleVector();
 
@@ -105,6 +107,12 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 			TGeoElementRN* element_rn =	element_table->GetElementRN(a_particle,z_particle); // (A,Z)
 			cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
 			mass_particle = ElementMassInMeV(element_rn);
+		}
+		// this rarely happens...
+		if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
+			cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
+			cout << "Call DoDeex() again!" << endl;
+			goto RESET;
 		}
 		mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
 		mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
@@ -244,7 +252,7 @@ bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 }
 
 /////////////////////////////////////////////
-void Deexcitation::Decay(bool breakflag)
+void Deexcitation::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
 	cout << "Deexcitation::Decay()" << endl;
