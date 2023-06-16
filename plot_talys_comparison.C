@@ -23,8 +23,8 @@ int plot_talys_comparison(){
 	}
 	
 
-	// Old (TALYS 1.95 on komachi (tohoku rcns server))
-	TFile* rootf_old = new TFile( ((string)"output_rcns/Br_" + name_target + (string)"_summary.root").c_str(),"READ");
+	// Old (TALYS 1.95 with old tools on komachi (tohoku rcns server))
+	TFile* rootf_old = new TFile( ((string)"output_talys1.95_2022/Br_" + name_target + (string)"_summary.root").c_str(),"READ");
 	TGraph* g_old_target_br[num_particle];
 	for(int i=0;i<num_particle;i++){
 		os.str("");
