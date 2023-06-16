@@ -31,8 +31,9 @@ int main(int argc, char* argv[]){
 
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
-	const double Ex_min = 16.;
-	const double Ex_max = 35.;
+	const double Ex_min =-1;
+	const double Ex_max =-1;
+		// negative -> not applied
 	const bool flag_fig=0;
 	// -------------- //
 
@@ -58,7 +59,7 @@ int main(int argc, char* argv[]){
 
 	// prepare output root file
 	os.str("");	
-	os << "sim_out/output_" << argv[1] << ".root";
+	os << "sim_out/" << argv[1] << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree",""); // LAB Freme, MeV
 	int eventID=0, size;
@@ -90,19 +91,23 @@ int main(int argc, char* argv[]){
 	tree->Branch("PY",&PY,"PY[size]/D");
 	tree->Branch("PZ",&PZ,"PZ[size]/D");
 
-	TH2D* h_sf_random = new TH2D("h_sf_random","",800,0,800,400,0,400);
+	gStyle->SetTextSize(0.08);
+	gStyle->SetTitleSize(0.045);
+	gStyle->SetTitleXSize(0.045);
+	gStyle->SetTitleYSize(0.045);
+	gStyle->SetTitleYOffset(0.95);
+	TH2D* h_sf_random = new TH2D("h_sf_random","",400,0,800,400,0,400);
 	TH1D* h_sf_E_random = new TH1D("h_sf_E_random","",400,0,400); // missing E
-	TH1D* h_sf_p_random = new TH1D("h_sf_p_random","",800,0,800);
-	TH1D* h_sf_Ex_random = new TH1D("h_sf_Ex_random","",400,0,400);  // excitation E
+	TH1D* h_sf_p_random = new TH1D("h_sf_p_random","",400,0,800);
+	TH1D* h_sf_Ex_random = new TH1D("h_sf_Ex_random","",500,-100,400);  // excitation E
 
 
-	// Set Ex and mom tables (sf)
+	// Set Ex and mom tables (from SF) and proton separation energy
 	os.str("");	
 	if(Z+N==11){ // 12C
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
 		S = nucleus_table->GetNucleusPtr("12C")->S[2];
-	}
-	if(Z+N==15){
+	}else if(Z+N==15){
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
 		S = nucleus_table->GetNucleusPtr("16O")->S[2];
 	}
@@ -114,11 +119,6 @@ int main(int argc, char* argv[]){
 
 
 
-	gStyle->SetTextSize(0.08);
-	gStyle->SetTitleSize(0.045);
-	gStyle->SetTitleXSize(0.045);
-	gStyle->SetTitleYSize(0.045);
-	gStyle->SetTitleYOffset(0.95);
 	TCanvas* c_detail = new TCanvas("c_detail","",0,0,800,800);
 	string pdfname = "fig_sim/fig_detail.pdf";
 	if(flag_fig){
@@ -146,7 +146,9 @@ int main(int argc, char* argv[]){
 		
 
 		// select ROI
-		if(! (Ex>Ex_min && Ex<Ex_max) ) continue;
+		if(Ex<0) continue;
+		if(Ex_min>0 && Ex<Ex_min) continue;
+		if(Ex_max>0 && Ex>Ex_max) continue;
 
 		// DOIT 
 		//deex->DoDeex(Z,N,Ex); // this can also work w/ zero momentum
@@ -289,34 +291,45 @@ int main(int argc, char* argv[]){
 	TCanvas* c = new TCanvas("c","c",0,0,800,600);
 	c->Divide(2,2);
 	c->cd(1);
-	h_sf_Ex_random->GetXaxis()->SetRangeUser(8,47);
+	h_sf_Ex_random->GetXaxis()->SetRangeUser(-10,150);
 	h_sf_Ex_random->SetStats(0);
 	h_sf_Ex_random->SetMinimum(0);
 	h_sf_Ex_random->GetXaxis()->SetTitle("Excitation energy (MeV)");
+	h_sf_Ex_random->GetYaxis()->SetTitle("Events/bin");
 	h_sf_Ex_random->Draw("HIST");
 	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_sf_Ex_random->GetMaximum()*1.05);
 	l_Ex_min->SetLineStyle(2);
 	l_Ex_min->SetLineColor(kRed);
-	l_Ex_min->Draw("same");
+	if(Ex_min>0) l_Ex_min->Draw("same");
 	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_sf_Ex_random->GetMaximum()*1.05);
 	l_Ex_max->SetLineStyle(2);
 	l_Ex_max->SetLineColor(kRed);
-	l_Ex_max->Draw("same");
+	if(Ex_max>0) l_Ex_max->Draw("same");
 	//
 	c->cd(2);
 	gPad->SetLogz();
 	h_sf_random->SetStats(0);
 	h_sf_random->SetMinimum(1);
+	h_sf_random->GetXaxis()->SetTitle("Momentum (MeV)");
+	h_sf_random->GetYaxis()->SetTitle("Excitation energy (MeV)");
 	h_sf_random->Draw("colz");
 	h_sf_random->SetStats(0);
 	c->cd(3);
 	h_sf_E_random->SetStats(0);
 	h_sf_E_random->SetMinimum(0);
-	h_sf_E_random->GetXaxis()->SetRangeUser(0,100);
+	h_sf_E_random->GetXaxis()->SetRangeUser(0,150);
+	h_sf_E_random->GetXaxis()->SetTitle("Missing energy (MeV)");
+	h_sf_E_random->GetYaxis()->SetTitle("Events/bin");
 	h_sf_E_random->Draw("HIST");
+	TLine* l_S = new TLine(S,0,S,h_sf_E_random->GetMaximum()*1.05);
+	l_S->SetLineStyle(2);
+	l_S->SetLineColor(kRed);
+	l_S->Draw("same");
 	c->cd(4);
 	h_sf_p_random->SetStats(0);
 	h_sf_p_random->SetMinimum(0);
+	h_sf_p_random->GetXaxis()->SetTitle("Momentum (MeV)");
+	h_sf_p_random->GetYaxis()->SetTitle("Events/bin");
 	h_sf_p_random->Draw("HIST");
 	c->Print("fig_sim/fig_sf.pdf");
 
