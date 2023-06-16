@@ -220,7 +220,7 @@ int plot_sf(){
   h_sf_nominal->GetYaxis()->SetTitle("Removal energy (MeV)");
   h_sf_nominal->Draw("colz");
   os.str("");
-  os << "fig_sf_nominal_" << nucleus.c_str() << ".pdf";
+  os << "figure/fig_sf_nominal_" << nucleus.c_str() << ".pdf";
   c_nominal->Update();
   c_nominal->Print(os.str().c_str());
 
@@ -236,7 +236,7 @@ int plot_sf(){
 	//g_sf->Draw("surf");
 	f_sf->Draw("same");
   os.str("");
-  os << "fig_sf_" << nucleus.c_str() << ".pdf";
+  os << "figure/fig_sf_" << nucleus.c_str() << ".pdf";
   c->Update();
   c->Print(os.str().c_str());
 
@@ -272,7 +272,7 @@ int plot_sf(){
 	f_sf_E->SetLineColor(kBlue);
 	f_sf_E->Draw("same");
   os.str("");
-  os << "fig_sf_sf_1D_" << nucleus.c_str() << ".pdf";
+  os << "figure/fig_sf_sf_1D_" << nucleus.c_str() << ".pdf";
   c_1D->Update();
   c_1D->Print(os.str().c_str());
 	
