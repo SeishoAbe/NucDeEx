@@ -8,7 +8,7 @@ const double kE_th[num_particle]
 	= {0,3.1,3.1,
 		 4.0,4.6,0,4.5};
 
-int plot_simulation(){
+int plot_simulation_comparison(){
 	// ---- FIXME ---- //
 	string target = "11B";
 	const double Ex_min =16;
@@ -55,10 +55,13 @@ int plot_simulation(){
 	tree->SetBranchAddress("PZ",&PZ);
 
 	// --- Draw --- // 
+	gStyle->SetTextFont(132);
 	gStyle->SetTextSize(0.08);
-	gStyle->SetTitleSize(0.045);
-	gStyle->SetTitleXSize(0.045);
-	gStyle->SetTitleYSize(0.045);
+	gStyle->SetTitleSize(0.05,"XYZ");
+	gStyle->SetTitleFont(132,"XYZ");
+	gStyle->SetLabelSize(0.05,"XYZ");
+	gStyle->SetLabelFont(132,"XYZ");
+	gStyle->SetLegendFont(132);
 	gStyle->SetTitleYOffset(0.95);
 	
 	TH1D* h_Ex = new TH1D("h_Ex","",500,-100,400);
@@ -75,8 +78,8 @@ int plot_simulation(){
 	int numofevent=0;
 	map<string, double> br;
 	map<string, double> :: iterator itr;
-	double r_br[num_particle]={0}; // two-body
-	double r_br_2b[num_particle]={0}; // two-body
+	double rbr[num_particle]={0}; // two-body
+	double rbr_2b[num_particle]={0}; // two-body
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
 
@@ -103,11 +106,11 @@ int plot_simulation(){
 				if(p!=0) particle_counter++;
 				if(b==0){
 					first_p = p;
-					r_br[p]++;
+					rbr[p]++;
 				}
 			}
 		}
-		if(particle_counter==1) r_br_2b[first_p]++;
+		if(particle_counter==1) rbr_2b[first_p]++;
 		itr = br.find(decay->c_str());
 		if(itr != end(br) ) {
 			itr->second += 1;
@@ -121,21 +124,23 @@ int plot_simulation(){
 	cout << "max_size=" << max_size << endl;
 	cout << "numofevent=" << numofevent << endl;
 
-	double r_br_sum=0, r_br_2b_sum=0;
+	double rbr_sum=0, rbr_2b_sum=0;
 	for(int par=0;par<num_particle;par++){
-		r_br[par] = r_br[par]/numofevent*100; // %
-		r_br_2b[par] = r_br_2b[par]/numofevent*100; // %
+		rbr[par] = rbr[par]/numofevent*100; // %
+		rbr_2b[par] = rbr_2b[par]/numofevent*100; // %
 		cout << setw(10) << particle_name[par].c_str() << "  " 
-				 << setw(10) << r_br[par] << "  " << r_br_2b[par] << endl;
-		r_br_sum+=r_br[par];
-		r_br_2b_sum+=r_br_2b[par];
+				 << setw(10) << rbr[par] << "  " << rbr_2b[par] << endl;
+		rbr_sum+=rbr[par];
+		rbr_2b_sum+=rbr_2b[par];
 	}
-	cout << setw(10) << "sum" << "  " << setw(10) << r_br_sum << "  " << r_br_2b_sum << endl;
+	cout << setw(10) << "sum" << "  " << setw(10) << rbr_sum << "  " << rbr_2b_sum << endl;
 
-	double r_br_2b_nda_n = r_br_2b[1]/(r_br_2b[1]+r_br_2b[3]+r_br_2b[6]);
-	double r_br_2b_nda_da = (r_br_2b[3]+r_br_2b[6])/(r_br_2b[1]+r_br_2b[3]+r_br_2b[6]);
-	cout << "Relative BR (n vs d/a): n   : " << r_br_2b_nda_n << endl;
-	cout << "Relative BR (n vs d/a): d/a : " << r_br_2b_nda_da << endl;
+	// for comparison 
+	// nda relative br (2body)
+	double rbr_nda_n = rbr_2b[1]/(rbr_2b[1]+rbr_2b[3]+rbr_2b[6]);
+	double rbr_nda_da = (rbr_2b[3]+rbr_2b[6])/(rbr_2b[1]+rbr_2b[3]+rbr_2b[6]);
+	cout << "Relative BR (n vs d/a): n   : " << rbr_nda_n << endl;
+	cout << "Relative BR (n vs d/a): d/a : " << rbr_nda_da << endl;
 
 	
 	// output  (txt)
@@ -263,6 +268,67 @@ int plot_simulation(){
 	os.str("");
 	os << "fig_sim/fig_" << target.c_str() << "_kE" << suffix.c_str() << ".pdf";
 	c_kE->Print(os.str().c_str());
+
+
+	//----------------------------//
+	// nda plot
+	const int nda_data=3;
+	const int nda_color[nda_data]={416+2,800+6,600-6};
+	const int	nda_color_this = 616-6;
+	string nda_data_name[nda_data]={"KamLAND","Hu","Panin"};
+	TFile* rootf_nda[nda_data];
+	TH1D* h_nda[nda_data];
+	for(int i=0;i<nda_data;i++){
+		os.str("");
+		os << "data/" << nda_data_name[i].c_str() << "/" << nda_data_name[i].c_str() << ".root";
+		rootf_nda[i] = new TFile(os.str().c_str(),"READ");
+		TEnv* env = (TEnv*) rootf_nda[i]->Get("env");
+		//
+		os.str("");
+		os << "h_nda_" << nda_data_name[i].c_str();
+		h_nda[i] = new TH1D(os.str().c_str(),"",20,-10,10);
+		h_nda[i]->Fill(i,env->GetValue("rbr_nda_n",-9999.));
+		h_nda[i]->Fill(i+nda_data+3,env->GetValue("rbr_nda_da",-9999.));
+		h_nda[i]->SetFillColor(nda_color[i]);
+	}
+	TH1D* h_nda_this = new TH1D("h_nda_this","",20,-10,10);
+	h_nda_this->Fill(-1,rbr_nda_n*1e2);
+	h_nda_this->Fill(-1+nda_data+3,rbr_nda_da*1e2);
+
+
+	TCanvas* c_nda =new TCanvas("c_nda","c_nda",0,0,800,600);
+	TH1F* waku_nda = gPad->DrawFrame(-2,0,10,85);
+	waku_nda->GetXaxis()->SetLabelSize(0);
+	waku_nda->GetXaxis()->SetTickSize(0);
+	waku_nda->GetYaxis()->SetTitle("Relative branching ratio (%)");
+	for(int i=0;i<nda_data;i++){
+		h_nda[i]->Draw("HISTsame");
+	}
+	h_nda_this->SetFillColor(nda_color_this);
+	h_nda_this->Draw("HISTsame");
+	TLegend* leg = new TLegend(0.6,0.6,0.9,0.89);
+	leg->SetBorderSize(0);
+	leg->SetFillStyle(0);
+	leg->AddEntry(h_nda_this,"This work","F");
+	for(int i=0;i<nda_data;i++){
+		os.str("");
+		os << nda_data_name[i].c_str();
+		if(i!=0) os << " et al.";
+		leg->AddEntry(h_nda[i],os.str().c_str(),"F");
+	}
+	leg->Draw("same");
+	TLatex* l_n = new TLatex(1,-8,"n");
+	l_n->SetTextFont(12);
+	l_n->Draw("same");
+	TLatex* l_da = new TLatex(0.5+nda_data+3,-8,"d/#alpha");
+	l_da->SetTextFont(12);
+	l_da->Draw("same");
+	//
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_nda" << suffix.c_str() << ".pdf";
+	c_nda->Print(os.str().c_str());
+
+
 
 
 	return 0;
