@@ -5,7 +5,7 @@
 using namespace std;
 int plot_simulation(){
 	ostringstream os;
-	TFile* rootf = new TFile("sim_out/output_11B.root","READ");
+	TFile* rootf = new TFile("sim_out/11B.root","READ");
 	TTree* tree = (TTree*) rootf->Get("tree");
 	int eventID, size;
 	double MissE, Ex, S;
@@ -17,7 +17,8 @@ int plot_simulation(){
 	double PMag[bins], PX[bins],PY[bins],PZ[bins];
 	string* decay=0;
 	tree->SetBranchAddress("eventID",&eventID);
-	tree->SetBranchAddress("decay",&decay);
+	//tree->SetBranchAddress("decay",&decay);
+	tree->SetBranchAddress("decay_remove_g",&decay);
 	tree->SetBranchAddress("MissE",&MissE);
 	tree->SetBranchAddress("S",&S);
 	tree->SetBranchAddress("Ex",&Ex);
