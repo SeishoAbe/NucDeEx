@@ -62,9 +62,6 @@ int plot(){
 	env.SetValue("rbr_nda_da",rbr_nda_da);
 	env.Print();
 	env.Write("env");
-	rootf->Close();
-	delete rootf;
-
 
 	return 0;
 }
