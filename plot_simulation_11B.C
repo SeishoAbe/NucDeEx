@@ -6,9 +6,9 @@ using namespace std;
 
 const double kE_th[num_particle]
 	= {0,3.1,3.1,
-		 4.0,4.6,1e9,4.5};
+		 4.0,4.6,0,4.5};
 
-int plot_simulation_comparison(){
+int plot_simulation_11B(){
 	// ---- FIXME ---- //
 	string target = "11B";
 	const double Ex_min =16;
@@ -91,8 +91,9 @@ int plot_simulation_comparison(){
 	int numofevent=0, numofdetected=0;
 	map<string, double> br;
 	map<string, double> :: iterator itr;
-	double rbr[num_particle]={0}; // two-body
+	double rbr[num_particle]={0}; 
 	double rbr_2b[num_particle]={0}; // two-body
+	int count_particle_th[num_particle]={0};
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
 
@@ -120,6 +121,7 @@ int plot_simulation_comparison(){
 				h_kE[p]->Fill(kE[b]);
 				h_Ex_particle[p]->Fill(Ex);
 				if(kE[b]<kE_th[p]) continue;
+				count_particle_th[p]++;
 				flag_detected[p] = 1; // detected
 				if(p!=0) particle_counter++;
 			}
@@ -128,14 +130,14 @@ int plot_simulation_comparison(){
 
 		bool detected=0;
 		for(int par=1;par<num_particle;par++){
-			//cout << flag_detected[par] << "  ";
 			if(!flag_detected[par]) continue;
 			rbr[par]++;
-			if(particle_counter==1) rbr_2b[par]++;
-			h_Ex_particle_th[par]->Fill(Ex);
+			if(particle_counter==1){
+				rbr_2b[par]++;
+				h_Ex_particle_th[par]->Fill(Ex);
+			}
 			detected=1;
 		}
-		//cout << endl;
 		if(detected) numofdetected++;
 
 
@@ -330,16 +332,33 @@ int plot_simulation_comparison(){
 		h_kE[p]->SetLineColor(color_root[p]);
 		if(p!=0) h_kE[p]->SetLineWidth(2);
 		h_kE[p]->Draw("HIST");
+		if(kE_th[p]>0){
+			TLine* l_kE_th = new TLine(kE_th[p],0,kE_th[p],h_kE[p]->GetMaximum()*1.05);
+			l_kE_th->SetLineStyle(2);
+			l_kE_th->Draw("same");
+		}
 		os.str("");
 		os << "Prob = " << fixed << (double)h_kE[p]->GetEntries()/numofevent;
 		TText* t_kE = new TText(7,h_kE[p]->GetMaximum()*0.7,os.str().c_str());
 		t_kE->Draw("same");
+		//
+		os.str("");
+		os << "Prob (w/ th)= " << fixed << (double)count_particle_th[p]/numofevent;
+		TText* t_kE_th = new TText(7,h_kE[p]->GetMaximum()*0.6,os.str().c_str());
+		t_kE_th->Draw("same");
 	}
 	c_kE->cd(8);
 	TPaveText* t = new TPaveText(0.1,0.1,0.9,0.9);
 	os.str("");
 	os << "# generated events = " << numofevent;
 	t->AddText(os.str().c_str());
+	for(int par=0;par<num_particle;par++){
+		if(kE_th[par]>0){
+			os.str("");
+			os << "kE_th(" << particle_name[par].substr(0,1) << ") = " << setprecision(1) << kE_th[par];
+			t->AddText(os.str().c_str());
+		}
+	}
 	t->Draw("same");
 	//
 	os.str("");
