@@ -14,7 +14,7 @@ int plot(){
 	const double br_a_2b = 3.34729;
 	const double br_a    = 3.42384;
 
-	TFile* rootf = new TFile("KamLAND.root","RECREATE");
+	TFile* rootf = new TFile("SAbe_Tohoku_2023.root","RECREATE");
 	TEnv env("env");
 	env.SetValue("rbr_nda_n",rbr_nda_n);
 	env.SetValue("rbr_nda_da",rbr_nda_da);
