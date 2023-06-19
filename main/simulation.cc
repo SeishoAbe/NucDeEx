@@ -70,6 +70,8 @@ int main(int argc, char* argv[]){
 	double mass[bins];
 	double totalE[bins],kE[bins];
 	double PMag[bins], PX[bins],PY[bins],PZ[bins];
+	bool flag[bins];
+	double Ex_daughter[bins];
 	string decay, decay_remove_g;
 	tree->Branch("eventID",&eventID,"eventID/I");
 	tree->Branch("decay",&decay);
@@ -90,6 +92,9 @@ int main(int argc, char* argv[]){
 	tree->Branch("PX",&PX,"PX[size]/D");
 	tree->Branch("PY",&PY,"PY[size]/D");
 	tree->Branch("PZ",&PZ,"PZ[size]/D");
+	tree->Branch("flag",&flag,"flag[size]/O");
+	tree->Branch("Ex_daughter",&Ex_daughter,"Ex_daughter[size]/D");
+
 
 	gStyle->SetTextSize(0.08);
 	gStyle->SetTitleSize(0.045);
@@ -174,6 +179,9 @@ int main(int argc, char* argv[]){
 			PX[i]=p._momentum.X();
 			PY[i]=p._momentum.Y();
 			PZ[i]=p._momentum.Z();
+			flag[i]=p._flag;
+			Ex_daughter[i]=p._Ex;
+			//
 			if(p._name.length()>4) pname[i] = p._name.substr(0,1);
 			else pname[i] = p._name;
 			os << pname[i].c_str();
