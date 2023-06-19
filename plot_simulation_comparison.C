@@ -66,12 +66,25 @@ int plot_simulation_comparison(){
 	
 	TH1D* h_Ex = new TH1D("h_Ex","",500,-100,400);
 	TH1D* h_nmulti = new TH1D("h_nmulti","",10,-0.5,9.5);
-	TH1D* h_kE[num_particle];
+	TH1D* h_kE[num_particle], *h_Ex_particle[num_particle];
+	TH1D* h_Ex_particle_th[num_particle]; // w/ experimental threshold
 	for(int p=0;p<num_particle;p++){
 		os.str("");
 		os << "h_kE_" << p;
 		if(p==0) h_kE[p]= new TH1D(os.str().c_str(),"",200,0,20);
 		else     h_kE[p]= new TH1D(os.str().c_str(),"",40,0,20);
+		//
+		os.str("");
+		os << "h_Ex_particle_" << p;
+		h_Ex_particle[p] = new TH1D(os.str().c_str(),"",500,-100,400);
+		h_Ex_particle[p]->SetLineColor(color_root[p]);
+		//h_Ex_particle[p]->SetFillColor(color_root[p]);
+		//
+		os.str("");
+		os << "h_Ex_particle_th_" << p;
+		h_Ex_particle_th[p] = new TH1D(os.str().c_str(),"",500,-100,400);
+		h_Ex_particle_th[p]->SetLineColor(color_root[p]);
+		h_Ex_particle_th[p]->SetFillColor(color_root[p]);
 	}
 
 	int max_size=0;
@@ -104,13 +117,15 @@ int plot_simulation_comparison(){
 			if(p>=0){ // this is particle info (not daughter nuclei)
 				h_kE[p]->Fill(kE[b]);
 				if(p!=0) particle_counter++;
-				if(b==0){
-					first_p = p;
-					rbr[p]++;
-				}
+				if(b==0) first_p = p;
 			}
 		}
+		rbr[first_p]++;
 		if(particle_counter==1) rbr_2b[first_p]++;
+		h_Ex_particle[first_p]->Fill(Ex);
+
+
+		// save map
 		itr = br.find(decay->c_str());
 		if(itr != end(br) ) {
 			itr->second += 1;
@@ -179,32 +194,16 @@ int plot_simulation_comparison(){
 	h_nmulti->Scale(1./h_nmulti->GetEntries());
 	for(int p=0;p<num_particle;p++){
 		h_kE[p]->Scale(1./h_kE[p]->GetEntries());
+		h_Ex_particle[p]->Scale(1.0/h_Ex->GetEntries());
 	}
-
-	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
-	h_Ex->GetXaxis()->SetRangeUser(8,47);
-	h_Ex->SetStats(0);
-	h_Ex->SetMinimum(0);
-	h_Ex->GetXaxis()->SetTitle("Excitation energy (MeV)");
-	h_Ex->GetYaxis()->SetTitle("A.U.");
-	h_Ex->Draw("HIST");
-	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
-	l_Ex_min->SetLineWidth(2);
-	l_Ex_min->SetLineStyle(2);
-	l_Ex_min->SetLineColor(kRed);
-	if(Ex_min>8 && Ex_min<47) l_Ex_min->Draw("same");
-	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_Ex->GetMaximum()*1.05);
-	l_Ex_max->SetLineWidth(2);
-	l_Ex_max->SetLineStyle(2);
-	l_Ex_max->SetLineColor(kRed);
-	if(Ex_max>8 && Ex_max<47) l_Ex_max->Draw("same");
-	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
-	c_Ex->Print(os.str().c_str());
 
 
 	TCanvas* c_Ex_1 = new TCanvas("c_Ex_1","",0,0,800,600);
 	h_Ex->GetXaxis()->SetRangeUser(0,100);
+	h_Ex->SetStats(0);
+	h_Ex->SetMinimum(0);
+	h_Ex->GetXaxis()->SetTitle("Excitation energy (MeV)");
+	h_Ex->GetYaxis()->SetTitle("A.U.");
 	h_Ex->Draw("HIST");
 	TLine* l_1_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
 	l_1_Ex_min->SetLineWidth(2);
@@ -225,6 +224,33 @@ int plot_simulation_comparison(){
 	os.str("");
 	os << "fig_sim/fig_" << target.c_str() << "_Ex_1" << suffix.c_str() << ".pdf";
 	c_Ex_1->Print(os.str().c_str());
+
+
+
+	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
+	h_Ex->GetXaxis()->SetRangeUser(8,47);
+	h_Ex->Draw("HIST");
+	THStack* h_s_Ex = new THStack("h_s_Ex","");
+	for(int p=0;p<num_particle;p++){
+		h_s_Ex->Add(h_Ex_particle[p]);
+		h_Ex_particle[p]->Draw("HISTsame");
+	}
+	//h_s_Ex->Draw("HISTsame");
+	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
+	l_Ex_min->SetLineWidth(2);
+	l_Ex_min->SetLineStyle(2);
+	l_Ex_min->SetLineColor(kRed);
+	if(Ex_min>8 && Ex_min<47) l_Ex_min->Draw("same");
+	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_Ex->GetMaximum()*1.05);
+	l_Ex_max->SetLineWidth(2);
+	l_Ex_max->SetLineStyle(2);
+	l_Ex_max->SetLineColor(kRed);
+	if(Ex_max>8 && Ex_max<47) l_Ex_max->Draw("same");
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
+	c_Ex->Print(os.str().c_str());
+
+
 
 	TCanvas* c_nmulti = new TCanvas("c_nmulti","",0,0,800,600);
 	h_nmulti->GetXaxis()->SetNdivisions(10);
@@ -275,7 +301,8 @@ int plot_simulation_comparison(){
 	const int nda_data=3;
 	const int nda_color[nda_data]={416+2,800+6,600-6};
 	const int	nda_color_this = 616-6;
-	string nda_data_name[nda_data]={"KamLAND","Hu","Panin"};
+	string nda_data_name[nda_data]={"SAbe_Tohoku_2023","Hu","Panin"};
+	string nda_data_legend[nda_data]={"Abe (2023)","Hu et al. (2022)","Panin et al. (2016)"};
 	TFile* rootf_nda[nda_data];
 	TH1D* h_nda[nda_data];
 	for(int i=0;i<nda_data;i++){
@@ -312,8 +339,7 @@ int plot_simulation_comparison(){
 	leg_nda->AddEntry(h_nda_this,"This work","F");
 	for(int i=0;i<nda_data;i++){
 		os.str("");
-		os << nda_data_name[i].c_str();
-		if(i!=0) os << " et al.";
+		os << nda_data_legend[i].c_str();
 		leg_nda->AddEntry(h_nda[i],os.str().c_str(),"F");
 	}
 	leg_nda->Draw("same");
@@ -334,7 +360,8 @@ int plot_simulation_comparison(){
 	const int br_data=4;
 	const int br_color[br_data]={416+2,800+6,600,1};
 	const int	br_color_this = 616-6;
-	string br_data_name[br_data]={"KamLAND","Hu","CASCADE","Yosoi"};
+	string br_data_name[br_data]={"SAbe_Tohoku_2023","Hu","CASCADE","Yosoi"};
+	string br_data_legend[br_data]={"Abe (2023)","Hu et al. (2022)","CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
 	TFile* rootf_br[br_data];
 	TH1D* h_br[br_data];
 	TH1D* h_br_2b[br_data];
@@ -421,8 +448,7 @@ int plot_simulation_comparison(){
 		h_br[i]->Draw("HISTsame");
 		h_br_2b[i]->Draw("HISTsame");
 		os.str("");
-		os << br_data_name[i].c_str();
-		if(i!=0 && i!=2) os << " et al.";
+		os << br_data_legend[i].c_str();
 		leg_br->AddEntry(h_br[i],os.str().c_str(),"l");
 	}
 	leg_br->Draw("same");
