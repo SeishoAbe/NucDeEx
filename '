@@ -6,7 +6,7 @@ using namespace std;
 
 const double kE_th[num_particle]
 	= {0,3.1,3.1,
-		 4.0,4.6,0,4.5};
+		 4.0,4.6,1e9,4.5};
 
 int plot_simulation_comparison(){
 	// ---- FIXME ---- //
@@ -66,8 +66,8 @@ int plot_simulation_comparison(){
 	
 	TH1D* h_Ex = new TH1D("h_Ex","",500,-100,400);
 	TH1D* h_nmulti = new TH1D("h_nmulti","",10,-0.5,9.5);
-	TH1D* h_kE[num_particle], *h_Ex_particle[num_particle];
-	TH1D* h_Ex_particle_th[num_particle]; // w/ experimental threshold
+	TH1D* h_kE[num_particle];
+	TH1D* h_Ex_particle[num_particle], *h_Ex_particle_th[num_particle]; // w/ experimental threshold
 	for(int p=0;p<num_particle;p++){
 		os.str("");
 		os << "h_kE_" << p;
@@ -84,11 +84,11 @@ int plot_simulation_comparison(){
 		os << "h_Ex_particle_th_" << p;
 		h_Ex_particle_th[p] = new TH1D(os.str().c_str(),"",500,-100,400);
 		h_Ex_particle_th[p]->SetLineColor(color_root[p]);
-		h_Ex_particle_th[p]->SetFillColor(color_root[p]);
+		//h_Ex_particle_th[p]->SetFillColor(color_root[p]);
 	}
 
 	int max_size=0;
-	int numofevent=0;
+	int numofevent=0, numofdetected=0;
 	map<string, double> br;
 	map<string, double> :: iterator itr;
 	double rbr[num_particle]={0}; // two-body
@@ -100,11 +100,13 @@ int plot_simulation_comparison(){
 		h_Ex->Fill(Ex);
 		if(Ex_min>0 && Ex<Ex_min) continue;
 		if(Ex_max>0 && Ex>Ex_max) continue;
+		numofevent++;
 
 		if(max_size<size) max_size=size;
+
 		int nmulti=0;
 		int particle_counter=0; // w/o g
-		int first_p=-1;
+		bool flag_detected[num_particle]={0};
 		for(int b=0;b<size;b++){
 			if(PDG[b]==2112) nmulti++;
 			int p=-1;
@@ -116,13 +118,24 @@ int plot_simulation_comparison(){
 			}
 			if(p>=0){ // this is particle info (not daughter nuclei)
 				h_kE[p]->Fill(kE[b]);
+				if(kE[b]<kE_th[p]) continue;
+				flag_detected[p] = 1; // detected
 				if(p!=0) particle_counter++;
-				if(b==0) first_p = p;
 			}
 		}
-		rbr[first_p]++;
-		if(particle_counter==1) rbr_2b[first_p]++;
-		h_Ex_particle[first_p]->Fill(Ex);
+		h_nmulti->Fill(nmulti); // w/o energy th
+
+		bool detected=0;
+		for(int par=1;par<num_particle;par++){
+			//cout << flag_detected[par] << "  ";
+			if(!flag_detected[par]) continue;
+			rbr[par]++;
+			if(particle_counter==1) rbr_2b[par]++;
+			h_Ex_particle_th[par]->Fill(Ex);
+			detected=1;
+		}
+		//cout << endl;
+		if(detected) numofdetected++;
 
 
 		// save map
@@ -133,16 +146,15 @@ int plot_simulation_comparison(){
 			//cout << decay->c_str() << endl;
 			br.insert(make_pair(decay->c_str(),1));
 		}
-		h_nmulti->Fill(nmulti);
-		numofevent++;
 	}
 	cout << "max_size=" << max_size << endl;
 	cout << "numofevent=" << numofevent << endl;
+	cout << "numofdetected=" << numofdetected << endl;
 
 	double rbr_sum=0, rbr_2b_sum=0;
 	for(int par=0;par<num_particle;par++){
-		rbr[par] = rbr[par]/numofevent*100; // %
-		rbr_2b[par] = rbr_2b[par]/numofevent*100; // %
+		rbr[par] = rbr[par]/numofdetected*100; // %
+		rbr_2b[par] = rbr_2b[par]/numofdetected*100; // %
 		cout << setw(10) << particle_name[par].c_str() << "  " 
 				 << setw(10) << rbr[par] << "  " << rbr_2b[par] << endl;
 		rbr_sum+=rbr[par];
@@ -194,11 +206,17 @@ int plot_simulation_comparison(){
 	h_nmulti->Scale(1./h_nmulti->GetEntries());
 	for(int p=0;p<num_particle;p++){
 		h_kE[p]->Scale(1./h_kE[p]->GetEntries());
-		h_Ex_particle[p]->Scale(1.0/h_Ex->GetEntries());
+		h_Ex_particle_th[p]->Scale(1.0/h_Ex->GetEntries());
 	}
 
 
-	TCanvas* c_Ex_1 = new TCanvas("c_Ex_1","",0,0,800,600);
+	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf[";
+	c_Ex->Print(os.str().c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+	//
 	h_Ex->GetXaxis()->SetRangeUser(0,100);
 	h_Ex->SetStats(0);
 	h_Ex->SetMinimum(0);
@@ -222,18 +240,15 @@ int plot_simulation_comparison(){
 	//h_Ex->Fit(f_lorentzian,"","",18,30);
 	//f_lorentzian->Draw("same");
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_Ex_1" << suffix.c_str() << ".pdf";
-	c_Ex_1->Print(os.str().c_str());
-
-
-
-	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
+	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
+	c_Ex->Print(os.str().c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+	//
 	h_Ex->GetXaxis()->SetRangeUser(8,47);
-	h_Ex->Draw("HIST");
-	THStack* h_s_Ex = new THStack("h_s_Ex","");
+		h_Ex->Draw("HIST");
 	for(int p=0;p<num_particle;p++){
-		h_s_Ex->Add(h_Ex_particle[p]);
-		h_Ex_particle[p]->Draw("HISTsame");
+		h_Ex_particle_th[p]->Draw("HISTsame");
 	}
 	//h_s_Ex->Draw("HISTsame");
 	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
@@ -249,7 +264,26 @@ int plot_simulation_comparison(){
 	os.str("");
 	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
 	c_Ex->Print(os.str().c_str());
-
+	c_Ex->Update();
+	c_Ex->Clear();
+	//
+	THStack* h_s_Ex = new THStack("h_s_Ex","");
+	TH1F* waku = gPad->DrawFrame(8,47);
+	for(int p=2;p<num_particle;p++){
+		h_Ex_particle_th[p]->SetFillColor(color_root[p]);
+		h_s_Ex->Add(h_Ex_particle_th[p]);
+	}
+	h_s_Ex->Draw("HIST");
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
+	c_Ex->Print(os.str().c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf]";
+	c_Ex->Print(os.str().c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
 
 
 	TCanvas* c_nmulti = new TCanvas("c_nmulti","",0,0,800,600);
