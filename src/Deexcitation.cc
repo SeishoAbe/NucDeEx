@@ -256,10 +256,6 @@ void Deexcitation::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
 	cout << "Deexcitation::Decay()" << endl;
-
-	cout << "mass_target   = " << mass_target << endl;
-	cout << "mass_particle = " << mass_particle << endl;
-	cout << "mass_daughter = " << mass_daughter << endl;
 	
 	// ---- CM frame --- //
 	// --- Calculate kinematics (CM)
@@ -278,6 +274,9 @@ void Deexcitation::Decay(const bool breakflag)
 		abort();
 	}
 	if(verbose>0){
+		cout << "mass_target   = " << mass_target << endl;
+		cout << "mass_particle = " << mass_particle << endl;
+		cout << "mass_daughter = " << mass_daughter << endl;
 		cout << "cmMomentum  = " << cmMomentum << endl;
 		cout << "kE_particle = " << kE_particle << endl;
 		cout << "kE_daughter = " << kE_daughter << endl;
@@ -309,7 +308,8 @@ void Deexcitation::Decay(const bool breakflag)
 	Particle p_particle(PDG_particle[decay_mode],
 											mass_particle,
 											mom_particle,
-											particle_name[decay_mode]);
+											particle_name[decay_mode],
+											1,0);// trace flag==1, Ex_daughter==0
 	double totalE_particle_bef = p_particle.totalE();
 	p_particle.Boost(totalE_target,mom_target);// BOOST!
 	double totalE_particle_aft = p_particle.totalE();
@@ -317,7 +317,8 @@ void Deexcitation::Decay(const bool breakflag)
 	Particle p_daughter(PDGion(Z_daughter,N_daughter),
 											mass_daughter, // w/o excitation E
 											mom_daughter,
-											name_daughter);
+											name_daughter,
+											0,Ex_daughter); // intermediate state in default
 
 	double totalE_daughter_bef = p_daughter.totalE();
 	p_daughter.Boost(totalE_target,mom_target);
@@ -342,6 +343,7 @@ void Deexcitation::Decay(const bool breakflag)
 	cout << "totalE_ex_bef = " << totalE_ex_bef << endl;
 	cout << "totalE_ex_aft = " << totalE_ex_aft << endl;
 
+
 	// --- Check Energy conservation (4dim energy including momentum)
 	//       Fundamental energy conservation 
 	//		   (Total energy in LAB) = (Total energy in CM after boost)
@@ -352,10 +354,16 @@ void Deexcitation::Decay(const bool breakflag)
 		cerr << "ERROR: @ Deexcitation:Decay(): Energy is not conserved..." << endl;
 		abort();
 	}
-	_particle.push_back(p_particle);
 
-	// DoDeex loop will be end -> Save daughter
-	if(breakflag)_particle.push_back(p_daughter);
+	// Then, push back
+
+	_particle.push_back(p_particle);
+	// DoDeex loop will be end -> turn on track flag, because it is not intermediate state
+	if(breakflag) p_daughter._flag=1;
+	_particle.push_back(p_daughter);
+
+	cout << "flag_particle = " << p_particle._flag << endl;
+	cout << "flag_daughter = " << p_daughter._flag << endl;
 }
 
 /////////////////////////////////////////////
