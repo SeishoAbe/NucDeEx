@@ -18,13 +18,16 @@ Particle::Particle()
 }
 
 ///////////////
-Particle::Particle(const int PDG, const double mass, const TVector3& mom, const string name)
+Particle::Particle(const int PDG, const double mass, const TVector3& mom, 
+									 const string name, const bool flag, const double Ex)
 ///////////////
 {
 	_PDG=PDG;
 	_mass=mass;
 	_momentum.SetXYZ(mom.X(), mom.Y(), mom.Z());
 	_name=name;
+	_flag=flag;
+	_Ex=Ex;
 }
 
 
