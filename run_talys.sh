@@ -2,7 +2,7 @@
 
 ### FIXME ###
 #TARGET_TMP="11B 11C 15N 15O"
-TARGET_TMP="11B"
+TARGET_TMP="11C 11B"
 FILE_TMP="energy.1.2.p.txt energy"
 ldmodel_tmp="1 2 3 4 5 6"
 #############
@@ -34,3 +34,4 @@ do
 		talys < ../$INDIR/input_${TARGET}_ldmodel${ldmodel} > output_${TARGET}_ldmodel${ldmodel}
 	done
 done
+cd -
