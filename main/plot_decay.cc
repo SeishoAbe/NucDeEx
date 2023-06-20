@@ -25,8 +25,8 @@ const string decay_name[num_particle] // for G4
 		 "Deuteron","Triton","He3","Alpha"};
 
 int main(int argc, char* argv[]){
-	if(argc!=2){
-		cerr << argv[0] << " [Target nucleus]" << endl;
+	if(argc!=3){
+		cerr << argv[0] << " [Target nucleus] [ldmodel]" << endl;
 		return 0;
 	}
   // --- FIXME  --- //
@@ -34,6 +34,8 @@ int main(int argc, char* argv[]){
   const float Ex_max=100*1e3; // keV <- G4Rad
   const int Ex_bin_width=0.2*1e3; // keV <- G4Rad
   // ---------------//
+
+	const int ldmodel = atoi(argv[2]);
   
   std::ostringstream os;
   NucleusTable* nucleus_table = new NucleusTable();
@@ -42,7 +44,7 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 	os.str("");
-	os << "output/output_" << argv[1];
+	os << "output/output_" << argv[1] << "_ldmodel" << ldmodel;
 	ReadTALYS* read_talys = new ReadTALYS(os.str().c_str(), nucleus_table);
 	read_talys->SetVerboseLevel(1);
 	if(!read_talys->Read()){
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]){
 
 	// prepare output root file
 	os.str("");
-	os << "output/Br_" << argv[1] << ".root";
+	os << "output/Br_" << argv[1] << "_ldmodel" << ldmodel << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree","tree");
 	int Z,N, Ex_bin;
@@ -217,7 +219,7 @@ int main(int argc, char* argv[]){
 		}
 		gPad->RedrawAxis();
 		os.str("");
-		os << "fig/" << argv[1] << "/fig_" << name.c_str() << "_pop.pdf";
+		os << "fig/" << argv[1] << "_ldmodel" << ldmodel << "/fig_" << name.c_str() << "_pop.pdf";
 		c_target_pop->Print(os.str().c_str());
 		c_target_pop->Update();
 		c_target_pop->Clear();
@@ -245,7 +247,7 @@ int main(int argc, char* argv[]){
 		gPad->RedrawAxis();
 		//
 		os.str("");
-		os << "fig/" << argv[1] << "/fig_" << name.c_str() << "_br.pdf";
+		os << "fig/" << argv[1] << "_ldmodel" << ldmodel << "/fig_" << name.c_str() << "_br.pdf";
 		c_target_br->Print(os.str().c_str());
 		c_target_br->Update();
 		c_target_br->Clear();
@@ -253,7 +255,9 @@ int main(int argc, char* argv[]){
 
 
 		TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
-		string pdfname= (string)"fig/" + (string)argv[1] + (string)"/fig_" + name + (string)"_br_ex.pdf";
+		os.str("");
+		os << "fig/" << argv[1] << "_ldmodel" << ldmodel << "/fig_" << name.c_str() << "_br_Ex.pdf";
+		string pdfname= os.str();
 		c_target_br_ex->Print( (pdfname+(string)"[").c_str() );
 		c_target_br_ex->Update();
 		c_target_br_ex->Clear();
@@ -337,6 +341,7 @@ int main(int argc, char* argv[]){
 		}
 
 		// --- Create RadioactiveDecay file --- //
+		/*
 		os.str("");
 		os << "output/" << argv[1] << "/z" << nuc_target->Z << ".a" << nuc_target->A;
 		ofstream ofs(os.str().c_str());
@@ -399,6 +404,7 @@ int main(int argc, char* argv[]){
 			}
 		}
 		ofs.close();
+		*/
 	}
 	// end of Nucleus loop in NucleusTable
 

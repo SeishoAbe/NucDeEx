@@ -31,6 +31,6 @@ for TARGET in $TARGET_TMP
 do
 	for ldmodel in $ldmodel_tmp
 	do
-		talys < ../$INDIR/input_${TARGET}_ldmodel${ldmodel} > output_$TARGET_$ldmodel
+		talys < ../$INDIR/input_${TARGET}_ldmodel${ldmodel} > output_${TARGET}_ldmodel${ldmodel}
 	done
 done
