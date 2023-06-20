@@ -1,7 +1,7 @@
 # Prefix
 /fig*
 old*
-output*
+/output*/output*
 sim_out*
 bin
 obj
