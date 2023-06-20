@@ -2,7 +2,7 @@
 #define __NucleusTable__HH__
 
 #include <map>
-#include <Nucleus.hh>
+#include "Nucleus.hh"
 
 using namespace std;
 

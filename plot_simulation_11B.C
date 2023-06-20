@@ -1,6 +1,12 @@
-#include "include/consts.hh"
 #include <TStyle.h>
+#include <algorithm>
 #include <map>
+
+#include "include/consts.hh"
+#include "include/NucleusTable.hh"
+#include "include/Nucleus.hh"
+
+R__LOAD_LIBRARY(lib/libTALYStool);
 
 using namespace std;
 
@@ -18,6 +24,25 @@ int plot_simulation_11B(){
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 
 	// --------------- //
+
+	//gSystem->Load("lib/libTALYStool");
+	NucleusTable* _nucleus_table = new NucleusTable();
+	if(!_nucleus_table->ReadTables()){
+		cerr << "Fatal Error" << endl;
+		abort();
+	}
+	Nucleus* nuc_target = _nucleus_table->GetNucleusPtr(target.c_str());
+	double SE[num_particle];
+	string daughter[num_particle]={"11B","10B","10Be","9Be","8Be","8Li","7Li"};
+	double criteria_3b[num_particle]={0};
+	for(int p=0;p<num_particle;p++){
+		SE[p] = nuc_target->S[p];
+		Nucleus* nuc = _nucleus_table->GetNucleusPtr(daughter[p].c_str());
+		criteria_3b[p] = min(5.0,(double)nuc->min_S());
+		criteria_3b[p] += SE[p];
+		cout << "criteria_3b = " << criteria_3b[p] << endl;
+	}
+
 
 	ostringstream os;
 	os.str("");
@@ -72,7 +97,9 @@ int plot_simulation_11B(){
 	TH1D* h_nmulti = new TH1D("h_nmulti","",10,-0.5,9.5);
 	TH1D* h_kE[num_particle];
 	TH1D* h_Ex_particle[num_particle]; // w/o experimental energy th
-	TH1D *h_Ex_particle_th[num_particle]; // w/ 
+	TH1D* h_Ex_particle_th[num_particle]; // w/ 
+	TH2D* h_Ex_kE[num_particle]; 
+	TH1D* h_SE[num_particle];
 	for(int p=0;p<num_particle;p++){
 		os.str("");
 		os << "h_kE_" << p;
@@ -88,6 +115,14 @@ int plot_simulation_11B(){
 		os << "h_Ex_particle_th_" << p;
 		h_Ex_particle_th[p] = new TH1D(os.str().c_str(),"",500,-100,400);
 		h_Ex_particle_th[p]->SetLineColor(color_root[p]);
+		//
+		os.str("");
+		os << "h_Ex_kE_" << p;
+		h_Ex_kE[p] = new TH2D(os.str().c_str(),"",1000,-100,400,100,0,50);
+		//
+		os.str("");
+		os << "h_SE_" << p;
+		h_SE[p] = new TH1D(os.str().c_str(),"",50,0,50);
 	}
 
 	int max_size=0;
@@ -102,6 +137,7 @@ int plot_simulation_11B(){
 	double rbr_th[num_particle]={0};  // w/ th
 	double rbr_th_2b[num_particle]={0}; // w/ th two-body
 	int count_particle_th[num_particle]={0};
+	int count_particle_3b[num_particle]={0};
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
 
@@ -117,6 +153,8 @@ int plot_simulation_11B(){
 		bool flag_detected[num_particle]={0};
 		int particle_counter=0,particle_counter_th=0; // w/o g
 		int first_p=-1;
+		double kE_r[num_particle]={0};
+		double Ex_daughter_r=-1;
 		for(int b=0;b<size;b++){
 			int p=-1;
 			for(int par=0;par<num_particle;par++){
@@ -129,14 +167,18 @@ int plot_simulation_11B(){
 				multi[p]++;
 				h_kE[p]->Fill(kE[b]);
 				h_Ex_particle[p]->Fill(Ex);
-				if(first_p<0) first_p=p;
+				if(first_p<0 && p>=1) first_p=p; // except gamma
 				if(p!=0) particle_counter++;
 				// --- apply threshold 
 				if(kE[b]<kE_th[p]) continue;
 				// --- 
+				kE_r[p]=kE[b];
 				count_particle_th[p]++;
 				flag_detected[p] = 1; // detected
-				if(p!=0) particle_counter_th++;
+				if(p>=1) particle_counter_th++;
+			}else if(Ex_daughter_r<0 && first_p>0){ // daughter
+				if(flag[b]==0) Ex_daughter_r=Ex_daughter[b];
+				else Ex_daughter_r=0;
 			}
 		}
 
@@ -154,6 +196,11 @@ int plot_simulation_11B(){
 		for(int par=1;par<num_particle;par++){
 			if(!flag_detected[par]) continue;
 			rbr_th[par]++;
+			h_Ex_kE[par]->Fill(Ex,kE_r[par]);
+			if(Ex_daughter_r>=0){
+				h_SE[par]->Fill(Ex_daughter_r+SE[par]);
+				if(Ex_daughter_r+SE[par]>criteria_3b[par]) count_particle_3b[par]++;
+			}
 			if(particle_counter_th==1){
 				rbr_th_2b[par]++;
 				h_Ex_particle_th[par]->Fill(Ex);
@@ -182,7 +229,7 @@ int plot_simulation_11B(){
 		rbr[par] = rbr[par]/numofevent*100; // %
 		rbr_2b[par] = rbr_2b[par]/numofevent*100; // %
 		cout << setw(10) << particle_name[par].c_str() << "  " 
-				 << setw(10) << rbr[par] << "  " << rbr_2b[par] << endl;
+				 << setw(10) << fixed << setprecision(1) << rbr[par] << "  " << rbr_2b[par] << endl;
 		rbr_sum+=rbr[par];
 		rbr_2b_sum+=rbr_2b[par];
 	}
@@ -204,7 +251,7 @@ int plot_simulation_11B(){
 	// nda relative br (2body)(use nominal)
 	double rbr_nda_n = rbr_2b[1]/(rbr_2b[1]+rbr_2b[3]+rbr_2b[6]);
 	double rbr_nda_da = (rbr_2b[3]+rbr_2b[6])/(rbr_2b[1]+rbr_2b[3]+rbr_2b[6]);
-	cout << "Relative BR (n vs d/a): n   : " << rbr_nda_n << endl;
+	cout << "Relative BR (n vs d/a): n   : " << setprecision(2) << rbr_nda_n << endl;
 	cout << "Relative BR (n vs d/a): d/a : " << rbr_nda_da << endl;
 
 	
@@ -278,7 +325,7 @@ int plot_simulation_11B(){
 	c_Ex->Update();
 	c_Ex->Clear();
 	//
-	h_Ex->SetTitle("w/o experimental energy threshold");
+	h_Ex->SetTitle("w/o energy th. (double count is included)");
 	h_Ex->GetXaxis()->SetRangeUser(8,47);
 	h_Ex->Draw("HIST");
 	for(int p=1;p<num_particle;p++){
@@ -311,7 +358,7 @@ int plot_simulation_11B(){
 	c_Ex->Update();
 	c_Ex->Clear();
 	//
-	h_Ex->SetTitle("w/ experimental energy threshold");
+	h_Ex->SetTitle("w/ energy th. (two-body decay)");
 	h_Ex->GetXaxis()->SetRangeUser(8,47);
 	h_Ex->Draw("HIST");
 	for(int p=0;p<num_particle;p++){
@@ -550,9 +597,9 @@ int plot_simulation_11B(){
 	h_br_2b_this->Fill(-1+br_data*6,rbr_th_2b[6]);
 
 
-
+	const double max_br_plot=32;
 	TCanvas* c_br =new TCanvas("c_br","c_br",0,0,800,600);
-	TH1F* waku_br = gPad->DrawFrame(-3,0,30,32);
+	TH1F* waku_br = gPad->DrawFrame(-3,0,30,max_br_plot);
 	waku_br->GetXaxis()->SetLabelSize(0);
 	waku_br->GetXaxis()->SetTickSize(0);
 	waku_br->GetYaxis()->SetTitle("Relative branching ratio (%)");
@@ -574,7 +621,87 @@ int plot_simulation_11B(){
 		leg_br->AddEntry(h_br[i],os.str().c_str(),"l");
 	}
 	leg_br->Draw("same");
+	//
+	TLine* line_br_n = new TLine(br_data,0,br_data,max_br_plot);
+	line_br_n->SetLineStyle(2);
+	line_br_n->Draw("same");
+	TLatex* l_br_n_factor = new TLatex(-1,max_br_plot*0.9,"#times 1/2");
+	l_br_n_factor->SetTextSize(0.07);
+	l_br_n_factor->Draw("same");
+	//
+	int index=0;
+	for(int p=1;p<num_particle;p++){
+		if(particle_name[p]=="helium-3") continue;
+		TLatex* l_br;
+		if(particle_name[p]=="alpha") l_br = new TLatex(br_data*index*1.5+1,-2.5,"#alpha");
+		else l_br = new TLatex(br_data*index*1.5+1,-2.5,particle_name[p].substr(0,1).c_str());
+		l_br->Draw("same");
+		l_br->SetTextFont(12);
+		index++;
+	}
+	//
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_br" << suffix.c_str() << ".pdf";
+	c_br->Print(os.str().c_str());
 
+
+	TCanvas* c_Ex_kE = new TCanvas("c_Ex_kE","c_Ex_kE",0,0,1200,600);
+	c_Ex_kE->Divide(4,2);
+	for(int p=0;p<num_particle;p++){
+		c_Ex_kE->cd(p+1);
+		h_Ex_kE[p]->SetTitle(particle_name[p].c_str());
+		h_Ex_kE[p]->SetStats(0);
+		h_Ex_kE[p]->GetXaxis()->SetRangeUser(0,50);
+		h_Ex_kE[p]->GetYaxis()->SetRangeUser(0,28);
+		h_Ex_kE[p]->GetXaxis()->SetTitle("Excitation energy (MeV)");
+		h_Ex_kE[p]->GetYaxis()->SetTitle("Kinetic energy of particle (MeV)");
+		h_Ex_kE[p]->Draw("colz");
+		//TLine* l_Ex_kE = new TLine(SE[p],0,50,
+		TF1* f_Ex_kE = new TF1("f_Ex_kE","(x-[1])*[0]",0,50);
+		double factor=1;
+		if(p==1 && p==2) factor= 1- 1.0/11;
+		if(p==3) factor = 1-2.0/11;
+		if(p==4 || p==5) factor = 1-3.0/11;
+		if(p==6) factor = 1-4.0/11;
+		f_Ex_kE->SetParameter(0,factor);
+		f_Ex_kE->SetParameter(1,SE[p]);
+		f_Ex_kE->Draw("same");
+	}
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_Ex_kE" << suffix.c_str() << ".pdf";
+	c_Ex_kE->Print(os.str().c_str());
+
+
+	TCanvas* c_SE = new TCanvas("c_SE","c_SE",0,0,1200,600);
+	c_SE->Divide(4,2);
+	for(int p=0;p<num_particle;p++){
+		c_SE->cd(p+1);
+		h_SE[p]->SetTitle(particle_name[p].c_str());
+		h_SE[p]->SetStats(0);
+		h_SE[p]->GetXaxis()->SetRangeUser(0,50);
+		h_SE[p]->GetXaxis()->SetTitle("Separation E + Excitation daughter (MeV)");
+		h_SE[p]->Draw("HIST");
+		TLine* l_SE = new TLine(SE[p],0,SE[p],h_SE[p]->GetMaximum()*1.05);
+		l_SE->SetLineStyle(2);
+		l_SE->Draw("same");
+		//
+		TLine* l_3b = new TLine(criteria_3b[p],0,criteria_3b[p],h_SE[p]->GetMaximum()*1.05);
+		l_3b->SetLineStyle(2);
+		l_3b->Draw("same");
+		//
+		os.str("");
+		os << "Prob = " << (double)h_SE[p]->GetEntries()/numofevent*100;
+		TText* t_SE  = new TText(20,h_SE[p]->GetMaximum()*0.85,os.str().c_str());
+		t_SE->Draw("same");
+		//
+		os.str("");
+		os << "Prob (3b) = " << (double)count_particle_3b[p]/numofevent*100;
+		TText* t_SE_3b  = new TText(20,h_SE[p]->GetMaximum()*0.75,os.str().c_str());
+		t_SE_3b->Draw("same");
+	}
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_SE" << suffix.c_str() << ".pdf";
+	c_SE->Print(os.str().c_str());
 
 	return 0;
 }
