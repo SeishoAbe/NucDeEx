@@ -168,7 +168,7 @@ int plot_simulation_11B(){
 				h_kE[p]->Fill(kE[b]);
 				h_Ex_particle[p]->Fill(Ex);
 				if(first_p<0 && p>=1) first_p=p; // except gamma
-				if(p!=0) particle_counter++;
+				if(p>=1) particle_counter++;
 				// --- apply threshold 
 				if(kE[b]<kE_th[p]) continue;
 				// --- 
