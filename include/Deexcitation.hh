@@ -21,7 +21,7 @@ using namespace std;
 
 class Deexcitation{
 	public:
-	Deexcitation();
+	Deexcitation(const int ldmodel=1);
 	virtual ~Deexcitation();
 
 	void DoDeex(const int Z, const int N, const double Ex,
@@ -93,6 +93,7 @@ class Deexcitation{
 
 	// others
 	NucleusTable* _nucleus_table;
+	int ldmodel;
 	int verbose;
 	int eventID;
 	ostringstream os;
