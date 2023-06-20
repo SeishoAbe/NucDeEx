@@ -10,10 +10,12 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-	if(argc!=2){
+	if(argc<=2){
 		cerr << argv[0] << " [Target nucleus]" << endl;
 		return 0;
 	}
+	int ldmodel=1; // default: 1 (constant temperature)
+	if(argc==3) ldmodel = atoi(argv[2]);
 
 	ostringstream os;
 
@@ -22,10 +24,10 @@ int main(int argc, char* argv[]){
 		cerr << "something wrong" << endl;
 		return 1;
 	}
+	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
 
 	os.str("");
-	os << "input/input_" << argv[1];
-	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
+	os << "input/input_" << argv[1] << "_ldmodel" << ldmodel;
 
 	ofstream ofs(os.str().c_str());
 	ofs << "projectile 0" << endl;
@@ -41,6 +43,7 @@ int main(int argc, char* argv[]){
 	ofs << "bins 0" << endl;
 	// maxlevelsbin
 	ofs << "maxlevelstar " << nuc_target->maxlevelsbin << endl;
+	if(ldmodel!=1) ofs << "ldmodel " << ldmodel << endl;
 
 
 	for(int p=0;p<num_particle;p++){
