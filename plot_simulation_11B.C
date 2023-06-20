@@ -33,6 +33,8 @@ int plot_simulation_11B(){
 	double mass[bins];
 	double totalE[bins],kE[bins];
 	double PMag[bins], PX[bins],PY[bins],PZ[bins];
+	bool flag[bins];
+	double Ex_daughter[bins];
 	string* decay=0;
 	tree->SetBranchAddress("eventID",&eventID);
 	if(flag_decay) tree->SetBranchAddress("decay_remove_g",&decay);
@@ -53,6 +55,8 @@ int plot_simulation_11B(){
 	tree->SetBranchAddress("PX",&PX);
 	tree->SetBranchAddress("PY",&PY);
 	tree->SetBranchAddress("PZ",&PZ);
+	tree->SetBranchAddress("flag",&flag);
+	tree->SetBranchAddress("Ex_daughter",&Ex_daughter);
 
 	// --- Draw --- // 
 	gStyle->SetTextFont(132);
@@ -67,7 +71,8 @@ int plot_simulation_11B(){
 	TH1D* h_Ex = new TH1D("h_Ex","",500,-100,400);
 	TH1D* h_nmulti = new TH1D("h_nmulti","",10,-0.5,9.5);
 	TH1D* h_kE[num_particle];
-	TH1D* h_Ex_particle[num_particle], *h_Ex_particle_th[num_particle]; // w/ experimental threshold
+	TH1D* h_Ex_particle[num_particle]; // w/o experimental energy th
+	TH1D *h_Ex_particle_th[num_particle]; // w/ 
 	for(int p=0;p<num_particle;p++){
 		os.str("");
 		os << "h_kE_" << p;
@@ -78,21 +83,24 @@ int plot_simulation_11B(){
 		os << "h_Ex_particle_" << p;
 		h_Ex_particle[p] = new TH1D(os.str().c_str(),"",500,-100,400);
 		h_Ex_particle[p]->SetLineColor(color_root[p]);
-		//h_Ex_particle[p]->SetFillColor(color_root[p]);
 		//
 		os.str("");
 		os << "h_Ex_particle_th_" << p;
 		h_Ex_particle_th[p] = new TH1D(os.str().c_str(),"",500,-100,400);
 		h_Ex_particle_th[p]->SetLineColor(color_root[p]);
-		//h_Ex_particle_th[p]->SetFillColor(color_root[p]);
 	}
 
 	int max_size=0;
 	int numofevent=0, numofdetected=0;
 	map<string, double> br;
 	map<string, double> :: iterator itr;
-	double rbr[num_particle]={0}; 
+	// for comparison w/ Panin
+	double rbr[num_particle]={0}; // two-body
 	double rbr_2b[num_particle]={0}; // two-body
+	// for comparison w/ Yosoi
+	// double counter could be happen
+	double rbr_th[num_particle]={0};  // w/ th
+	double rbr_th_2b[num_particle]={0}; // w/ th two-body
 	int count_particle_th[num_particle]={0};
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
@@ -105,11 +113,11 @@ int plot_simulation_11B(){
 
 		if(max_size<size) max_size=size;
 
-		int nmulti=0;
-		int particle_counter=0; // w/o g
+		int multi[num_particle]={0};
 		bool flag_detected[num_particle]={0};
+		int particle_counter=0,particle_counter_th=0; // w/o g
+		int first_p=-1;
 		for(int b=0;b<size;b++){
-			if(PDG[b]==2112) nmulti++;
 			int p=-1;
 			for(int par=0;par<num_particle;par++){
 				if(PDG_particle[par]==PDG[b]){
@@ -118,30 +126,44 @@ int plot_simulation_11B(){
 				}
 			}
 			if(p>=0){ // this is particle info (not daughter nuclei)
+				multi[p]++;
 				h_kE[p]->Fill(kE[b]);
 				h_Ex_particle[p]->Fill(Ex);
+				if(first_p<0) first_p=p;
+				if(p!=0) particle_counter++;
+				// --- apply threshold 
 				if(kE[b]<kE_th[p]) continue;
+				// --- 
 				count_particle_th[p]++;
 				flag_detected[p] = 1; // detected
-				if(p!=0) particle_counter++;
+				if(p!=0) particle_counter_th++;
 			}
 		}
-		h_nmulti->Fill(nmulti); // w/o energy th
 
+		// --- Fill multiplicity histogram
+		h_nmulti->Fill(multi[1]); // w/o energy th
+		
+		// --- Nominal rbr 
+		if(first_p>=0){
+			rbr[first_p]++;
+			if(particle_counter==1) rbr_2b[first_p]++;
+		}
+			
+		// --- Detected rbr 
 		bool detected=0;
 		for(int par=1;par<num_particle;par++){
 			if(!flag_detected[par]) continue;
-			rbr[par]++;
-			if(particle_counter==1){
-				rbr_2b[par]++;
+			rbr_th[par]++;
+			if(particle_counter_th==1){
+				rbr_th_2b[par]++;
 				h_Ex_particle_th[par]->Fill(Ex);
 			}
-			detected=1;
+			if(par>=2) detected=1; // neutrons did not affect detection
 		}
 		if(detected) numofdetected++;
 
 
-		// save map
+		//--- save map--//
 		itr = br.find(decay->c_str());
 		if(itr != end(br) ) {
 			itr->second += 1;
@@ -154,10 +176,11 @@ int plot_simulation_11B(){
 	cout << "numofevent=" << numofevent << endl;
 	cout << "numofdetected=" << numofdetected << endl;
 
+	cout << "### without threshold " << endl;
 	double rbr_sum=0, rbr_2b_sum=0;
 	for(int par=0;par<num_particle;par++){
-		rbr[par] = rbr[par]/numofdetected*100; // %
-		rbr_2b[par] = rbr_2b[par]/numofdetected*100; // %
+		rbr[par] = rbr[par]/numofevent*100; // %
+		rbr_2b[par] = rbr_2b[par]/numofevent*100; // %
 		cout << setw(10) << particle_name[par].c_str() << "  " 
 				 << setw(10) << rbr[par] << "  " << rbr_2b[par] << endl;
 		rbr_sum+=rbr[par];
@@ -165,15 +188,27 @@ int plot_simulation_11B(){
 	}
 	cout << setw(10) << "sum" << "  " << setw(10) << rbr_sum << "  " << rbr_2b_sum << endl;
 
+	cout << "### with threshold " << endl;
+	double rbr_th_sum=0, rbr_th_2b_sum=0;
+	for(int par=0;par<num_particle;par++){
+		rbr_th[par] = rbr_th[par]/numofevent*100; // %
+		rbr_th_2b[par] = rbr_th_2b[par]/numofevent*100; // %
+		cout << setw(10) << particle_name[par].c_str() << "  " 
+				 << setw(10) << rbr_th[par] << "  " << rbr_th_2b[par] << endl;
+		rbr_th_sum+=rbr_th[par];
+		rbr_th_2b_sum+=rbr_th_2b[par];
+	}
+	cout << setw(10) << "sum" << "  " << setw(10) << rbr_th_sum << "  " << rbr_th_2b_sum << endl;
+
 	// for comparison 
-	// nda relative br (2body)
+	// nda relative br (2body)(use nominal)
 	double rbr_nda_n = rbr_2b[1]/(rbr_2b[1]+rbr_2b[3]+rbr_2b[6]);
 	double rbr_nda_da = (rbr_2b[3]+rbr_2b[6])/(rbr_2b[1]+rbr_2b[3]+rbr_2b[6]);
 	cout << "Relative BR (n vs d/a): n   : " << rbr_nda_n << endl;
 	cout << "Relative BR (n vs d/a): d/a : " << rbr_nda_da << endl;
 
 	
-	// output  (txt)
+	// output map as .txt
 	os.str("");
 	if(Ex_min>0) os << "_Exmin" << Ex_min;
 	if(Ex_max>0) os	<< "_Exmax" << Ex_max;
@@ -372,7 +407,7 @@ int plot_simulation_11B(){
 	const int nda_color[nda_data]={416+2,800+6,600-6};
 	const int	nda_color_this = 616-6;
 	string nda_data_name[nda_data]={"SAbe_Tohoku_2023","Hu","Panin"};
-	string nda_data_legend[nda_data]={"Abe (2023)","Hu et al. (2022)","Panin et al. (2016)"};
+	string nda_data_legend[nda_data]={"Abe et al. (2023)","Hu et al. (2022)","Panin et al. (2016)"};
 	TFile* rootf_nda[nda_data];
 	TH1D* h_nda[nda_data];
 	for(int i=0;i<nda_data;i++){
@@ -431,10 +466,11 @@ int plot_simulation_11B(){
 	const int br_color[br_data]={416+2,800+6,600,1};
 	const int	br_color_this = 616-6;
 	string br_data_name[br_data]={"SAbe_Tohoku_2023","Hu","CASCADE","Yosoi"};
-	string br_data_legend[br_data]={"Abe (2023)","Hu et al. (2022)","CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
+	string br_data_legend[br_data]={"Abe et al. (2023)","Hu et al. (2022)","CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
 	TFile* rootf_br[br_data];
 	TH1D* h_br[br_data];
 	TH1D* h_br_2b[br_data];
+	const int bin_offset=11;
 	for(int i=0;i<br_data;i++){
 		os.str("");
 		os << "data/" << br_data_name[i].c_str() << "/" << br_data_name[i].c_str() << ".root";
@@ -454,27 +490,39 @@ int plot_simulation_11B(){
 		h_br_2b[i] = new TH1D(os.str().c_str(),"",50,-10,40);
 		//
 		if(br_data_name[i]=="CASCADE"){
-			h_br[i]->Fill(i,env->GetValue("cas_br_n",-9999.));
-			h_br_2b[i]->Fill(i,env->GetValue("cas_br_n_2b",-9999.));
-			h_br[i]->Fill(i+br_data*1.5,env->GetValue("cas_br_p",-9999.));
-			h_br_2b[i]->Fill(i+br_data*1.5,env->GetValue("cas_br_p_2b",-9999.));
-			h_br[i]->Fill(i+br_data*3,env->GetValue("cas_br_d",-9999.));
-			h_br_2b[i]->Fill(i+br_data*3,env->GetValue("cas_br_d_2b",-9999.));
-			h_br[i]->Fill(i+br_data*4.5,env->GetValue("cas_br_t",-9999.));
-			h_br_2b[i]->Fill(i+br_data*4.5,env->GetValue("cas_br_t_2b",-9999.));
-			h_br[i]->Fill(i+br_data*6,env->GetValue("cas_br_a",-9999.));
-			h_br_2b[i]->Fill(i+br_data*6,env->GetValue("cas_br_a_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset,env->GetValue("cas_br_n",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset,env->GetValue("cas_br_n_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*1.5,env->GetValue("cas_br_p",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*1.5,env->GetValue("cas_br_p_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*3,env->GetValue("cas_br_d",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*3,env->GetValue("cas_br_d_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*4.5,env->GetValue("cas_br_t",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*4.5,env->GetValue("cas_br_t_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*6,env->GetValue("cas_br_a",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*6,env->GetValue("cas_br_a_2b",-9999.));
 		}else{
-			h_br[i]->Fill(i,env->GetValue("br_n",-9999.));
-			h_br_2b[i]->Fill(i,env->GetValue("br_n_2b",-9999.));
-			h_br[i]->Fill(i+br_data*1.5,env->GetValue("br_p",-9999.));
-			h_br_2b[i]->Fill(i+br_data*1.5,env->GetValue("br_p_2b",-9999.));
-			h_br[i]->Fill(i+br_data*3,env->GetValue("br_d",-9999.));
-			h_br_2b[i]->Fill(i+br_data*3,env->GetValue("br_d_2b",-9999.));
-			h_br[i]->Fill(i+br_data*4.5,env->GetValue("br_t",-9999.));
-			h_br_2b[i]->Fill(i+br_data*4.5,env->GetValue("br_t_2b",-9999.));
-			h_br[i]->Fill(i+br_data*6,env->GetValue("br_a",-9999.));
-			h_br_2b[i]->Fill(i+br_data*6,env->GetValue("br_a_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset,env->GetValue("br_n",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset,env->GetValue("br_n_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*1.5,env->GetValue("br_p",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*1.5,env->GetValue("br_p_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*3,env->GetValue("br_d",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*3,env->GetValue("br_d_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*4.5,env->GetValue("br_t",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*4.5,env->GetValue("br_t_2b",-9999.));
+			h_br[i]->SetBinContent(i+bin_offset+br_data*6,env->GetValue("br_a",-9999.));
+			h_br_2b[i]->SetBinContent(i+bin_offset+br_data*6,env->GetValue("br_a_2b",-9999.));
+			if(br_data_name[i]=="Yosoi"){
+				h_br[i]->SetBinError(i+bin_offset,env->GetValue("br_e_n",-9999.));
+				h_br_2b[i]->SetBinError(i+bin_offset,env->GetValue("br_e_n_2b",-9999.));
+				h_br[i]->SetBinError(i+bin_offset+br_data*1.5,env->GetValue("br_e_p",-9999.));
+				h_br_2b[i]->SetBinError(i+bin_offset+br_data*1.5,env->GetValue("br_e_p_2b",-9999.));
+				h_br[i]->SetBinError(i+bin_offset+br_data*3,env->GetValue("br_e_d",-9999.));
+				h_br_2b[i]->SetBinError(i+bin_offset+br_data*3,env->GetValue("br_e_d_2b",-9999.));
+				h_br[i]->SetBinError(i+bin_offset+br_data*4.5,env->GetValue("br_e_t",-9999.));
+				h_br_2b[i]->SetBinError(i+bin_offset+br_data*4.5,env->GetValue("br_e_t_2b",-9999.));
+				h_br[i]->SetBinError(i+bin_offset+br_data*6,env->GetValue("br_e_a",-9999.));
+				h_br_2b[i]->SetBinError(i+bin_offset+br_data*6,env->GetValue("br_e_a_2b",-9999.));
+			}
 		}
 		//
 		h_br[i]->SetLineColor(br_color[i]);
@@ -490,16 +538,16 @@ int plot_simulation_11B(){
 	h_br_2b_this->SetLineColor(br_color_this);
 	h_br_2b_this->SetFillColor(br_color_this);
 	//
-	h_br_this->Fill(-1,rbr[1]/2);
-	h_br_2b_this->Fill(-1,rbr_2b[1]/2);
-	h_br_this->Fill(-1+br_data*1.5,rbr[2]);
-	h_br_2b_this->Fill(-1+br_data*1.5,rbr_2b[2]);
-	h_br_this->Fill(-1+br_data*3,rbr[3]);
-	h_br_2b_this->Fill(-1+br_data*3,rbr_2b[3]);
-	h_br_this->Fill(-1+br_data*4.5,rbr[4]);
-	h_br_2b_this->Fill(-1+br_data*4.5,rbr_2b[4]);
-	h_br_this->Fill(-1+br_data*6,rbr[6]);
-	h_br_2b_this->Fill(-1+br_data*6,rbr_2b[6]);
+	h_br_this->Fill(-1,rbr_th[1]/2);
+	h_br_2b_this->Fill(-1,rbr_th_2b[1]/2);
+	h_br_this->Fill(-1+br_data*1.5,rbr_th[2]);
+	h_br_2b_this->Fill(-1+br_data*1.5,rbr_th_2b[2]);
+	h_br_this->Fill(-1+br_data*3,rbr_th[3]);
+	h_br_2b_this->Fill(-1+br_data*3,rbr_th_2b[3]);
+	h_br_this->Fill(-1+br_data*4.5,rbr_th[4]);
+	h_br_2b_this->Fill(-1+br_data*4.5,rbr_th_2b[4]);
+	h_br_this->Fill(-1+br_data*6,rbr_th[6]);
+	h_br_2b_this->Fill(-1+br_data*6,rbr_th_2b[6]);
 
 
 
@@ -517,6 +565,10 @@ int plot_simulation_11B(){
 	for(int i=0;i<br_data;i++){
 		h_br[i]->Draw("HISTsame");
 		h_br_2b[i]->Draw("HISTsame");
+		if(br_data_name[i]=="Yosoi"){
+			h_br[i]->Draw("Esame");
+			h_br_2b[i]->Draw("Esame");
+		}
 		os.str("");
 		os << br_data_legend[i].c_str();
 		leg_br->AddEntry(h_br[i],os.str().c_str(),"l");
