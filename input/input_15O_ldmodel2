@@ -1,0 +1,22 @@
+projectile 0
+element 8
+mass 15
+energy energy.1.2.p.txt
+
+bins 0
+maxlevelstar 6
+ldmodel 2
+maxlevelsbin g 6
+maxlevelsbin n 0
+maxlevelsbin p 9
+maxlevelsbin d 0
+maxlevelsbin t 0
+maxlevelsbin h 1
+maxlevelsbin a 8
+maxlevelsres 0
+ejectiles g n p a d t h
+
+outdiscrete y
+outpopulation y
+outdecay y
+outlevels y
