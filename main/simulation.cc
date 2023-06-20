@@ -22,12 +22,13 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-	if(argc<=1){
-		cerr << "Input: " << argv[0] << " [Target nucleus] [Random Seed (optional)]" << endl;
+	if(argc<=2){
+		cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [Random Seed (optional)]" << endl;
 		return 0;
 	}
+	const int ldmodel=atoi(argv[2]);
 	int seed=1; // default: 1
-	if(argc==3) seed = atoi(argv[2]);
+	if(argc==4) seed = atoi(argv[3]);
 
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]){
 	const int N = nuc->N;
 	
 	// Set deex tool
-	Deexcitation* deex = new Deexcitation();
+	Deexcitation* deex = new Deexcitation(ldmodel);
 	deex->SetSeed(seed); // 0: time
 	deex->SetVerbose(1);
 	cout << "SEED = " << seed << endl;
@@ -59,7 +60,7 @@ int main(int argc, char* argv[]){
 
 	// prepare output root file
 	os.str("");	
-	os << "sim_out/" << argv[1] << ".root";
+	os << "sim_out/" << argv[1] << "_ldmodel" << ldmodel << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree",""); // LAB Freme, MeV
 	int eventID=0, size;
