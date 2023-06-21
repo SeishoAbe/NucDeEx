@@ -15,7 +15,10 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 	int ldmodel=1; // default: 1 (constant temperature)
-	if(argc==3) ldmodel = atoi(argv[2]);
+	bool parity=0, optmodall=0;
+	if(argc>=3) ldmodel = atoi(argv[2]);
+	if(argc>=4) parity  = (bool) atoi(argv[3]);
+	if(argc>=5) optmodall = (bool) atoi(argv[4]);
 
 	ostringstream os;
 
@@ -28,8 +31,10 @@ int main(int argc, char* argv[]){
 
 	os.str("");
 	os << "input/input_" << argv[1] << "_ldmodel" << ldmodel;
-
+	if(parity) os << "_parity";
+	if(optmodall) os << "_optmodall";
 	ofstream ofs(os.str().c_str());
+
 	ofs << "projectile 0" << endl;
 	ofs << "element " << nuc_target->Z << endl;
 	ofs << "mass " << nuc_target->A << endl;
@@ -41,11 +46,15 @@ int main(int argc, char* argv[]){
 	ofs << endl;
 
 	ofs << "bins 0" << endl;
+	ofs << "ldmodel " << ldmodel << endl;
+	if(parity) ofs << "parity y" << endl;
+	else       ofs << "parity n" << endl;
+	if(optmodall) ofs << "optmodall y" << endl;
+	else          ofs << "optmodall n" << endl;
+	ofs << endl;
+
 	// maxlevelsbin
 	ofs << "maxlevelstar " << nuc_target->maxlevelsbin << endl;
-	if(ldmodel!=1) ofs << "ldmodel " << ldmodel << endl;
-
-
 	for(int p=0;p<num_particle;p++){
 		int Z=nuc_target->Z;
 		int N=nuc_target->N;
@@ -73,7 +82,6 @@ int main(int argc, char* argv[]){
 	ofs << endl;
 	ofs << "outdiscrete y" << endl;
 	ofs << "outpopulation y" << endl;
-	//ofs << "outspectra y" << endl;
 	ofs << "outdecay y" << endl;
 	ofs << "outlevels y" << endl;
 

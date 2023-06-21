@@ -20,6 +20,7 @@ int plot_simulation_11B(){
 	const double Ex_min =16;
 	const double Ex_max =35;
 		// negative -> not applied
+	const int ldmodel=1;
 	const bool flag_decay=1;
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 
@@ -46,7 +47,7 @@ int plot_simulation_11B(){
 
 	ostringstream os;
 	os.str("");
-	os << "sim_out/" << target.c_str() << ".root";
+	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
 	cout << os.str().c_str() << endl;
 	TTree* tree = (TTree*) rootf->Get("tree");
@@ -261,10 +262,10 @@ int plot_simulation_11B(){
 	if(Ex_max>0) os	<< "_Exmax" << Ex_max;
 	string suffix = os.str();
 	os.str("");
-	os << "sim_out/" << target.c_str() << suffix.c_str() << "_raw.txt";
+	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel << suffix.c_str() << "_raw.txt";
 	ofstream ofs_raw (os.str().c_str());
 	os.str("");
-	os << "sim_out/" << target.c_str() << suffix.c_str() << ".txt";
+	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel << suffix.c_str() << ".txt";
 	ofstream ofs (os.str().c_str());
 	const double br_th = 0.5;
 	ofs << "# br threshold written in this table: " << br_th << endl;
@@ -298,7 +299,8 @@ int plot_simulation_11B(){
 
 	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_Ex" << suffix.c_str() << ".pdf";
 	string pdfname=os.str();
 	c_Ex->Print( (pdfname+"[").c_str());
 	c_Ex->Update();
@@ -399,7 +401,8 @@ int plot_simulation_11B(){
 	t_nmulti->Draw("same");
 	//
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_nmulti" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_nmulti" << suffix.c_str() << ".pdf";
 	c_nmulti->Print(os.str().c_str());
 
 	
@@ -444,7 +447,8 @@ int plot_simulation_11B(){
 	t->Draw("same");
 	//
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_kE" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_kE" << suffix.c_str() << ".pdf";
 	c_kE->Print(os.str().c_str());
 
 
@@ -503,7 +507,8 @@ int plot_simulation_11B(){
 	l_da->Draw("same");
 	//
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_nda" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_nda" << suffix.c_str() << ".pdf";
 	c_nda->Print(os.str().c_str());
 
 
@@ -641,7 +646,8 @@ int plot_simulation_11B(){
 	}
 	//
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_br" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_br" << suffix.c_str() << ".pdf";
 	c_br->Print(os.str().c_str());
 
 
@@ -668,7 +674,8 @@ int plot_simulation_11B(){
 		f_Ex_kE->Draw("same");
 	}
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_Ex_kE" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_Ex_kE" << suffix.c_str() << ".pdf";
 	c_Ex_kE->Print(os.str().c_str());
 
 
@@ -700,7 +707,8 @@ int plot_simulation_11B(){
 		t_SE_3b->Draw("same");
 	}
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_SE" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel 
+		 << "_SE" << suffix.c_str() << ".pdf";
 	c_SE->Print(os.str().c_str());
 
 	return 0;
