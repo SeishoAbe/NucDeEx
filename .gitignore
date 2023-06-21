@@ -1,7 +1,7 @@
 # Prefix
 /fig*
 old*
-/output*/output*
+/output*/*/output*
 sim_out*
 bin
 obj
@@ -15,3 +15,10 @@ log*
 *.o
 *.a
 *.so
+
+#special file
+cs??????
+tr??????
+ecis.invin
+ecisinv.inp
+
