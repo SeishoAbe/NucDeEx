@@ -33,10 +33,13 @@ int main(int argc, char* argv[]){
 
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
+	const bool flag_fig=0;
+	//const int numofevent=100; // to be generated
+	//const bool flag_fig=1;
+
 	const double Ex_min =-1;
 	const double Ex_max =-1;
 		// negative -> not applied
-	const bool flag_fig=0;
 	// -------------- //
 
 	ostringstream os,os_remove_g;
@@ -236,7 +239,7 @@ int main(int argc, char* argv[]){
 			waku1->GetYaxis()->SetTitle("Py (MeV)");
 			linitXY->Draw();
 			for(int i=0;i<size;i++){
-				lXY[i]->Draw();
+				if(flag[i]) lXY[i]->Draw();
 			}
 			//
 			c_detail->cd(2);
@@ -246,7 +249,7 @@ int main(int argc, char* argv[]){
 			waku2->GetYaxis()->SetTitle("Pz (MeV)");
 			linitYZ->Draw();
 			for(int i=0;i<size;i++){
-				lYZ[i]->Draw();
+				if(flag[i]) lYZ[i]->Draw();
 			}
 			//
 			c_detail->cd(3);
@@ -256,7 +259,7 @@ int main(int argc, char* argv[]){
 			waku3->GetYaxis()->SetTitle("Pz (MeV)");
 			linitXZ->Draw();
 			for(int i=0;i<size;i++){
-				lXZ[i]->Draw();
+				if(flag[i]) lXZ[i]->Draw();
 			}
 			//
 			c_detail->cd(4);
@@ -275,6 +278,7 @@ int main(int argc, char* argv[]){
 			//
 			t->AddText("--- Decay products ---");
 			for(int i=0;i<size;i++){
+				if(!flag[i]) continue;
 				os.str("");
 				os << pname[i].c_str();
 				os << ": kE = " <<  kE[i];
@@ -326,7 +330,7 @@ int main(int argc, char* argv[]){
 	h_sf_random->SetStats(0);
 	h_sf_random->SetMinimum(1);
 	h_sf_random->GetXaxis()->SetTitle("Momentum (MeV)");
-	h_sf_random->GetYaxis()->SetTitle("Excitation energy (MeV)");
+	h_sf_random->GetYaxis()->SetTitle("Missing energy (MeV)");
 	h_sf_random->Draw("colz");
 	h_sf_random->SetStats(0);
 	c->cd(3);
