@@ -4,6 +4,10 @@ mass 11
 energy energy.1.2.p.txt
 
 bins 0
+ldmodel 1
+parity n
+optmodall n
+
 maxlevelstar 8
 maxlevelsbin g 8
 maxlevelsbin n 1
