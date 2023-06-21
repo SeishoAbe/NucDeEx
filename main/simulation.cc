@@ -22,13 +22,14 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-	if(argc<=2){
-		cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [Random Seed (optional)]" << endl;
+	if(argc<4){
+		cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [Random Seed (optional)]" << endl;
 		return 0;
 	}
 	const int ldmodel=atoi(argv[2]);
+	const bool parity_optmodall=(bool)atoi(argv[3]);
 	int seed=1; // default: 1
-	if(argc==4) seed = atoi(argv[3]);
+	if(argc==5) seed = atoi(argv[4]);
 
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
@@ -51,16 +52,17 @@ int main(int argc, char* argv[]){
 	const int N = nuc->N;
 	
 	// Set deex tool
-	Deexcitation* deex = new Deexcitation(ldmodel);
+	Deexcitation* deex = new Deexcitation(ldmodel, parity_optmodall);
 	deex->SetSeed(seed); // 0: time
 	deex->SetVerbose(1);
 	cout << "SEED = " << seed << endl;
 	
 
-
 	// prepare output root file
 	os.str("");	
-	os << "sim_out/" << argv[1] << "_ldmodel" << ldmodel << ".root";
+	os << "sim_out/" << argv[1] << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree",""); // LAB Freme, MeV
 	int eventID=0, size;
@@ -127,7 +129,9 @@ int main(int argc, char* argv[]){
 
 	TCanvas* c_detail = new TCanvas("c_detail","",0,0,800,800);
 	os.str("");
-	os << "fig_sim/fig_" << argv[1] << "ldmodel" << ldmodel << "_detail.pdf";
+	os << "fig_sim/fig_" << argv[1] << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << "_detail.pdf";
 	string pdfname = os.str();
 	if(flag_fig){
 		c_detail->Print( (pdfname + (string)"[").c_str() );
@@ -343,7 +347,9 @@ int main(int argc, char* argv[]){
 	h_sf_p_random->GetYaxis()->SetTitle("Events/bin");
 	h_sf_p_random->Draw("HIST");
 	os.str("");
-	os << "fig_sim/fig_" << argv[1] << "ldmodel" << ldmodel << "_sf.pdf";
+	os << "fig_sim/fig_" << argv[1] << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << "_sf.pdf";
 	c->Print(os.str().c_str());
 
 
