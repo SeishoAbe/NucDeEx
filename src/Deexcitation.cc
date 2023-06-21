@@ -21,7 +21,7 @@
 using namespace std;
 
 ///////////////////////////
-Deexcitation::Deexcitation(const int ld)
+Deexcitation::Deexcitation(const int ld, const bool p_o)
 ///////////////////////////
 {
 	// Prepare nuc table
@@ -37,6 +37,7 @@ Deexcitation::Deexcitation(const int ld)
 	element_table = geo->GetElementTable();
 	eventID=0;
 	ldmodel=ld;
+	parity_optmodall=p_o;
 }
 
 ///////////////////////////
@@ -394,8 +395,11 @@ bool Deexcitation::OpenROOT(const char* name)
 /////////////////////////////////////////////
 {
 	os.str("");
-	os << getenv("TALYS_WORK") << "/output/Br_" << name 
-		 << "_ldmodel" << ldmodel << ".root"; 
+	os << getenv("TALYS_WORK") << "/output/" << name 
+		 << "/Br_" << name << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << ".root"; 
+	//
 	rootf = new TFile(os.str().c_str(),"READ");
 	if(! rootf->IsOpen()) return 0;
 	if(verbose>1){
