@@ -126,7 +126,9 @@ int main(int argc, char* argv[]){
 
 
 	TCanvas* c_detail = new TCanvas("c_detail","",0,0,800,800);
-	string pdfname = "fig_sim/fig_detail.pdf";
+	os.str("");
+	os << "fig_sim/fig_" << argv[1] << "ldmodel" << ldmodel << "_detail.pdf";
+	string pdfname = os.str();
 	if(flag_fig){
 		c_detail->Print( (pdfname + (string)"[").c_str() );
 		c_detail->Update();
@@ -340,7 +342,9 @@ int main(int argc, char* argv[]){
 	h_sf_p_random->GetXaxis()->SetTitle("Momentum (MeV)");
 	h_sf_p_random->GetYaxis()->SetTitle("Events/bin");
 	h_sf_p_random->Draw("HIST");
-	c->Print("fig_sim/fig_sf.pdf");
+	os.str("");
+	os << "fig_sim/fig_" << argv[1] << "ldmodel" << ldmodel << "_sf.pdf";
+	c->Print(os.str().c_str());
 
 
 	outf->cd();
