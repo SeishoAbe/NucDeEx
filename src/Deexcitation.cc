@@ -38,6 +38,10 @@ Deexcitation::Deexcitation(const int ld, const bool p_o)
 	eventID=0;
 	ldmodel=ld;
 	parity_optmodall=p_o;
+	for(int p=0;p<num_particle;p++){
+		g_br[p]=0;
+	}
+	g_br_ex=0;
 }
 
 ///////////////////////////
@@ -152,8 +156,10 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 	//		TGraph memory looks not relased only by closing & deleting root file...
 	for(int p=0;p<num_particle;p++){
 		delete g_br[p];
+		g_br[p]=0;
 	}
 	delete g_br_ex;
+	g_br_ex=0;
 
 	rootf->Close();
 	delete rootf;
@@ -424,6 +430,7 @@ bool Deexcitation::GetBrTGraph(const string st)
 		os.str("");
 		os << "g_" << st.c_str() << "_br_" << p;
 		g_br[p] = (TGraph*) rootf->Get(os.str().c_str());
+		if(g_br[p]==0) return 0; // no tgraph
 	}
 	return 1;
 }
@@ -448,6 +455,7 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 	os.str("");
 	os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
 	g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
+	if(g_br_ex==0) return -1; // no tgraph
 
 	return point;
 }
