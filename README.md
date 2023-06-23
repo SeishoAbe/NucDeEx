@@ -37,6 +37,7 @@ make
 - `bin/`: Executables
 - `lib/`: Library directory
 - `obj/`: Object file directory
+- `macro/`: ROOT macro files to check output
 
 ### Tables, output etc.
 - `output/`
