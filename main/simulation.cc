@@ -30,6 +30,7 @@ int main(int argc, char* argv[]){
 	const bool parity_optmodall=(bool)atoi(argv[3]);
 	int seed=1; // default: 1
 	if(argc==5) seed = atoi(argv[4]);
+	cout << "SEED = " << seed << endl;
 
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
@@ -44,21 +45,15 @@ int main(int argc, char* argv[]){
 
 	ostringstream os,os_remove_g;
 
-	// Get Z and N
-  NucleusTable* nucleus_table = new NucleusTable();
-  if(!nucleus_table->ReadTables()){
-		cerr << "something wrong" << endl;
-		return 1;
-	}
-	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
-	const int Z = nuc->Z;
-	const int N = nuc->N;
-	
 	// Set deex tool
 	Deexcitation* deex = new Deexcitation(ldmodel, parity_optmodall);
 	deex->SetSeed(seed); // 0: time
 	deex->SetVerbose(1);
-	cout << "SEED = " << seed << endl;
+	// Get Z and N
+  NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
+	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
+	const int Z = nuc->Z;
+	const int N = nuc->N;
 	
 
 	// prepare output root file
@@ -125,9 +120,10 @@ int main(int argc, char* argv[]){
 	cout << "S = " << S << endl;
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
 	TH2D* h_sf_int = (TH2D*) rootf->Get("h_sf_int");
-	cout << gRandom->GetSeed() << endl;
+	h_sf_int->SetDirectory(0);
 	gRandom->SetSeed(seed); // for TH2 GetRandom2
-
+	rootf->Close();
+	delete rootf;
 
 
 	TCanvas* c_detail = new TCanvas("c_detail","",0,0,800,800);
