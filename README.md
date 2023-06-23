@@ -31,14 +31,14 @@ make
 
 ## Directory
 
-### Code
+### Codes
 - `main/`: main codes for TALYS calulation and event simulation
 - `src/` & `incldue/`: TALYS output analyzer and simulator codes
 - `bin/`: Executables
 - `lib/`: Library directory
 - `obj/`: Object file directory
 
-### Tables, etc.
+### Tables, output etc.
 - `output/`
 	- Files converted from TALYS' output
 	- These contain branching ratios.
