@@ -6,12 +6,11 @@ CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
 CXXFLAGS += -I./include
 ARFLAGS=
 
-
 ## for cern root
 CXXFLAGS        += $(shell root-config --cflags)
 #LDFLAGS         += $(shell root-config --libs) # <- Print regular ROOT libraries
 #LDFLAGS         += $(shell root-config --glibs) # <- Print regular + GUI ROOT libraries
-LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries (Eve is necessary)
+LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
 
 LIBDIR=lib
 LIBNAME=${LIBDIR}/libTALYStool.a
