@@ -26,7 +26,8 @@ make
  run_talys.sh
  ./bin/plot_decay
 ```
-
+- `./bin/plot_decay` is an analyzer on TALYS output.
+- The files created by this executable are used in the simulator (`./bin/simulation`).
 
 ## Directory
 
