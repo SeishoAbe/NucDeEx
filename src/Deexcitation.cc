@@ -148,8 +148,16 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		cout << endl;
 	}
 		
+	// --- Need this to release memory of TGraph
+	//		TGraph memory looks not relased only by closing & deleting root file...
+	for(int p=0;p<num_particle;p++){
+		delete g_br[p];
+	}
+	delete g_br_ex;
+
 	rootf->Close();
 	delete rootf;
+
 	eventID++;
 }
 

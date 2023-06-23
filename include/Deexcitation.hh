@@ -47,7 +47,7 @@ class Deexcitation{
 	int  GetBrExTGraph(const string st, const double ex_t, const int mode); 
 		// The nearest TGraph point will be returned
 	TFile* rootf;
-	TTree* tree;
+	//TTree* tree;
 	TGraph* g_br[num_particle];
 	TGraph* g_br_ex;
 	TRandom3* rndm;
