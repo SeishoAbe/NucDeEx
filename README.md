@@ -53,3 +53,5 @@ make
 	- Energy distrubition file inputed into TALYS
   - `sf/`
 	- Benhar SF used in event simulation
+- `data/`
+  - Reference data (other predictions, experimental data) are stored.
