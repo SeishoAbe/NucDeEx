@@ -44,12 +44,12 @@ make
 	- These contain branching ratios.
 - `sim_out/`
 	- Event simulation output 
-- `tables/`: 
-	- `nucleus/`
-		- List of nucleus considered in TALYS calculation
+- `tables/`
+  - `nucleus/`
+    - List of nucleus considered in TALYS calculation
   - `separation_energy/`
-		- Separation energy tables obtained from TALYS
-	- `energy_distribution/`
-		- Energy distrubition file inputed into TALYS
-	- `sf/`
-		- Benhar SF used in event simulation
+	- Separation energy tables obtained from TALYS
+  - `energy_distribution/`
+	- Energy distrubition file inputed into TALYS
+  - `sf/`
+	- Benhar SF used in event simulation
