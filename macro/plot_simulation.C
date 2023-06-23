@@ -1,12 +1,14 @@
-#include "include/consts.hh"
 #include <TStyle.h>
+#include <algorithm>
 #include <map>
 
-using namespace std;
+#include "../include/consts.hh"
+#include "../include/NucleusTable.hh"
+#include "../include/Nucleus.hh"
 
-const double kE_th[num_particle]
-	= {0,3.1,3.1,
-		 4.0,4.6,0,4.5};
+R__LOAD_LIBRARY(lib/libTALYStool);
+
+using namespace std;
 
 int plot_simulation(){
 	// ---- FIXME ---- //
@@ -14,6 +16,8 @@ int plot_simulation(){
 	const double Ex_min =16;
 	const double Ex_max =35;
 		// negative -> not applied
+	const int ldmodel=1;
+	const bool parity_optmodall=1;
 	const bool flag_decay=1;
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 
@@ -21,7 +25,9 @@ int plot_simulation(){
 
 	ostringstream os;
 	os.str("");
-	os << "sim_out/" << target.c_str() << ".root";
+	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
 	cout << os.str().c_str() << endl;
 	TTree* tree = (TTree*) rootf->Get("tree");
@@ -33,6 +39,8 @@ int plot_simulation(){
 	double mass[bins];
 	double totalE[bins],kE[bins];
 	double PMag[bins], PX[bins],PY[bins],PZ[bins];
+	bool flag[bins];
+	double Ex_daughter[bins];
 	string* decay=0;
 	tree->SetBranchAddress("eventID",&eventID);
 	if(flag_decay) tree->SetBranchAddress("decay_remove_g",&decay);
@@ -53,17 +61,23 @@ int plot_simulation(){
 	tree->SetBranchAddress("PX",&PX);
 	tree->SetBranchAddress("PY",&PY);
 	tree->SetBranchAddress("PZ",&PZ);
+	tree->SetBranchAddress("flag",&flag);
+	tree->SetBranchAddress("Ex_daughter",&Ex_daughter);
 
 	// --- Draw --- // 
+	gStyle->SetTextFont(132);
 	gStyle->SetTextSize(0.08);
-	gStyle->SetTitleSize(0.045);
-	gStyle->SetTitleXSize(0.045);
-	gStyle->SetTitleYSize(0.045);
+	gStyle->SetTitleSize(0.05,"XYZ");
+	gStyle->SetTitleFont(132,"XYZ");
+	gStyle->SetLabelSize(0.05,"XYZ");
+	gStyle->SetLabelFont(132,"XYZ");
+	gStyle->SetLegendFont(132);
 	gStyle->SetTitleYOffset(0.95);
 	
 	TH1D* h_Ex = new TH1D("h_Ex","",500,-100,400);
 	TH1D* h_nmulti = new TH1D("h_nmulti","",10,-0.5,9.5);
 	TH1D* h_kE[num_particle];
+	TH1D* h_Ex_particle[num_particle]; // w/o experimental energy th
 	for(int p=0;p<num_particle;p++){
 		os.str("");
 		os << "h_kE_" << p;
@@ -75,8 +89,9 @@ int plot_simulation(){
 	int numofevent=0;
 	map<string, double> br;
 	map<string, double> :: iterator itr;
-	double r_br[num_particle]={0}; // two-body
-	double r_br_2b[num_particle]={0}; // two-body
+	// for comparison w/ Panin
+	double rbr[num_particle]={0}; // two-body
+	double rbr_2b[num_particle]={0}; // two-body
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
 
@@ -84,13 +99,14 @@ int plot_simulation(){
 		h_Ex->Fill(Ex);
 		if(Ex_min>0 && Ex<Ex_min) continue;
 		if(Ex_max>0 && Ex>Ex_max) continue;
+		numofevent++;
 
 		if(max_size<size) max_size=size;
-		int nmulti=0;
-		int particle_counter=0; // w/o g
+
+		int multi[num_particle]={0};
+		int particle_counter=0;
 		int first_p=-1;
 		for(int b=0;b<size;b++){
-			if(PDG[b]==2112) nmulti++;
 			int p=-1;
 			for(int par=0;par<num_particle;par++){
 				if(PDG_particle[par]==PDG[b]){
@@ -99,15 +115,24 @@ int plot_simulation(){
 				}
 			}
 			if(p>=0){ // this is particle info (not daughter nuclei)
+				multi[p]++;
 				h_kE[p]->Fill(kE[b]);
-				if(p!=0) particle_counter++;
-				if(b==0){
-					first_p = p;
-					r_br[p]++;
-				}
+				h_Ex_particle[p]->Fill(Ex);
+				if(first_p<0 && p>=1) first_p=p; // except gamma
+				if(p>=1) particle_counter++;
 			}
 		}
-		if(particle_counter==1) r_br_2b[first_p]++;
+
+		// --- Fill multiplicity histogram
+		h_nmulti->Fill(multi[1]); // w/o energy th
+		
+		// --- Nominal rbr 
+		if(first_p>=0){
+			rbr[first_p]++;
+			if(particle_counter==1) rbr_2b[first_p]++;
+		}
+
+		//--- save map--//
 		itr = br.find(decay->c_str());
 		if(itr != end(br) ) {
 			itr->second += 1;
@@ -115,39 +140,37 @@ int plot_simulation(){
 			//cout << decay->c_str() << endl;
 			br.insert(make_pair(decay->c_str(),1));
 		}
-		h_nmulti->Fill(nmulti);
-		numofevent++;
 	}
 	cout << "max_size=" << max_size << endl;
 	cout << "numofevent=" << numofevent << endl;
 
-	double r_br_sum=0, r_br_2b_sum=0;
+	cout << "### without threshold " << endl;
+	double rbr_sum=0, rbr_2b_sum=0;
 	for(int par=0;par<num_particle;par++){
-		r_br[par] = r_br[par]/numofevent*100; // %
-		r_br_2b[par] = r_br_2b[par]/numofevent*100; // %
+		rbr[par] = rbr[par]/numofevent*100; // %
+		rbr_2b[par] = rbr_2b[par]/numofevent*100; // %
 		cout << setw(10) << particle_name[par].c_str() << "  " 
-				 << setw(10) << r_br[par] << "  " << r_br_2b[par] << endl;
-		r_br_sum+=r_br[par];
-		r_br_2b_sum+=r_br_2b[par];
+				 << setw(10) << fixed << setprecision(1) << rbr[par] << "  " << rbr_2b[par] << endl;
+		rbr_sum+=rbr[par];
+		rbr_2b_sum+=rbr_2b[par];
 	}
-	cout << setw(10) << "sum" << "  " << setw(10) << r_br_sum << "  " << r_br_2b_sum << endl;
-
-	double r_br_2b_nda_n = r_br_2b[1]/(r_br_2b[1]+r_br_2b[3]+r_br_2b[6]);
-	double r_br_2b_nda_da = (r_br_2b[3]+r_br_2b[6])/(r_br_2b[1]+r_br_2b[3]+r_br_2b[6]);
-	cout << "Relative BR (n vs d/a): n   : " << r_br_2b_nda_n << endl;
-	cout << "Relative BR (n vs d/a): d/a : " << r_br_2b_nda_da << endl;
+	cout << setw(10) << "sum" << "  " << setw(10) << rbr_sum << "  " << rbr_2b_sum << endl;
 
 	
-	// output  (txt)
+	// output map as .txt
 	os.str("");
 	if(Ex_min>0) os << "_Exmin" << Ex_min;
 	if(Ex_max>0) os	<< "_Exmax" << Ex_max;
 	string suffix = os.str();
 	os.str("");
-	os << "sim_out/" << target.c_str() << suffix.c_str() << "_raw.txt";
+	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << suffix.c_str() << "_raw.txt";
 	ofstream ofs_raw (os.str().c_str());
 	os.str("");
-	os << "sim_out/" << target.c_str() << suffix.c_str() << ".txt";
+	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << suffix.c_str() << ".txt";
 	ofstream ofs (os.str().c_str());
 	const double br_th = 0.5;
 	ofs << "# br threshold written in this table: " << br_th << endl;
@@ -174,32 +197,24 @@ int plot_simulation(){
 	h_nmulti->Scale(1./h_nmulti->GetEntries());
 	for(int p=0;p<num_particle;p++){
 		h_kE[p]->Scale(1./h_kE[p]->GetEntries());
+		h_Ex_particle[p]->Scale(2.0/h_Ex->GetEntries());
 	}
 
 	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
-	h_Ex->GetXaxis()->SetRangeUser(8,47);
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << "_Ex" << suffix.c_str() << ".pdf";
+	string pdfname=os.str();
+	c_Ex->Print( (pdfname+"[").c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+	//
+	h_Ex->GetXaxis()->SetRangeUser(0,100);
 	h_Ex->SetStats(0);
 	h_Ex->SetMinimum(0);
 	h_Ex->GetXaxis()->SetTitle("Excitation energy (MeV)");
 	h_Ex->GetYaxis()->SetTitle("A.U.");
-	h_Ex->Draw("HIST");
-	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
-	l_Ex_min->SetLineWidth(2);
-	l_Ex_min->SetLineStyle(2);
-	l_Ex_min->SetLineColor(kRed);
-	if(Ex_min>8 && Ex_min<47) l_Ex_min->Draw("same");
-	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_Ex->GetMaximum()*1.05);
-	l_Ex_max->SetLineWidth(2);
-	l_Ex_max->SetLineStyle(2);
-	l_Ex_max->SetLineColor(kRed);
-	if(Ex_max>8 && Ex_max<47) l_Ex_max->Draw("same");
-	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_Ex" << suffix.c_str() << ".pdf";
-	c_Ex->Print(os.str().c_str());
-
-
-	TCanvas* c_Ex_1 = new TCanvas("c_Ex_1","",0,0,800,600);
-	h_Ex->GetXaxis()->SetRangeUser(0,100);
 	h_Ex->Draw("HIST");
 	TLine* l_1_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
 	l_1_Ex_min->SetLineWidth(2);
@@ -211,15 +226,41 @@ int plot_simulation(){
 	l_1_Ex_max->SetLineStyle(2);
 	l_1_Ex_max->SetLineColor(kRed);
 	if(Ex_max>8) l_1_Ex_max->Draw("same");
-	os.str("");
-  //TF1* f_lorentzian = new TF1("f_lorentziaon","[0]/(TMath::Pi()*(TMath::Power(x-[1],2)+TMath::Power([0],2)))",0,100);
-  //f_lorentzian->SetParameter(0,7); // HWHM
-  //f_lorentzian->SetParameter(1,23); // mean
-	//h_Ex->Fit(f_lorentzian,"","",18,30);
-	//f_lorentzian->Draw("same");
-	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_Ex_1" << suffix.c_str() << ".pdf";
-	c_Ex_1->Print(os.str().c_str());
+	c_Ex->Print(pdfname.c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+	//
+	h_Ex->SetTitle("w/o energy th. (double count is included)");
+	h_Ex->GetXaxis()->SetRangeUser(8,47);
+	h_Ex->Draw("HIST");
+	for(int p=1;p<num_particle;p++){
+		h_Ex_particle[p]->Draw("HISTsame");
+	}
+	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_Ex->GetMaximum()*1.05);
+	l_Ex_min->SetLineWidth(2);
+	l_Ex_min->SetLineStyle(2);
+	l_Ex_min->SetLineColor(kRed);
+	if(Ex_min>8 && Ex_min<47) l_Ex_min->Draw("same");
+	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_Ex->GetMaximum()*1.05);
+	l_Ex_max->SetLineWidth(2);
+	l_Ex_max->SetLineStyle(2);
+	l_Ex_max->SetLineColor(kRed);
+	if(Ex_max>8 && Ex_max<47) l_Ex_max->Draw("same");
+	c_Ex->Print(pdfname.c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+	//
+	THStack* h_s_Ex = new THStack("h_s_Ex","");
+	h_Ex->Draw("HIST");
+	for(int p=2;p<num_particle;p++){
+		h_Ex_particle[p]->SetFillColor(color_root[p]);
+		h_s_Ex->Add(h_Ex_particle[p]);
+	}
+	h_s_Ex->Draw("HISTsame");
+	c_Ex->Print((pdfname+"]").c_str());
+	c_Ex->Update();
+	c_Ex->Clear();
+
 
 	TCanvas* c_nmulti = new TCanvas("c_nmulti","",0,0,800,600);
 	h_nmulti->GetXaxis()->SetNdivisions(10);
@@ -233,7 +274,9 @@ int plot_simulation(){
 	t_nmulti->Draw("same");
 	//
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_nmulti" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << "_nmulti" << suffix.c_str() << ".pdf";
 	c_nmulti->Print(os.str().c_str());
 
 	
@@ -261,7 +304,9 @@ int plot_simulation(){
 	t->Draw("same");
 	//
 	os.str("");
-	os << "fig_sim/fig_" << target.c_str() << "_kE" << suffix.c_str() << ".pdf";
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << "_kE" << suffix.c_str() << ".pdf";
 	c_kE->Print(os.str().c_str());
 
 

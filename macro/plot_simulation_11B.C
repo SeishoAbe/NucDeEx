@@ -27,7 +27,6 @@ int plot_simulation_11B(){
 		// 1- > use string w/o "g" (gamma) <- use this 
 	// --------------- //
 
-	//gSystem->Load("lib/libTALYStool");
 	NucleusTable* _nucleus_table = new NucleusTable();
 	if(!_nucleus_table->ReadTables()){
 		cerr << "Fatal Error" << endl;
@@ -44,7 +43,6 @@ int plot_simulation_11B(){
 		criteria_3b[p] += SE[p];
 		cout << "criteria_3b = " << criteria_3b[p] << endl;
 	}
-
 
 	ostringstream os;
 	os.str("");
@@ -213,7 +211,6 @@ int plot_simulation_11B(){
 		}
 		if(detected) numofdetected++;
 
-
 		//--- save map--//
 		itr = br.find(decay->c_str());
 		if(itr != end(br) ) {
@@ -299,10 +296,9 @@ int plot_simulation_11B(){
 	h_nmulti->Scale(1./h_nmulti->GetEntries());
 	for(int p=0;p<num_particle;p++){
 		h_kE[p]->Scale(1./h_kE[p]->GetEntries());
-		h_Ex_particle[p]->Scale(1.0/h_Ex->GetEntries());
+		h_Ex_particle[p]->Scale(2.0/h_Ex->GetEntries());
 		h_Ex_particle_th[p]->Scale(1.0/h_Ex->GetEntries());
 	}
-
 
 	TCanvas* c_Ex = new TCanvas("c_Ex","",0,0,800,600);
 	os.str("");
