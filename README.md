@@ -45,7 +45,7 @@ make
 - `sim_out/`
 	- Event simulation output 
 - `tables/`: 
-	- `nucleus/
+	- `nucleus/`
 		- List of nucleus considered in TALYS calculation
   - `separation_energy/`
 		- Separation energy tables obtained from TALYS
