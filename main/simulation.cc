@@ -138,6 +138,10 @@ int main(int argc, char* argv[]){
 		c_detail->Clear();
 	}
 	
+	//
+	vector<Particle> particle;
+	TVector3 Pinit;
+
 	while(eventID<numofevent){
 		// determine momentum (scalar) and missing E according to SF
 		h_sf_int->GetRandom2(PinitMag,MissE);
@@ -150,11 +154,9 @@ int main(int argc, char* argv[]){
 		double costheta = 2.*gRandom->Rndm()-1;
 		double sintheta = sqrt( 1. - pow(costheta,2) );
 		double phi      = 2*TMath::Pi()*gRandom->Rndm();
-		TVector3 Pinit(PinitMag*sintheta*cos(phi),
-									 PinitMag*sintheta*sin(phi),
-									 PinitMag*costheta);
-
-		
+		Pinit.SetXYZ(PinitMag*sintheta*cos(phi),
+								 PinitMag*sintheta*sin(phi),
+								 PinitMag*costheta);
 
 		// select ROI
 		if(Ex<0) continue;
@@ -166,7 +168,7 @@ int main(int argc, char* argv[]){
 		deex->DoDeex(Z,N,Ex,Pinit);
 
 		// scoling
-		vector<Particle> particle = deex->GetParticleVector();
+		particle = deex->GetParticleVector();
 		PinitX   = Pinit.X();
 		PinitY   = Pinit.Y();
 		PinitZ   = Pinit.Z();
@@ -197,6 +199,11 @@ int main(int argc, char* argv[]){
 		decay = os.str();
 		decay_remove_g = os_remove_g.str();
 		tree->Fill();
+
+		particle.clear();
+		vector<Particle>().swap(particle);
+
+		eventID++;
 
 		// prepare detail fig
 		if(flag_fig){
@@ -296,8 +303,6 @@ int main(int argc, char* argv[]){
 			c_detail->Update();
 			c_detail->Clear();
 		}
-
-		eventID++;
 	}
 	if(flag_fig)c_detail->Print( (pdfname + (string)"]").c_str() );
 	delete c_detail;
