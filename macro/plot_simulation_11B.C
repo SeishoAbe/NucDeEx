@@ -2,9 +2,9 @@
 #include <algorithm>
 #include <map>
 
-#include "include/consts.hh"
-#include "include/NucleusTable.hh"
-#include "include/Nucleus.hh"
+#include "../include/consts.hh"
+#include "../include/NucleusTable.hh"
+#include "../include/Nucleus.hh"
 
 R__LOAD_LIBRARY(lib/libTALYStool);
 
