@@ -2,8 +2,8 @@
 
 ### FIXME ###
 #TARGET_TMP="11B 11C 15N 15O"
-#TARGET_TMP="15O 15N"
-TARGET_TMP="11B 11C"
+TARGET_TMP="15O 15N"
+#TARGET_TMP="11B 11C"
 ldmodel_tmp="1 2 3"
 parity_optmodall_tmp="0 1"
 #############

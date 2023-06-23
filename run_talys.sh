@@ -2,17 +2,16 @@
 
 ### FIXME ###
 #TARGET_TMP="11B 11C 15N 15O"
-#TARGET_TMP="11B"
-TARGET_TMP="11C"
+#TARGET_TMP="11B 11C"
+TARGET_TMP="15N 15O"
 FILE_TMP="energy.1.2.p.txt energy"
 ldmodel_tmp="1 2 3"
 parity_optmodall_tmp="0 1"
 #############
 
 #ldmodel_tmp="1 2 3 4 5 6"
-# 4-6 (microscopic is not available):w
+# 4-6 (microscopic is not available)
 
-OUTDIR=output
 INDIR=input
 
 cd /home/seisho/talys_1.96
@@ -21,7 +20,7 @@ cd -
 
 for TARGET in $TARGET_TMP
 do
-	OUTDIR=$OUTDIR/$TARGET
+	OUTDIR=output/$TARGET
 	if [ ! -e $OUTDIR ] ; then
 		mkdir $OUTDIR
 	fi

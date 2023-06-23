@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ### FIXME ###
-TARGET_TMP="11B"
+#TARGET_TMP="11B"
+TARGET_TMP="11C 15N 15O"
 ldmodel_tmp="1 2 3"
 parity_optmodall_tmp="0 1"
 #############
