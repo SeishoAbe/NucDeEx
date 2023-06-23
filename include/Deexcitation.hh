@@ -34,6 +34,7 @@ class Deexcitation{
 	void SetEventID(int id){ eventID=id;};
 	int  GetEventID(){ return eventID; };
 	vector<Particle> GetParticleVector(){return _particle;};
+	NucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
 
 	private:
 	// --- Simulation method called by DoDeex() --- //
