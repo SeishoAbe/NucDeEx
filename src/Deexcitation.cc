@@ -26,7 +26,7 @@ Deexcitation::Deexcitation(const int ld, const bool p_o)
 {
 	// Prepare nuc table
 	_nucleus_table = new NucleusTable();
-	if(!_nucleus_table->ReadTables()){
+	if(!_nucleus_table->ReadTables(0)){
 		cerr << "Fatal Error" << endl;
 		abort();
 	}
@@ -90,38 +90,45 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		cout << "     mom_target: "; mom_target.Print();
 
 		// --- Get (TGraph*) br based on name_target
-		GetBrTGraph(name_target); 
-		
-		// --- Determine decay mode 
-		//     Return: The same as array in consts.hh
-		//     It also sets Z_daughter, Z_daughter
-		decay_mode = DecayMode(Ex_target); 
+		if(GetBrTGraph(name_target)){ // TGraph found
+			// --- Determine decay mode 
+			//     Return: The same as array in consts.hh
+			//     It also sets Z_daughter, Z_daughter
+			decay_mode = DecayMode(Ex_target); 
 
-		// --- Get nearest Ex bin (TGraph point) and then get (TGraph*) br_ex
-		GetBrExTGraph(name_target, Ex_target, decay_mode);
+			// --- Get nearest Ex bin (TGraph point) and then get (TGraph*) br_ex
+			GetBrExTGraph(name_target, Ex_target, decay_mode);
 
-		// --- Determine daughter excitation energy
-		int Ex_daughter_point;
-		DaughterExPoint(&Ex_daughter,&Ex_daughter_point);
+			// --- Determine daughter excitation energy
+			int Ex_daughter_point;
+			DaughterExPoint(&Ex_daughter,&Ex_daughter_point);
 
-		// --- Get mass using ROOT libraries
-		if(decay_mode<=2){ // obtained from TDatabasePDG
-			mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/TGeoUnit::MeV;//GeV2MeV
-		}else{ // obtained from TGeoElementRN
-			int a_particle = (PDG_particle[decay_mode]%1000)/10;
-			int z_particle = ((PDG_particle[decay_mode]%1000000)-a_particle*10)/10000;
-			TGeoElementRN* element_rn =	element_table->GetElementRN(a_particle,z_particle); // (A,Z)
-			cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
-			mass_particle = ElementMassInMeV(element_rn);
+			// --- Get mass using ROOT libraries
+			if(decay_mode<=2){ // obtained from TDatabasePDG
+				mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/TGeoUnit::MeV;//GeV2MeV
+			}else{ // obtained from TGeoElementRN
+				int a_particle = (PDG_particle[decay_mode]%1000)/10;
+				int z_particle = ((PDG_particle[decay_mode]%1000000)-a_particle*10)/10000;
+				TGeoElementRN* element_rn =	element_table->GetElementRN(a_particle,z_particle); // (A,Z)
+				cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
+				mass_particle = ElementMassInMeV(element_rn);
+			}
+			// this rarely happens...
+			if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
+				cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
+				cout << "Call DoDeex() again!" << endl;
+				goto RESET;
+			}
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
+		}else{ // no tgraph found -> gamma emission to g.s.
+			cout << "Cannot find TGraph" << endl;
+			cout << "Force gamma decay" << endl;
+			decay_mode=0; 
+			Ex_daughter=0;
+			mass_particle=0;
+			mass_daughter=mass_target;
 		}
-		// this rarely happens...
-		if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
-			cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
-			cout << "Call DoDeex() again!" << endl;
-			goto RESET;
-		}
-		mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
-		mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
 
 		// --- Get separation E and Qvalue 
 		S = nuc_target->S[decay_mode];
@@ -147,7 +154,7 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		mass_target = mass_daughter;
 		mom_target  += mom_daughter;
 		//kE_target  = kE_daughter;
-		nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
+		nuc_target = nuc_daughter;
 		name_target = (string)nuc_target->name;
 		cout << endl;
 	}
