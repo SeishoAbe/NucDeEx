@@ -167,17 +167,17 @@ int main(int argc, char* argv[]){
 		deex->DoDeex(Z,N,Ex,Pinit);
 
 		// scoling
-		vector<Particle> particle = deex->GetParticleVector();
+		vector<Particle>* particle = deex->GetParticleVector();
 		PinitX   = Pinit.X();
 		PinitY   = Pinit.Y();
 		PinitZ   = Pinit.Z();
 		
-		size=particle.size();
+		size=particle->size();
 		os.str("");
 		os_remove_g.str("");
 		string pname[size];
 		for(int i=0;i<size;i++){
-			Particle p = particle.at(i);
+			Particle p = particle->at(i);
 			PDG[i]=p._PDG;
 			mass[i]=p._mass;
 			totalE[i]=p.totalE();
