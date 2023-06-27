@@ -42,6 +42,7 @@ Deexcitation::Deexcitation(const int ld, const bool p_o)
 		g_br[p]=0;
 	}
 	g_br_ex=0;
+	_particle=0;
 }
 
 ///////////////////////////
@@ -52,6 +53,10 @@ Deexcitation::~Deexcitation()
 	delete rndm;
 	delete pdg;
 	delete geo;
+	if(_particle!=0){
+		_particle->clear();
+		delete _particle;
+	}
 }
 
 /////////////////////////////////////////////
@@ -380,10 +385,10 @@ void Deexcitation::Decay(const bool breakflag)
 
 	// Then, push back
 
-	_particle.push_back(p_particle);
+	_particle->push_back(p_particle);
 	// DoDeex loop will be end -> turn on track flag, because it is not intermediate state
 	if(breakflag) p_daughter._flag=1;
-	_particle.push_back(p_daughter);
+	_particle->push_back(p_daughter);
 
 	cout << "flag_particle = " << p_particle._flag << endl;
 	cout << "flag_daughter = " << p_daughter._flag << endl;
@@ -471,6 +476,9 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 void Deexcitation::InitParticleVector()
 /////////////////////////////////////////////
 {
-	_particle.clear();
-	vector<Particle>().swap(_particle); // memory release
+	if(_particle!=0){
+		_particle->clear();
+		delete _particle;
+	}
+	_particle = new vector<Particle>;
 }
