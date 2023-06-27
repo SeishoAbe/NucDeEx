@@ -33,7 +33,7 @@ class Deexcitation{
 	void SetVerbose(int v){ verbose=v; };
 	void SetEventID(int id){ eventID=id;};
 	int  GetEventID(){ return eventID; };
-	vector<Particle> GetParticleVector(){return _particle;};
+	vector<Particle>* GetParticleVector(){return _particle;};
 	NucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
 
 	private:
@@ -84,7 +84,7 @@ class Deexcitation{
 
 	// for output
 	void InitParticleVector();
-	vector<Particle> _particle;
+	vector<Particle> *_particle;
 	int PDGion(int Z,int N);
 
 	// others
