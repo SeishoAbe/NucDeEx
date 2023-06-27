@@ -139,7 +139,6 @@ int main(int argc, char* argv[]){
 	}
 	
 	//
-	vector<Particle> particle;
 	TVector3 Pinit;
 
 	while(eventID<numofevent){
@@ -168,7 +167,7 @@ int main(int argc, char* argv[]){
 		deex->DoDeex(Z,N,Ex,Pinit);
 
 		// scoling
-		particle = deex->GetParticleVector();
+		vector<Particle> particle = deex->GetParticleVector();
 		PinitX   = Pinit.X();
 		PinitY   = Pinit.Y();
 		PinitZ   = Pinit.Z();
@@ -199,9 +198,6 @@ int main(int argc, char* argv[]){
 		decay = os.str();
 		decay_remove_g = os_remove_g.str();
 		tree->Fill();
-
-		particle.clear();
-		vector<Particle>().swap(particle);
 
 		eventID++;
 
