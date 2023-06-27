@@ -67,8 +67,6 @@ class Deexcitation{
 	double Ex_target;
 	double mass_target;
 	TVector3 mom_target;
-	//double kE_target;
-	//int PDG_target;
 	Nucleus* nuc_target;
 	string name_target;
 
@@ -77,15 +75,12 @@ class Deexcitation{
 	double Ex_daughter;
 	double mass_daughter;
 	TVector3 mom_daughter;
-	//double kE_daughter;
-	//int PDG_daughter;
 	Nucleus* nuc_daughter;
 	string name_daughter;
 
 	// decay particle info
 	double mass_particle;
 	TVector3 mom_particle;
-	//double kE_particle;
 
 	// for output
 	void InitParticleVector();

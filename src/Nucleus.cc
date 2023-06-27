@@ -10,27 +10,15 @@
 using namespace std;
 
 ///////////////
-Nucleus::Nucleus()
+void Nucleus::Init(const bool init_flag)
 ///////////////
 {
-	Init();
-}
+	S = new float[num_particle];
+	for(int i=0;i<num_particle;i++){
+		S[i]=0;
+	}
+	if(!init_flag) return;
 
-///////////////
-Nucleus::Nucleus(const char* Name, int z, int n)
-///////////////
-{
-  strcpy(name,Name);
-  Z=z;
-  N=n;
-  A=z+n;
-	Init();
-}
-
-///////////////
-void Nucleus::Init()
-///////////////
-{
 	flag_s=flag_target=flag_data=0;
 	id=0;
 	maxlevelsbin=0;
@@ -58,10 +46,8 @@ void Nucleus::Init()
 	pop_p = new float**[num_particle];
 	Ex_p = new float**[num_particle];
 	Ex_bin_p = new int*[num_particle];
-	S = new float[num_particle];
 
 	for(int i=0;i<num_particle;i++){
-		S[i]=0;
 		pop_p[i] = new float*[bins];
 		Ex_p[i] = new float*[bins];
 		Ex_bin_p[i] = new int[bins];

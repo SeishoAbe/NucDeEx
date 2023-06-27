@@ -11,7 +11,7 @@ class NucleusTable{
 	NucleusTable(){num_of_nuc=-1;};
   virtual ~NucleusTable(){;};
 
-  bool ReadTables();
+  bool ReadTables(const bool init_flag=1);
 	int getID(const char* name);
 	int GetNumofNuc(){return num_of_nuc;};
 	
