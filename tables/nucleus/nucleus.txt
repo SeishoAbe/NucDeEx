@@ -36,7 +36,7 @@
 8Be  4 4 0 
 7Be  4 3 1
 #
-11Li 3 8 0
+#11Li 3 8 0 <- not considered
 10Li 3 7 0
 9Li 3 6 1
 8Li 3 5 1
