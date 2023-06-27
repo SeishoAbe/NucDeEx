@@ -12,7 +12,7 @@
 using namespace std;
 
 ///////////////
-bool NucleusTable::ReadTables()
+bool NucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
 	// --- Read nucleus / separation energy tables ---//
@@ -36,6 +36,9 @@ bool NucleusTable::ReadTables()
 
 	// create array for nucleus
 	_nucleus = new Nucleus[num_of_nuc];
+	for(int i=0;i<num_of_nuc;i++){
+		_nucleus[i].Init(init_flag);
+	}
 
 	// then read again
   char Name[5];

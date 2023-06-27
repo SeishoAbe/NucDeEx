@@ -7,11 +7,10 @@ using namespace std;
 
 class Nucleus{
   public :
-	Nucleus();
-  Nucleus(const char* Name,
-          int z,
-          int n);
+	Nucleus(){;};
 	~Nucleus();
+	void Init(const bool init_flag=1);
+		// 1: init all parms
 
   char name[5];
   int Z;
@@ -66,7 +65,6 @@ class Nucleus{
 	bool CheckEx();
 	
 	private:
-	void Init();
 	const float check_criteria=0.05;
 };
 #endif
