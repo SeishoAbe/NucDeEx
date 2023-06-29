@@ -171,13 +171,15 @@ int plot_simulation_11B(){
 				h_Ex_particle[p]->Fill(Ex);
 				if(first_p<0 && p>=1) first_p=p; // except gamma
 				if(p>=1) particle_counter++;
+				//particle_counter++;
 				// --- apply threshold 
 				if(kE[b]<kE_th[p]) continue;
 				// --- 
 				kE_r[p]=kE[b];
 				count_particle_th[p]++;
 				flag_detected[p] = 1; // detected
-				if(p>=1) particle_counter_th++;
+				//if(p>=1) particle_counter_th++;
+				particle_counter_th++;
 			}else if(Ex_daughter_r<0 && first_p>0){ // daughter
 				if(flag[b]==0) Ex_daughter_r=Ex_daughter[b];
 				else Ex_daughter_r=0;
@@ -203,6 +205,7 @@ int plot_simulation_11B(){
 				h_SE[par]->Fill(Ex_daughter_r+SE[par]);
 				if(Ex_daughter_r+SE[par]>criteria_3b[par]) count_particle_3b[par]++;
 			}
+			//if( (par!=1 &&particle_counter_th==1) || (par==1 && particle_counter==1) ){
 			if(particle_counter_th==1){
 				rbr_th_2b[par]++;
 				h_Ex_particle_th[par]->Fill(Ex);
@@ -423,13 +426,15 @@ int plot_simulation_11B(){
 			l_kE_th->Draw("same");
 		}
 		os.str("");
-		os << "Prob = " << fixed << (double)h_kE[p]->GetEntries()/numofevent;
-		TText* t_kE = new TText(7,h_kE[p]->GetMaximum()*0.7,os.str().c_str());
+		os << "Prob = " << fixed << setprecision(2) << (double)h_kE[p]->GetEntries()/numofevent;
+		TText* t_kE = new TText(5,h_kE[p]->GetMaximum()*0.7,os.str().c_str());
+		t_kE->SetTextSize(0.06);
 		t_kE->Draw("same");
 		//
 		os.str("");
-		os << "Prob (w/ th)= " << fixed << (double)count_particle_th[p]/numofevent;
-		TText* t_kE_th = new TText(7,h_kE[p]->GetMaximum()*0.6,os.str().c_str());
+		os << "Prob (w/ th)= " << fixed << (double)count_particle_th[p]/numofevent << " (" << (double)count_particle_th[p]/h_kE[p]->GetEntries()*100 << "%)";
+		TText* t_kE_th = new TText(5,h_kE[p]->GetMaximum()*0.6,os.str().c_str());
+		t_kE_th->SetTextSize(0.06);
 		t_kE_th->Draw("same");
 	}
 	c_kE->cd(8);
@@ -517,14 +522,34 @@ int plot_simulation_11B(){
 
 	//---  br plot
 	const int br_data=4;
-	const int br_color[br_data]={416+2,800+6,600,1};
 	const int	br_color_this = 616-6;
+	TH1D* h_br_this  = new TH1D("h_br_this","",50,-10,40);
+	TH1D* h_br_2b_this  = new TH1D("h_br_2b_this","",50,-10,40);
+	h_br_this->SetLineColor(br_color_this);
+	h_br_2b_this->SetFillStyle(3445);
+	h_br_2b_this->SetLineColor(br_color_this);
+	h_br_2b_this->SetFillColor(br_color_this);
+	//
+	h_br_this->Fill(-1,rbr_th[1]/2);
+	h_br_2b_this->Fill(-1,rbr_th_2b[1]/2);
+	h_br_this->Fill(-1+br_data*1.5,rbr_th[2]);
+	h_br_2b_this->Fill(-1+br_data*1.5,rbr_th_2b[2]);
+	h_br_this->Fill(-1+br_data*3,rbr_th[3]);
+	h_br_2b_this->Fill(-1+br_data*3,rbr_th_2b[3]);
+	h_br_this->Fill(-1+br_data*4.5,rbr_th[4]);
+	h_br_2b_this->Fill(-1+br_data*4.5,rbr_th_2b[4]);
+	h_br_this->Fill(-1+br_data*6,rbr_th[6]);
+	h_br_2b_this->Fill(-1+br_data*6,rbr_th_2b[6]);
+
+
+	const int br_color[br_data]={416+2,800+6,600,1};
 	string br_data_name[br_data]={"SAbe_Tohoku_2023","Hu","CASCADE","Yosoi"};
 	string br_data_legend[br_data]={"Abe et al. (2023)","Hu et al. (2022)","CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
 	TFile* rootf_br[br_data];
 	TH1D* h_br[br_data];
 	TH1D* h_br_2b[br_data];
 	const int bin_offset=11;
+	double chi2 =0;
 	for(int i=0;i<br_data;i++){
 		os.str("");
 		os << "data/" << br_data_name[i].c_str() << "/" << br_data_name[i].c_str() << ".root";
@@ -576,6 +601,15 @@ int plot_simulation_11B(){
 				h_br_2b[i]->SetBinError(i+bin_offset+br_data*4.5,env->GetValue("br_e_t_2b",-9999.));
 				h_br[i]->SetBinError(i+bin_offset+br_data*6,env->GetValue("br_e_a",-9999.));
 				h_br_2b[i]->SetBinError(i+bin_offset+br_data*6,env->GetValue("br_e_a_2b",-9999.));
+				//
+				chi2 += pow( (rbr_th[2] - env->GetValue("br_p",-9999.))/env->GetValue("br_e_p",-9999.), 2);
+				chi2 += pow( (rbr_th_2b[2] - env->GetValue("br_p_2b",-9999.))/env->GetValue("br_e_p_2b",-9999.), 2);
+				chi2 += pow( (rbr_th[3] - env->GetValue("br_d",-9999.))/env->GetValue("br_e_d",-9999.), 2);
+				chi2 += pow( (rbr_th_2b[3] - env->GetValue("br_d_2b",-9999.))/env->GetValue("br_e_d_2b",-9999.), 2);
+				chi2 += pow( (rbr_th[4] - env->GetValue("br_t",-9999.))/env->GetValue("br_e_t",-9999.), 2);
+				chi2 += pow( (rbr_th_2b[4] - env->GetValue("br_t_2b",-9999.))/env->GetValue("br_e_t_2b",-9999.), 2);
+				chi2 += pow( (rbr_th[6] - env->GetValue("br_a",-9999.))/env->GetValue("br_e_a",-9999.), 2);
+				chi2 += pow( (rbr_th_2b[6] - env->GetValue("br_a_2b",-9999.))/env->GetValue("br_e_a_2b",-9999.), 2);
 			}
 		}
 		//
@@ -585,31 +619,13 @@ int plot_simulation_11B(){
 		h_br_2b[i]->SetFillColor(br_color[i]);
 	}
 
-	TH1D* h_br_this  = new TH1D("h_br_this","",50,-10,40);
-	TH1D* h_br_2b_this  = new TH1D("h_br_2b_this","",50,-10,40);
-	h_br_this->SetLineColor(br_color_this);
-	h_br_2b_this->SetFillStyle(3445);
-	h_br_2b_this->SetLineColor(br_color_this);
-	h_br_2b_this->SetFillColor(br_color_this);
-	//
-	h_br_this->Fill(-1,rbr_th[1]/2);
-	h_br_2b_this->Fill(-1,rbr_th_2b[1]/2);
-	h_br_this->Fill(-1+br_data*1.5,rbr_th[2]);
-	h_br_2b_this->Fill(-1+br_data*1.5,rbr_th_2b[2]);
-	h_br_this->Fill(-1+br_data*3,rbr_th[3]);
-	h_br_2b_this->Fill(-1+br_data*3,rbr_th_2b[3]);
-	h_br_this->Fill(-1+br_data*4.5,rbr_th[4]);
-	h_br_2b_this->Fill(-1+br_data*4.5,rbr_th_2b[4]);
-	h_br_this->Fill(-1+br_data*6,rbr_th[6]);
-	h_br_2b_this->Fill(-1+br_data*6,rbr_th_2b[6]);
-
 
 	const double max_br_plot=32;
 	TCanvas* c_br =new TCanvas("c_br","c_br",0,0,800,600);
 	TH1F* waku_br = gPad->DrawFrame(-3,0,30,max_br_plot);
 	waku_br->GetXaxis()->SetLabelSize(0);
 	waku_br->GetXaxis()->SetTickSize(0);
-	waku_br->GetYaxis()->SetTitle("Relative branching ratio (%)");
+	waku_br->GetYaxis()->SetTitle("Branching ratio (%)");
 	h_br_this->Draw("HISTsame");
 	h_br_2b_this->Draw("HISTsame");
 	TLegend* leg_br = new TLegend(0.6,0.6,0.9,0.9);
@@ -635,6 +651,11 @@ int plot_simulation_11B(){
 	TLatex* l_br_n_factor = new TLatex(-1,max_br_plot*0.9,"#times 1/2");
 	l_br_n_factor->SetTextSize(0.07);
 	l_br_n_factor->Draw("same");
+	os.str("");
+	os << "#chi^{2} = " << chi2;
+	TLatex* l_chi2 = new TLatex(br_data*1.5,max_br_plot*0.9,os.str().c_str());
+	l_chi2->SetTextSize(0.07);
+	l_chi2->Draw("same");
 	//
 	int index=0;
 	for(int p=1;p<num_particle;p++){
@@ -715,6 +736,42 @@ int plot_simulation_11B(){
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << "_SE" << suffix.c_str() << ".pdf";
 	c_SE->Print(os.str().c_str());
+
+
+	// output 
+	os.str("");
+	os << "sim_out/Br_" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << ".root";
+	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
+	TEnv env_o("env");
+	env_o.SetValue("rbr_nda_n",rbr_nda_n*100);
+	env_o.SetValue("rbr_nda_da",rbr_nda_da*100);
+	env_o.SetValue("br_n_2b",rbr_th_2b[1]/2);
+	env_o.SetValue("br_n",rbr_th[1]/2);
+	env_o.SetValue("br_p_2b",rbr_th_2b[2]/2);
+	env_o.SetValue("br_p",rbr_th[2]/2);
+	env_o.SetValue("br_d_2b",rbr_th_2b[3]/2);
+	env_o.SetValue("br_d",rbr_th[3]/2);
+	env_o.SetValue("br_t_2b",rbr_th_2b[4]/2);
+	env_o.SetValue("br_t",rbr_th[4]/2);
+	env_o.SetValue("br_a_2b",rbr_th_2b[6]/2);
+	env_o.SetValue("br_a",rbr_th[6]/2);
+	env_o.Write("env");
+	//
+	for(int i=0;i<nda_data;i++){
+		h_nda[i]->Write();
+	}
+	for(int i=0;i<br_data;i++){
+		h_br[i]->Write();
+		h_br_2b[i]->Write();
+	}
+	h_nda_this->Write();
+	h_br_this->Write();
+	h_br_2b_this->Write();
+	//
+	//outf->Close();
+	//delete outf;
 
 	return 0;
 }
