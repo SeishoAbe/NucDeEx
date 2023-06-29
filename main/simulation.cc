@@ -188,7 +188,8 @@ int main(int argc, char* argv[]){
 			PZ[i]=p._momentum.Z();
 			flag[i]=p._flag;
 			Ex_daughter[i]=p._Ex;
-			//
+			// for decay mode string
+			if(!p._flag) continue;  // intermediate state 
 			if(p._name.length()>4) pname[i] = p._name.substr(0,1);
 			else pname[i] = p._name;
 			os << pname[i].c_str();
