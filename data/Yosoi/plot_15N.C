@@ -37,6 +37,8 @@ int plot_15N(){
 
 	TFile* rootf = new TFile("Yosoi_15N.root","RECREATE");
 	TEnv env("env");
+	env.SetValue("br_n_2b",br_n_2b);
+	env.SetValue("br_n",br_n);
 	env.SetValue("br_p_2b",br_p_2b);
 	env.SetValue("br_p",br_p);
 	env.SetValue("br_d_2b",br_d_2b);
@@ -46,6 +48,8 @@ int plot_15N(){
 	env.SetValue("br_a_2b",br_a_2b);
 	env.SetValue("br_a",br_a);
 	//
+	env.SetValue("br_e_n_2b",br_e_n_2b);
+	env.SetValue("br_e_n",br_e_n);
 	env.SetValue("br_e_p_2b",br_e_p_2b);
 	env.SetValue("br_e_p",br_e_p);
 	env.SetValue("br_e_d_2b",br_e_d_2b);
