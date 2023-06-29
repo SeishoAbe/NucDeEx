@@ -21,7 +21,7 @@ int plot_simulation_11B(){
 	const double Ex_max =35;
 		// negative -> not applied
 	const int ldmodel=1;
-	const bool parity_optmodall=1;
+	const bool parity_optmodall=0;
 	const bool flag_decay=1;
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 

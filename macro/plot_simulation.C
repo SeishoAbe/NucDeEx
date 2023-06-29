@@ -13,11 +13,11 @@ using namespace std;
 int plot_simulation(){
 	// ---- FIXME ---- //
 	string target = "11B";
-	const double Ex_min =16;
-	const double Ex_max =35;
+	const double Ex_min =15.9;
+	const double Ex_max =-1;
 		// negative -> not applied
 	const int ldmodel=1;
-	const bool parity_optmodall=1;
+	const bool parity_optmodall=0;
 	const bool flag_decay=1;
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 
@@ -83,6 +83,11 @@ int plot_simulation(){
 		os << "h_kE_" << p;
 		if(p==0) h_kE[p]= new TH1D(os.str().c_str(),"",200,0,20);
 		else     h_kE[p]= new TH1D(os.str().c_str(),"",40,0,20);
+		//
+		os.str("");
+		os << "h_Ex_particle_" << p;
+		h_Ex_particle[p] = new TH1D(os.str().c_str(),"",500,-100,400);
+		h_Ex_particle[p]->SetLineColor(color_root[p]);
 	}
 
 	int max_size=0;
