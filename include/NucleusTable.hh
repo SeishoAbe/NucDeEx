@@ -18,6 +18,7 @@ class NucleusTable{
 	Nucleus* GetNucleusPtr(const char* name);
 	Nucleus* GetNucleusPtr(int id);
 	Nucleus* GetNucleusPtr(int Z,int N);
+	Nucleus* GetNucleusPtrPDG(int PDG);
 	const char* nuc_name[9]
 		= {"","H","He","Li","Be","B","C","N","O"}; // [Z]
 

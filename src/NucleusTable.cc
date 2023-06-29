@@ -112,6 +112,15 @@ Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
 }
 
 ///////////////
+Nucleus* NucleusTable::GetNucleusPtrPDG(int PDG)
+///////////////
+{
+	int A = (PDG%1000)/10;
+	int Z = ((PDG%1000000)-A*10)/10000;
+	return GetNucleusPtr(Z,A-Z);
+}
+
+///////////////
 int NucleusTable::getID(const char* name)
 ///////////////
 {
