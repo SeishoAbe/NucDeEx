@@ -2,12 +2,13 @@
 
 ### FIXME ###
 #TARGET_TMP="11B 11C 15N 15O"
-#TARGET_TMP="11B 11C"
-TARGET_TMP="15N 15O"
-FILE_TMP="energy.1.2.p.txt energy"
-ldmodel_tmp="1 2 3"
-parity_optmodall_tmp="0 1"
+#ldmodel_tmp="1 2 3"
+#parity_optmodall_tmp="0 1"
+TARGET_TMP="15N"
+ldmodel_tmp="1"
+parity_optmodall_tmp="0"
 #############
+FILE_TMP="energy.1.2.p.txt energy"
 
 #ldmodel_tmp="1 2 3 4 5 6"
 # 4-6 (microscopic is not available)
