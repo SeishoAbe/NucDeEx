@@ -77,10 +77,8 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 		status=0;
 	}
 
-	// --- Initialization --- //
-	InitParticleVector();
 
-	// --- Call sub functions 
+	// --- Call sub functions according to shell and nucleus conditions- --//
 	if(Zt+Nt == Z+N){
 		// --- No change in nucleus (Coherent scattering etc.)
 		//     Currently not supported. Nothing to do.
@@ -115,8 +113,11 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 													     const int Z, const int N, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
-	RESET:
 	cout << "DoDeex_talys()" << endl;
+	RESET:
+
+	// --- Initialization --- //
+	InitParticleVector();
 
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
@@ -167,7 +168,6 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 			if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
 				cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
 				cout << "Call DoDeex() again!" << endl;
-				InitParticleVector(); // needs to be call before RESET
 				goto RESET; // call this fuc again
 			}
 			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
@@ -229,6 +229,9 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 													   const int Z, const int N, const TVector3& mom)
 /////////////////////////////////////////////
 {
+	// --- Initialization --- //
+	InitParticleVector();
+
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
 	N_target   = N;
