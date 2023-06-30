@@ -33,10 +33,10 @@ int main(int argc, char* argv[]){
 	cout << "SEED = " << seed << endl;
 
 	// ---- FIXME --- // 
-	const int numofevent=1e5; // to be generated
-	const bool flag_fig=0;
-	//const int numofevent=100; // to be generated
-	//const bool flag_fig=1;
+	//const int numofevent=1e5; // to be generated
+	//const bool flag_fig=0;
+	const int numofevent=1000; // to be generated
+	const bool flag_fig=1;
 
 	const double Ex_min =-1;
 	const double Ex_max =-1;
@@ -54,6 +54,9 @@ int main(int argc, char* argv[]){
 	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
 	const int Z = nuc->Z;
 	const int N = nuc->N;
+	int Zt,Nt;
+	if(Z+N==11) Zt=6,Nt=6;
+	if(Z+N==15) Zt=8,Nt=8;
 	
 
 	// prepare output root file
@@ -163,8 +166,8 @@ int main(int argc, char* argv[]){
 		if(Ex_max>0 && Ex>Ex_max) continue;
 
 		// DOIT 
-		//deex->DoDeex(Z,N,Ex); // this can also work w/ zero momentum
-		deex->DoDeex(Z,N,Ex,Pinit);
+		//deex->DoDeex(Zt,Nt,Z,N,1,Ex,Pinit); // s1/2-hole 
+		deex->DoDeex(Zt,Nt,Z,N,2,Ex,Pinit); // p3/2-hole
 
 		// scoling
 		vector<Particle>* particle = deex->GetParticleVector();
