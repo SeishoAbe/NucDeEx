@@ -92,6 +92,7 @@ int plot_simulation_15N(){
 	gStyle->SetLabelSize(0.05,"XYZ");
 	gStyle->SetLabelFont(132,"XYZ");
 	gStyle->SetLegendFont(132);
+	//gStyle->SetLegendTextSize(0.04);
 	gStyle->SetTitleYOffset(0.95);
 
 	TH1D* h_kEg[numofnuc]; // gamma kE spectrum for each nuc
@@ -732,6 +733,7 @@ int plot_simulation_15N(){
 	h_kE[0]->Scale(h_kE[0]->GetEntries());
 	TCanvas* c_kEgamma = new TCanvas("c_kEgamma","c_kEgamma",0,0,800,600);
 	h_kE[0]->GetXaxis()->SetRangeUser(2.5,8);
+	h_kE[0]->GetXaxis()->SetTitle("Gamma energy (MeV)");
 	h_kE[0]->Draw("HISTsame");
 	TLine* l_kE_th = new TLine(kE_th[0],0,kE_th[0],h_kE[0]->GetMaximum()*1.05);
 	l_kE_th->SetLineStyle(2);
@@ -772,6 +774,52 @@ int plot_simulation_15N(){
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << "_kEgamma" << suffix.c_str() << ".pdf";
 	c_kEgamma->Print(os.str().c_str());
+
+	
+	const double FWHM=1;
+	TF1* f_gaus = new TF1("f_gaus","TMath::Gaus(x,0,[0]/2.35)",-5,5);
+	f_gaus->SetParameter(0,FWHM);
+	TH1D* h_kEg_res = new TH1D("h_kE_g_res","",50,0,10);
+	for(int b=1;b<200;b++){
+		double E=h_kE[0]->GetBinCenter(b);
+		int ev = h_kE[0]->GetBinContent(b);
+		for(int i =0;i<ev;i++){
+			double Eres=E+f_gaus->GetRandom();
+			h_kEg_res->Fill(Eres);
+		}
+	}
+
+	TCanvas* c_kEg_res = new TCanvas("c_kEg_res","",0,0,800,600);
+	h_kEg_res->GetXaxis()->SetRangeUser(3,8.2);
+	h_kEg_res->Scale(1.0/h_kEg_res->Integral());
+	h_kEg_res->GetYaxis()->SetMaxDigits(2);
+	h_kEg_res->SetStats(0);
+	h_kEg_res->SetLineColor(kBlack);
+	h_kEg_res->Draw("HIST");
+	h_kEg_res->GetXaxis()->SetTitle("Gamma energy (MeV)");
+	h_kEg_res->GetYaxis()->SetTitle("A.U");
+	TFile* rootf_kobayashi = new TFile("data/Kobayashi/Kobayashi.root","READ");
+	TH1D* h_kobayashi = (TH1D*) rootf_kobayashi->Get("h");
+	h_kobayashi->Scale(1./h_kobayashi->Integral());
+	//h_kobayashi->Scale(1./h_kobayashi->Integral()/(8.2-3));
+	h_kobayashi->SetLineColor(kRed);
+	h_kobayashi->SetLineStyle(2);
+	h_kobayashi->Draw("HISTsame");
+	TLegend* leg = new TLegend(0.4,0.6,0.9,0.9);
+	leg->SetFillStyle(0);
+	leg->SetBorderSize(0);
+	leg->SetTextSize(0.04);
+	os.str("");
+	os << "This work (Res. " << (int) FWHM << " MeV FWHM)";
+	leg->AddEntry(h_kEg_res,os.str().c_str(),"l");
+	leg->AddEntry(h_kobayashi,"Kobayashi et at.","l");
+	leg->Draw("same");
+	os.str("");
+	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel;
+	if(parity_optmodall) os << "_parity_optmodall";
+	os << "_kEg_res" << suffix.c_str() << ".pdf";
+	c_kEg_res->Print(os.str().c_str());
+
 
 
 	// output 
