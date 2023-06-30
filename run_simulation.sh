@@ -1,10 +1,12 @@
 #!/bin/bash
 
 ### FIXME ###
-#TARGET_TMP="11B"
-TARGET_TMP="11C 15N 15O"
+TARGET_TMP="11B 11C 15N 15O"
 ldmodel_tmp="1 2 3"
 parity_optmodall_tmp="0 1"
+#TARGET_TMP="11B"
+#ldmodel_tmp="1"
+#parity_optmodall_tmp="0"
 #############
 
 LogDir=log
