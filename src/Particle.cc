@@ -67,13 +67,18 @@ void Particle::Boost(const double totalE_parent,const TVector3& mom_parent)
 		cerr << "Inputed Mass = " << _mass << endl;
 		abort();
 	}
-	if(verbose>0) cout << "Bef boost: "; lv.Print();
+	if(verbose>0){
+		cout << "Bef boost: ";
+		lv.Print();
+	}
 
 	// --- Boost --- //
 	lv.Boost(beta);
 
-	if(verbose>0) cout << "Aft boost: "; lv.Print();
 	_momentum = lv.Vect(); // save new vectors after boost
-	if(verbose>0) cout << "Aft boost:"; _momentum.Print();
-	//lv.SetPxPyPzE(mom_parent.X(),mom_parent.Y(),mom_parent.Z(),total_E_parent);
+	if(verbose>0){
+		cout << "Aft boost: ";
+		lv.Print();
+		_momentum.Print();
+	}
 }
