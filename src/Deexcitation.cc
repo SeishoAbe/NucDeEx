@@ -60,18 +60,63 @@ Deexcitation::~Deexcitation()
 }
 
 /////////////////////////////////////////////
-void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVector3& mom)
+int Deexcitation::DoDeex(const int Zt, const int Nt,
+													const int Z, const int N, const int shell, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
 	cout << endl << "###################################" << endl;
-	cout << "Deexcitation::DoDeex(" << Z << "," << N << "," 
-			 << Ex << ")  eventID=" << eventID << endl;
+	cout << "Deexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
+			 << "," << shell << "," << Ex << ")  eventID=" << eventID << endl;
 	cout << "###################################" << endl;
+	eventID++;
 
-	RESET:
+	int status=-1;
+
+	if(! (Zt+Nt==12 || Zt+Nt==16) ){
+		cerr << "This tool does not support the target nucleus" << endl;
+		status=0;
+	}
 
 	// --- Initialization --- //
 	InitParticleVector();
+
+	// --- Call sub functions 
+	if(Zt+Nt == Z+N){
+		// --- No change in nucleus (Coherent scattering etc.)
+		//     Currently not supported. Nothing to do.
+		status=0;
+	}else if(Zt+Nt == Z+N+1){
+		// --- Single nucleon disapperance
+		if(shell==3){ 
+			// p1/2-hole. nothing to do
+			status=1;
+		}else if(shell==2){
+			// p3/2-hole 
+			status=DoDeex_p32(Zt,Nt,Z,N,mom); 
+		}else if(shell==1){
+			// s1/2-hole read TALYS data
+			status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
+		}else{
+			cerr << "ERROR: Unexpected shell level: shell = " << shell << endl;
+			status=-1;
+		}
+	}else if(Zt+Nt>Z+N){
+		// --- Multi-nucleon disapperance
+		status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
+	}else{
+		cerr << "ERROR: Unexpected target & residual nuclei" << endl;
+		status=-1;
+	}
+	return status;
+}
+
+/////////////////////////////////////////////
+int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
+													     const int Z, const int N, const double Ex, const TVector3& mom)
+/////////////////////////////////////////////
+{
+	RESET:
+	cout << "DoDeex_talys()" << endl;
 
 	// store target info. we don't want to change original value.
 	Z_target   = Z;
@@ -85,7 +130,7 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 	if( ! OpenROOT(name_target.c_str()) ){
 		cout << "We don't have deexcitation profile for this nucleus: " 
 				 << name_target.c_str() << endl;
-		return;
+		return 0;
 	}
 	
 	// Loop until zero excitation energy or null nuc_daughter ptr
@@ -122,7 +167,8 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 			if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
 				cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
 				cout << "Call DoDeex() again!" << endl;
-				goto RESET;
+				InitParticleVector(); // needs to be call before RESET
+				goto RESET; // call this fuc again
 			}
 			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
 			mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
@@ -158,7 +204,6 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 		Ex_target = Ex_daughter;
 		mass_target = mass_daughter;
 		mom_target  += mom_daughter;
-		//kE_target  = kE_daughter;
 		nuc_target = nuc_daughter;
 		name_target = (string)nuc_target->name;
 		cout << endl;
@@ -176,9 +221,157 @@ void Deexcitation::DoDeex(const int Z, const int N, const double Ex, const TVect
 	rootf->Close();
 	delete rootf;
 
-	eventID++;
+	return 1;
 }
 
+/////////////////////////////////////////////
+int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
+													   const int Z, const int N, const TVector3& mom)
+/////////////////////////////////////////////
+{
+	// store target info. we don't want to change original value.
+	Z_target   = Z;
+	N_target   = N;
+	mom_target = mom;
+	nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
+	name_target = (string)nuc_target->name;
+	cout << "DoDeex_p32()" << endl;
+	cout << "### " << name_target;
+	cout << "     mom_target: "; mom_target.Print();
+
+	double random = rndm->Rndm();
+
+	//-----------11B------------//
+	if(Z==5 || N==6){
+	//--------------------------//
+		int index=0;
+		double Br_integ=0;
+		for(int i=0;i<Nlevel_p32_11B;i++){
+			Br_integ += Br_p32_11B[i];
+			if(random<Br_integ){
+				index=i;
+				break;
+			}
+		}
+		if(index>0){ // except g.s.
+			// set paremeters for boost calculation
+			decay_mode=0; 
+			Ex_target  = E_p32_11B[index];
+			Ex_daughter=0;
+			mass_particle=0;
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			mass_daughter=mass_target;
+			name_daughter = name_target;
+			Z_daughter = Z_target;
+			N_daughter = N_target;
+			nuc_daughter = nuc_target;
+			Qvalue = Ex_target;
+			Decay(1); // breakflag on
+		}
+	//-----------11C------------//
+	}else if(Z==6 || N==5){
+	//--------------------------//
+		int index=0;
+		double Br_integ=0;
+		for(int i=0;i<Nlevel_p32_11C;i++){
+			Br_integ += Br_p32_11C[i];
+			if(random<Br_integ){
+				index=i;
+				break;
+			}
+		}
+		if(index>0){ // except g.s.
+			// set paremeters for boost calculation
+			decay_mode=0; 
+			Ex_target  = E_p32_11C[index];
+			Ex_daughter=0;
+			mass_particle=0;
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			mass_daughter=mass_target;
+			name_daughter = name_target;
+			Z_daughter = Z_target;
+			N_daughter = N_target;
+			nuc_daughter = nuc_target;
+			Qvalue = Ex_target;
+			Decay(1); // breakflag on
+		}
+	//-----------15N------------//
+	}else if(Z==7 || N==8){
+	//--------------------------//
+		int index=0;
+		double Br_integ=0;
+		for(int i=0;i<Nlevel_p32_15N;i++){
+			Br_integ += Br_p32_15N[i];
+			if(random<Br_integ){
+				index=i;
+				break;
+			}
+		}
+		if(index==0){ // gamma
+			// set paremeters for boost calculation
+			decay_mode=0; 
+			Ex_target  = E_p32_15N[index];
+			Ex_daughter=0;
+			mass_particle=0;
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			mass_daughter=mass_target;
+			name_daughter = name_target;
+			Z_daughter = Z_target;
+			N_daughter = N_target;
+			nuc_daughter = nuc_target;
+			Qvalue = Ex_target;
+			Decay(1); // breakflag on
+		}else if(index==1){ // gamma but multiple -> read talys
+			DoDeex_talys(Zt,Nt,Z,N,E_p32_15N[index],mom);
+		}else if(index==2){ // proton
+			// set paremeters for boost calculation
+			decay_mode=2;
+			Ex_target  = E_p32_15N[index];
+			Ex_daughter=0;
+			mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/TGeoUnit::MeV;//GeV2MeV
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			Z_daughter = Z_target-1;
+			N_daughter = N_target;
+			mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
+			nuc_daughter = _nucleus_table->GetNucleusPtr(Z_daughter,N_daughter);
+			name_daughter = nuc_daughter->name;
+			S = nuc_target->S[decay_mode];
+			Qvalue = Ex_target - S - Ex_daughter;
+			Decay(1); // breakflag on
+		}else{
+			abort();
+		// return -1;
+		}
+	//-----------15O------------//
+	}else if(Z==8 || N==7){
+	//--------------------------//
+		int index=0;
+		double Br_integ=0;
+		for(int i=0;i<Nlevel_p32_15O;i++){
+			Br_integ += Br_p32_15O[i];
+			if(random<Br_integ){
+				index=i;
+				break;
+			}
+		}
+		// set paremeters for boost calculation
+		decay_mode=0; 
+		Ex_target  = E_p32_15O[index];
+		Ex_daughter=0;
+		mass_particle=0;
+		mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+		mass_daughter=mass_target;
+		name_daughter = name_target;
+		Z_daughter = Z_target;
+		N_daughter = N_target;
+		Qvalue = Ex_target;
+		Decay(1); // breakflag on
+	}else{ 
+		abort();
+		// return -1;
+	}
+	return 1;
+}
 
 /////////////////////////////////////////////
 int Deexcitation::DecayMode(const double Ex)

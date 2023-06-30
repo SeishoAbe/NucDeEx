@@ -13,11 +13,11 @@ using namespace std;
 int plot_simulation(){
 	// ---- FIXME ---- //
 	string target = "11B";
-	const double Ex_min =15.9;
+	const double Ex_min =-1;
 	const double Ex_max =-1;
 		// negative -> not applied
-	const int ldmodel=1;
-	const bool parity_optmodall=0;
+	const int ldmodel=2;
+	const bool parity_optmodall=1;
 	const bool flag_decay=1;
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 
