@@ -86,5 +86,12 @@ int plot(){
 	t_6->Draw("same");
 	c->Print("figure/fig_Eg_total.pdf");
 
+
+	TFile* outf = new TFile("Kobayashi.root","RECREATE");
+	h->Write();
+	h_16_20->Write();
+	h_20_30->Write();
+	h_30_40->Write();
+
 	return 0;
 }
