@@ -268,7 +268,8 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			Z_daughter = Z_target;
 			N_daughter = N_target;
 			nuc_daughter = nuc_target;
-			Qvalue = Ex_target;
+			S = nuc_target->S[decay_mode];
+			Qvalue = Ex_target - S - Ex_daughter;
 			Decay(1); // breakflag on
 		}
 	//-----------11C------------//
@@ -295,7 +296,8 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			Z_daughter = Z_target;
 			N_daughter = N_target;
 			nuc_daughter = nuc_target;
-			Qvalue = Ex_target;
+			S = nuc_target->S[decay_mode];
+			Qvalue = Ex_target - S - Ex_daughter;
 			Decay(1); // breakflag on
 		}
 	//-----------15N------------//
@@ -322,13 +324,14 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			Z_daughter = Z_target;
 			N_daughter = N_target;
 			nuc_daughter = nuc_target;
-			Qvalue = Ex_target;
+			S = nuc_target->S[decay_mode];
+			Qvalue = Ex_target - S - Ex_daughter;
 			Decay(1); // breakflag on
 		}else if(index==1){ // gamma but multiple -> read talys
 			DoDeex_talys(Zt,Nt,Z,N,E_p32_15N[index],mom);
-		}else if(index==2){ // proton
+		}else if(index==2){
 			// set paremeters for boost calculation
-			decay_mode=2;
+			decay_mode=2; // proton
 			Ex_target  = E_p32_15N[index];
 			Ex_daughter=0;
 			mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/TGeoUnit::MeV;//GeV2MeV
@@ -357,18 +360,36 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 				break;
 			}
 		}
-		// set paremeters for boost calculation
-		decay_mode=0; 
-		Ex_target  = E_p32_15O[index];
-		Ex_daughter=0;
-		mass_particle=0;
-		mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
-		mass_daughter=mass_target;
-		name_daughter = name_target;
-		Z_daughter = Z_target;
-		N_daughter = N_target;
-		Qvalue = Ex_target;
-		Decay(1); // breakflag on
+		if(index==0){ // gamma
+			// set paremeters for boost calculation
+			decay_mode=0; 
+			Ex_target  = E_p32_15O[index];
+			Ex_daughter=0;
+			mass_particle=0;
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			mass_daughter=mass_target;
+			name_daughter = name_target;
+			Z_daughter = Z_target;
+			N_daughter = N_target;
+			S = nuc_target->S[decay_mode];
+			Qvalue = Ex_target - S - Ex_daughter;
+			Decay(1); // breakflag on
+		}else if(index==1||index==2){
+			// set paremeters for boost calculation
+			decay_mode=2; // proton
+			Ex_target  = E_p32_15O[index];
+			Ex_daughter=0;
+			mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/TGeoUnit::MeV;//GeV2MeV
+			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
+			Z_daughter = Z_target-1;
+			N_daughter = N_target;
+			mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
+			nuc_daughter = _nucleus_table->GetNucleusPtr(Z_daughter,N_daughter);
+			name_daughter = nuc_daughter->name;
+			S = nuc_target->S[decay_mode];
+			Qvalue = Ex_target - S - Ex_daughter;
+			Decay(1); // breakflag on
+		}
 	}else{ 
 		abort();
 		// return -1;
