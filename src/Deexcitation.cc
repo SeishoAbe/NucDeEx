@@ -72,30 +72,37 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 
 	int status=-1;
 
-	if(! (Zt+Nt==12 || Zt+Nt==16) ){
+	if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
 		cerr << "This tool does not support the target nucleus" << endl;
 		status=0;
 	}
-
 
 	// --- Call sub functions according to shell and nucleus conditions- --//
 	if(Zt+Nt == Z+N){
 		// --- No change in nucleus (Coherent scattering etc.)
 		//     Currently not supported. Nothing to do.
+		InitParticleVector();
+		AddGSNucleus(Z,N,mom);
 		status=0;
 	}else if(Zt+Nt == Z+N+1){
+		_shell=-1;
+		if(shell>0) _shell=shell;
+		else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
+		else abort();
 		// --- Single nucleon disapperance
-		if(shell==3){ 
+		if(_shell==3){ 
 			// p1/2-hole. nothing to do
+			InitParticleVector();
+			AddGSNucleus(Z,N,mom);
 			status=1;
-		}else if(shell==2){
+		}else if(_shell==2){
 			// p3/2-hole 
 			status=DoDeex_p32(Zt,Nt,Z,N,mom); 
-		}else if(shell==1){
+		}else if(_shell==1){
 			// s1/2-hole read TALYS data
 			status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
 		}else{
-			cerr << "ERROR: Unexpected shell level: shell = " << shell << endl;
+			cerr << "ERROR: Unexpected shell level: shell = " << _shell << endl;
 			status=-1;
 		}
 	}else if(Zt+Nt>Z+N){
@@ -131,6 +138,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 	if( ! OpenROOT(name_target.c_str()) ){
 		cout << "We don't have deexcitation profile for this nucleus: " 
 				 << name_target.c_str() << endl;
+		AddGSNucleus(Z,N,mom);
 		return 0;
 	}
 	
@@ -256,7 +264,9 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 				break;
 			}
 		}
-		if(index>0){ // except g.s.
+		if(index==0){ // g.s.
+			AddGSNucleus(Z,N,mom);
+		}else{ // excited state
 			// set paremeters for boost calculation
 			decay_mode=0; 
 			Ex_target  = E_p32_11B[index];
@@ -284,7 +294,9 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 				break;
 			}
 		}
-		if(index>0){ // except g.s.
+		if(index==0){ // g.s.
+			AddGSNucleus(Z,N,mom);
+		}else{ // excited state
 			// set paremeters for boost calculation
 			decay_mode=0; 
 			Ex_target  = E_p32_11C[index];
@@ -396,6 +408,38 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 	}
 	return 1;
 }
+
+/////////////////////////////////////////////
+void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
+/////////////////////////////////////////////
+{
+	mass_target = ElementMassInMeV(element_table->GetElementRN(Z+N, Z));
+	nuc_target = _nucleus_table->GetNucleusPtr(Z,N);
+	name_target = (string)nuc_target->name;
+	Particle nucleus(PDGion(Z,N),
+								   mass_target, // w/o excitation E
+									 mom,
+								   name_target, 
+									 1,0); // track flag on // zero ex
+	_particle->push_back(nucleus);
+}
+
+
+/////////////////////////////////////////////
+int Deexcitation::ExtoShell(const int Zt, const int Nt, const double Ex)
+/////////////////////////////////////////////
+{
+	if(Zt==6&&Nt==6){ // 12C
+		if(Ex>Ex_12C_s12) return 1; // s1/2-hole
+		else return 2; //p3/2-hole
+	}else if(Zt==8&&Nt==8){
+		if(Ex>Ex_16O_s12) return 1;
+		else if(Ex>Ex_16O_p32) return 2;
+		else return 3;
+	}else abort();
+	return -1;
+}
+
 
 /////////////////////////////////////////////
 int Deexcitation::DecayMode(const double Ex)

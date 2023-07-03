@@ -30,9 +30,10 @@ class Deexcitation{
 						 const TVector3& mom=TVector3(0,0,0));
 	// Zt, Nt  : Target nucleus Z and N (supports 16O or 12C currently)
 	// Z, N    : Residual nucleus Z and N (having excitation energy)
-	// shell 1 : s1/2-hole
-	//			 2 : p3/2-hole
-	//       3 : p1/2-hole (only for 16O target)
+	// shell  0 : Shell level will be determined according to Ex (box cut)
+	//        1 : s1/2-hole
+	//			  2 : p3/2-hole
+	//        3 : p1/2-hole (only for 16O target)
 	// Ex      : Only used if shell==1
 	// mom     : 3D momentum of residual nucleus
 	// 
@@ -57,7 +58,11 @@ class Deexcitation{
 	// Note: Energy level is determined irrelevant to Ex
 	// return  1: Sucess
 	//        -1 : Fatal error
-
+	
+	void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
+	// Just add g.s. nucleus to the vector.
+	// this function will be used in p1/2-hole, etc.
+	int ExtoShell(const int Zt, const int Nt, const double Ex);
 
 	void SetSeed(int s){ rndm->SetSeed(s) ;};
 	int  GetSeed(){return rndm->GetSeed();};
@@ -67,6 +72,7 @@ class Deexcitation{
 	int  GetEventID(){ return eventID; };
 	vector<Particle>* GetParticleVector(){return _particle;};
 	NucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
+	int GetShell(){return _shell;};
 
 	private:
 	// --- Simulation method called by DoDeex() --- //
@@ -127,6 +133,12 @@ class Deexcitation{
 	int eventID;
 	ostringstream os;
 	const double check_criteria=1e-3;
+	int _shell;
+
+	// Constatnts for Ex to shell
+	const double Ex_12C_s12=16.0;
+	const double Ex_16O_s12=14.0;
+	const double Ex_16O_p32=4.0;
 
 	// Constants for (p3/2)-1 Br
 	// 11B* (Panin et al., Phys. Lett. B 753 204-210. Experimental data)
@@ -150,7 +162,5 @@ class Deexcitation{
 	const double E_p32_15O[Nlevel_p32_15O]={6.18,9.61,10.48};
 	const double Br_p32_15O[Nlevel_p32_15O]={0.872,0.064,0.064}; // guess
 	//const double Br_p32_15O[Nlevel_p32_15O]={1.,0,0}; // original Ejiri's value
-
-
 };
 #endif
