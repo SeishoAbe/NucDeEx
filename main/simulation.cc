@@ -203,8 +203,6 @@ int main(int argc, char* argv[]){
 		decay_remove_g = os_remove_g.str();
 		tree->Fill();
 
-		eventID++;
-
 		// prepare detail fig
 		if(flag_fig){
 			TArrow* lXY[size], *lYZ[size], *lXZ[size];
@@ -303,6 +301,7 @@ int main(int argc, char* argv[]){
 			c_detail->Update();
 			c_detail->Clear();
 		}
+		eventID++;
 	}
 	if(flag_fig)c_detail->Print( (pdfname + (string)"]").c_str() );
 	delete c_detail;

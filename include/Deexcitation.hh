@@ -146,9 +146,10 @@ class Deexcitation{
 	const double E_p32_15N[Nlevel_p32_15N]={6.32,9.93,10.70};
 	const double Br_p32_15N[Nlevel_p32_15N]={0.872,0.064,0.064};
 	// 15O* (Ejiri , Phys. Rev. C 58, 3)
-	static const int Nlevel_p32_15O=1;
-	const double E_p32_15O[Nlevel_p32_15O]={6.18};
-	const double Br_p32_15O[Nlevel_p32_15O]={1.};
+	static const int Nlevel_p32_15O=3;
+	const double E_p32_15O[Nlevel_p32_15O]={6.18,9.61,10.48};
+	const double Br_p32_15O[Nlevel_p32_15O]={0.872,0.064,0.064}; // guess
+	//const double Br_p32_15O[Nlevel_p32_15O]={1.,0,0}; // original Ejiri's value
 
 
 };
