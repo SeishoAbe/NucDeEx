@@ -41,7 +41,7 @@ double FUNC_SF_G(double *val,double *par)
 }
 
 int plot_sf(){
-  int flag=1;
+  int flag=0;
   // 0: 12C
   // 1: 16O
   
