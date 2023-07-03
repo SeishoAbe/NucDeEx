@@ -17,7 +17,7 @@
 #include <TArrow.h>
 #include <TText.h>
 #include <TPaveText.h>
-
+#include <THStack.h>
 
 using namespace std;
 
@@ -33,10 +33,10 @@ int main(int argc, char* argv[]){
 	cout << "SEED = " << seed << endl;
 
 	// ---- FIXME --- // 
-	//const int numofevent=1e5; // to be generated
-	//const bool flag_fig=0;
-	const int numofevent=1000; // to be generated
-	const bool flag_fig=1;
+	const int numofevent=1e5; // to be generated
+	const bool flag_fig=0;
+	//const int numofevent=1000; // to be generated
+	//const bool flag_fig=1;
 
 	const double Ex_min =-1;
 	const double Ex_max =-1;
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]){
 	os << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree",""); // LAB Freme, MeV
-	int eventID=0, size;
+	int eventID=0, size, shell;
 	double MissE, Ex, S;
 	double PinitMag, PinitX,PinitY,PinitZ;
 	//
@@ -83,6 +83,7 @@ int main(int argc, char* argv[]){
 	tree->Branch("MissE",&MissE,"MissE/D");
 	tree->Branch("S",&S,"S/D");
 	tree->Branch("Ex",&Ex,"Ex/D");
+	tree->Branch("shell",&shell,"shell/I");
 	tree->Branch("PinitMag",&PinitMag,"PinitMag/D");
 	tree->Branch("PinitX",&PinitX,"PinitX/D");
 	tree->Branch("PinitY",&PinitY,"PinitY/D");
@@ -108,7 +109,12 @@ int main(int argc, char* argv[]){
 	TH2D* h_sf_random = new TH2D("h_sf_random","",400,0,800,400,0,400);
 	TH1D* h_sf_E_random = new TH1D("h_sf_E_random","",400,0,400); // missing E
 	TH1D* h_sf_p_random = new TH1D("h_sf_p_random","",400,0,800);
-	TH1D* h_sf_Ex_random = new TH1D("h_sf_Ex_random","",500,-100,400);  // excitation E
+	TH1D* h_sf_Ex_random[4];// [0]: all
+	for(int i=0;i<4;i++){
+		os.str("");
+		os << "h_sf_Ex_random_" << i;
+		h_sf_Ex_random[i] = new TH1D(os.str().c_str(),"",500,-100,400);
+	}
 
 
 	// Set Ex and mom tables (from SF) and proton separation energy
@@ -151,7 +157,7 @@ int main(int argc, char* argv[]){
 		h_sf_random->Fill(PinitMag,MissE);
 		h_sf_E_random->Fill(MissE);
 		h_sf_p_random->Fill(PinitMag);
-		h_sf_Ex_random->Fill(Ex);
+		h_sf_Ex_random[0]->Fill(Ex);
 		// determine angle 
 		double costheta = 2.*gRandom->Rndm()-1;
 		double sintheta = sqrt( 1. - pow(costheta,2) );
@@ -161,21 +167,25 @@ int main(int argc, char* argv[]){
 								 PinitMag*costheta);
 
 		// select ROI
-		if(Ex<0) continue;
 		if(Ex_min>0 && Ex<Ex_min) continue;
 		if(Ex_max>0 && Ex>Ex_max) continue;
 
 		// DOIT 
 		//deex->DoDeex(Zt,Nt,Z,N,1,Ex,Pinit); // s1/2-hole 
-		deex->DoDeex(Zt,Nt,Z,N,2,Ex,Pinit); // p3/2-hole
+		//deex->DoDeex(Zt,Nt,Z,N,2,Ex,Pinit); // p3/2-hole
+		//deex->DoDeex(Zt,Nt,Z,N,3,Ex,Pinit); // p1/2-hole (nothing to do)
+		deex->DoDeex(Zt,Nt,Z,N,0,Ex,Pinit); // shell level is determined from Ex (box cut)
 
 		// scoling
+		shell = deex->GetShell();
 		vector<Particle>* particle = deex->GetParticleVector();
 		PinitX   = Pinit.X();
 		PinitY   = Pinit.Y();
 		PinitZ   = Pinit.Z();
-		
 		size=particle->size();
+
+		h_sf_Ex_random[shell]->Fill(Ex);
+		
 		os.str("");
 		os_remove_g.str("");
 		string pname[size];
@@ -269,7 +279,8 @@ int main(int argc, char* argv[]){
 			os << "eventID = " << eventID;
 			t->AddText(os.str().c_str());
 			os.str("");
-			os << argv[1] << ": Ex = " << fixed << setprecision(2) << Ex;
+			os << argv[1] << ",  Ex = " << fixed << setprecision(2) << Ex
+				 << ",  shell = " << shell;
 			t->AddText(os.str().c_str());
 			os.str("");
 			os << "P=(" << setprecision(1) << PinitX
@@ -310,20 +321,28 @@ int main(int argc, char* argv[]){
 	TCanvas* c = new TCanvas("c","c",0,0,800,600);
 	c->Divide(2,2);
 	c->cd(1);
-	h_sf_Ex_random->GetXaxis()->SetRangeUser(-10,150);
-	h_sf_Ex_random->SetStats(0);
-	h_sf_Ex_random->SetMinimum(0);
-	h_sf_Ex_random->GetXaxis()->SetTitle("Excitation energy (MeV)");
-	h_sf_Ex_random->GetYaxis()->SetTitle("Events/bin");
-	h_sf_Ex_random->Draw("HIST");
-	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_sf_Ex_random->GetMaximum()*1.05);
+	h_sf_Ex_random[0]->GetXaxis()->SetRangeUser(-10,150);
+	h_sf_Ex_random[0]->SetStats(0);
+	h_sf_Ex_random[0]->SetMinimum(0);
+	h_sf_Ex_random[0]->GetXaxis()->SetTitle("Excitation energy (MeV)");
+	h_sf_Ex_random[0]->GetYaxis()->SetTitle("Events/bin");
+	h_sf_Ex_random[0]->Draw("HIST");
+	THStack* h_s_sf_Ex_random = new THStack("h_s_sf_Ex_random","");
+	const int color[4]={1,600-7,632-7,920};
+	for(int i=1;i<4;i++){
+		h_sf_Ex_random[i]->SetFillColor(color[i]);
+		h_s_sf_Ex_random->Add(h_sf_Ex_random[i]);
+	}
+	h_s_sf_Ex_random->Draw("same");
+	TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_sf_Ex_random[0]->GetMaximum()*1.05);
 	l_Ex_min->SetLineStyle(2);
 	l_Ex_min->SetLineColor(kRed);
 	if(Ex_min>0) l_Ex_min->Draw("same");
-	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_sf_Ex_random->GetMaximum()*1.05);
+	TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_sf_Ex_random[0]->GetMaximum()*1.05);
 	l_Ex_max->SetLineStyle(2);
 	l_Ex_max->SetLineColor(kRed);
 	if(Ex_max>0) l_Ex_max->Draw("same");
+	gPad->RedrawAxis();
 	//
 	c->cd(2);
 	gPad->SetLogz();
@@ -358,7 +377,9 @@ int main(int argc, char* argv[]){
 
 
 	outf->cd();
-	h_sf_Ex_random->Write();
+	for(int i=0;i<4;i++){
+		h_sf_Ex_random[i]->Write();
+	}
 	h_sf_E_random->Write();
 	h_sf_p_random->Write();
 	h_sf_random->Write();
