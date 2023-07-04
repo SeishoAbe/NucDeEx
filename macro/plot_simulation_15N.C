@@ -740,10 +740,22 @@ int plot_simulation_15N(){
 	l_kE_th->SetLineWidth(2);
 	l_kE_th->Draw("same");
 	os.str("");
-	os << "BR (E>" << setprecision(0) << kE_th[0]<< "MeV) = " << fixed << setprecision(2) << (double)count_particle_th[0]/numofevent;
+	os << "BR (E>" << setprecision(0) << kE_th[0]<< "MeV) = " << fixed << setprecision(1) << (double)count_particle_th[0]/numofevent*100;
 	TText* t_kE_th = new TText(5,h_kE[0]->GetMaximum()*0.6,os.str().c_str());
 	t_kE_th->SetTextSize(0.06);
 	t_kE_th->Draw("same");
+	int count_gamma=0;
+	const double kE_gamma_th=6;
+	for(int i=1;i<=200;i++){
+		double e = h_kE[0]->GetBinCenter(i);
+		if(e>kE_gamma_th) count_gamma+=h_kE[0]->GetBinContent(i);
+	}
+	os.str("");
+	os << "BR (E>" << setprecision(0) << kE_gamma_th<< "MeV) = " << fixed << setprecision(1) << (double)count_gamma/numofevent*100;
+	TText* t_kE_6 = new TText(5,h_kE[0]->GetMaximum()*0.4,os.str().c_str());
+	t_kE_6->SetTextSize(0.06);
+	t_kE_6->Draw("same");
+
 	double prob[6]={0};
 	double Ediv[6]={3.5,4.0,4.7,5.5,6.5,7.4};
 	for(int b=1;b<200;b++){
