@@ -25,18 +25,17 @@ const string decay_name[num_particle] // for G4
 		 "Deuteron","Triton","He3","Alpha"};
 
 int main(int argc, char* argv[]){
-	if(argc!=4){
-		cerr << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall]" << endl;
+	if(argc!=5){
+		cerr << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi]" << endl;
 		return 0;
 	}
   // --- FIXME  --- //
   const float max_Ex_plot=50; // <- plot
-  const float Ex_max=100*1e3; // keV <- G4Rad
-  const int Ex_bin_width=0.2*1e3; // keV <- G4Rad
   // ---------------//
 
 	const int ldmodel = atoi(argv[2]);
 	const bool parity_optmodall = (bool)atoi(argv[3]);
+	const bool flag_jpi = (bool) atoi(argv[4]);
   
   std::ostringstream os;
   NucleusTable* nucleus_table = new NucleusTable();
@@ -44,8 +43,19 @@ int main(int argc, char* argv[]){
 		cerr << "something wrong" << endl;
 		return 1;
 	}
+	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
+	const int Zt=nuc->Z;
+	const int Nt=nuc->N;
+	const int At=Zt+Nt;
+
 	os.str("");
-	os << "output/" << argv[1] << "/output_" << argv[1] << "_ldmodel" << ldmodel;
+	os << "output/";
+	if(flag_jpi){
+		if(At==11) os << "12C";
+		else if(At==15) os << "16O";
+		else abort();
+	}
+	os << "/output_" << argv[1] << "_ldmodel" << ldmodel;
 	if(parity_optmodall) os << "_parity_optmodall";
 	ReadTALYS* read_talys = new ReadTALYS(os.str().c_str(), nucleus_table);
 	read_talys->SetVerboseLevel(1);
@@ -66,7 +76,13 @@ int main(int argc, char* argv[]){
 
 	// prepare output root file
 	os.str("");
-	os << "output/" << argv[1] << "/Br_" << argv[1] << "_ldmodel" << ldmodel;
+	os << "output/";
+	if(flag_jpi){
+		if(At==11) os << "12C";
+		else if(At==15) os << "16O";
+		else abort();
+	}
+	os << "/Br_" << argv[1] << "_ldmodel" << ldmodel;
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
@@ -222,7 +238,13 @@ int main(int argc, char* argv[]){
 		}
 		gPad->RedrawAxis();
 		os.str("");
-		os << "fig/" << argv[1] << "_ldmodel" << ldmodel;
+		os << "fig/";
+		if(flag_jpi){
+			if(At==11) os << "12C/";
+			else if(At==15) os << "16O/";
+			else abort();
+		}
+		os << argv[1] << "_ldmodel" << ldmodel;
 		if(parity_optmodall) os << "_parity_optmodall";
 		os << "/fig_" << name.c_str() << "_pop.pdf";
 		c_target_pop->Print(os.str().c_str());
@@ -252,7 +274,13 @@ int main(int argc, char* argv[]){
 		gPad->RedrawAxis();
 		//
 		os.str("");
-		os << "fig/" << argv[1] << "_ldmodel" << ldmodel;
+		os << "fig/";
+		if(flag_jpi){
+			if(At==11) os << "12C/";
+			else if(At==15) os << "16O/";
+			else abort();
+		}
+		os << argv[1] << "_ldmodel" << ldmodel;
 		if(parity_optmodall) os << "_parity_optmodall";
 		os << "/fig_" << name.c_str() << "_br.pdf";
 		c_target_br->Print(os.str().c_str());
@@ -263,7 +291,13 @@ int main(int argc, char* argv[]){
 
 		TCanvas* c_target_br_ex = new TCanvas("c_target_br_ex","",0,0,1200,600);
 		os.str("");
-		os << "fig/" << argv[1] << "_ldmodel" << ldmodel;
+		os << "fig/";
+		if(flag_jpi){
+			if(At==11) os << "12C/";
+			else if(At==15) os << "16O/";
+			else abort();
+		}
+		os << argv[1] << "_ldmodel" << ldmodel;
 		if(parity_optmodall) os << "_parity_optmodall";
 		os << "/fig_" << name.c_str() << "_br_Ex.pdf";
 		string pdfname= os.str();
@@ -348,72 +382,6 @@ int main(int argc, char* argv[]){
 				g_target_br_ex[p][i]->Write();
 			}
 		}
-
-		// --- Create RadioactiveDecay file --- //
-		/*
-		os.str("");
-		os << "output/" << argv[1] << "/z" << nuc_target->Z << ".a" << nuc_target->A;
-		ofstream ofs(os.str().c_str());
-
-		// at first copy original RaioactiveDecay file if it exists
-		os.str("");
-		char* env = getenv("G4RADIOACTIVEDATA_ORIGINAL");
-		if(env!=NULL){
-			os << env << "/z" << nuc_target->Z << ".a" << nuc_target->A;
-			ifstream ifs(os.str().c_str());
-			if(ifs.is_open()){
-				cout << "Copy original G4RadioactiveData" << endl;
-				char buf[500];
-				while(ifs.getline(buf,sizeof(buf))){
-					ofs << buf << endl;
-				}
-			}else{
-				cout << "There is no original G4RadioactiveData" << endl;
-			}
-			ifs.close();
-		}
-
-		// then output BR of talys
-		for(int i=0;i<bin_target;i++){
-			double Ex,junk;
-			g_target_br[0]->GetPoint(i,Ex,junk); // Ex (MeV)
-			//if(Ex<nuc_target->min_S()) continue;
-
-			// 1st line of G4Rad (Ex info)
-			ofs << "P" << setw(20) << right << Ex*1e3 << "  - 0" << endl; // MeV2keV
-
-			// 2nd line of G4 (Mode & total BR info)
-			float BR[num_particle]={0};
-			for(int p=0;p<num_particle;p++){
-				BR[p] = g_target_br[p]->Eval(Ex);
-				if(BR[p]<=0) continue;
-				if(BR[p]>=1) BR[p]=1.0;
-				ofs << setw(20) << " " << setw(8) << left << decay_name[p].c_str() << setw(7) << right << "0" 
-						<< setw(5) << " " << left << BR[p] << endl;
-			}
-
-			// 3rd line of G4 (daughter BR info)
-			for(int p=0;p<num_particle;p++){
-
-				// we do not need to prepare 3rd line for gamma (IT)
-				// It will be automatically calculated by PhotonEvapolation
-				if(p==0) continue;
-
-				for(int j=0;j<nuc_target->Ex_bin_p[p][i];j++){ // daughter ex bin loop
-					double RBR,Ex_daughter;//relative Br
-					g_target_br_ex[p][i]->GetPoint(j,Ex_daughter,RBR); // MeV
-					if(RBR<=0) continue;
-					RBR *= BR[p]*100; // relative Br -> absolute BR in %
-					float Qvalue = Ex - nuc_target->S[p] - Ex_daughter; // MeV 
-					if(Qvalue<0) continue;
-					ofs << setw(21) << " " << setw(8) << left << decay_name[p].c_str() << setw(16) << right << Ex_daughter*1e3
-							<< "   - " << setw(20) << RBR << setw(20) << Qvalue*1e3 << endl;
-
-				}
-			}
-		}
-		ofs.close();
-		*/
 	}
 	// end of Nucleus loop in NucleusTable
 
