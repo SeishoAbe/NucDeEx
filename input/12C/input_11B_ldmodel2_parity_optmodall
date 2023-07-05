@@ -1,7 +1,7 @@
 projectile 0
 element 5
 mass 11
-energy energy
+energy energy.1.2.p.txt
 
 bins 0
 ldmodel 2
