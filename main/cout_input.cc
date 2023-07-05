@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
 	ofs << "element " << Z << endl;
 	ofs << "mass " << A << endl;
 	if( flag_jpi && (A==11 || A==15)) {
-		ofs << "energy energy.1.2.p.txt" << endl;
+		ofs << "energy energy.1.2.p" << endl;
 	}else{
 		ofs << "energy energy" << endl;
 	}
