@@ -6,14 +6,14 @@
 14O 8 6 0
 13O 8 5 0
 12O 8 4 0
-#11O 8 3 0 # <- not considered
+11O 8 3 0
 #
 15N 7 8 16
 14N 7 7 9
 13N 7 6 0
 12N 7 5 0
 11N 7 4 0
-#10N 7 3 0 # <- not considered
+10N 7 3 0
 #
 14C 6 8 6
 13C 6 7 3
@@ -36,7 +36,7 @@
 8Be  4 4 0 
 7Be  4 3 1
 #
-#11Li 3 8 0 <- not considered
+11Li 3 8 0
 10Li 3 7 0
 9Li 3 6 1
 8Li 3 5 1
