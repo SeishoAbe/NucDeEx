@@ -7,7 +7,7 @@ int cout_energy(){
 	const double min=0, max=100;
 	TH1D* h = new TH1D("h","",bin,min,max);
 
-	ofstream ofs("energy.1.2.p.txt");
+	ofstream ofs("energy.1.2.p");
 	
 	ofs << setw(5) << bin << " 9 2" << endl;
 	// (energy bin) (#spin) (#parity)
