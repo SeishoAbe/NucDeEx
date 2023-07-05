@@ -1,6 +1,6 @@
 projectile 0
-element 5
-mass 11
+element 6
+mass 12
 energy energy
 
 bins 0
@@ -8,14 +8,14 @@ ldmodel 2
 parity y
 optmodall y
 
-maxlevelstar 8
-maxlevelsbin g 8
-maxlevelsbin n 4
-maxlevelsbin p 5
-maxlevelsbin d 0
+maxlevelstar 1
+maxlevelsbin g 1
+maxlevelsbin n 8
+maxlevelsbin p 8
+maxlevelsbin d 4
 maxlevelsbin t 0
-maxlevelsbin h 1
-maxlevelsbin a 1
+maxlevelsbin h 0
+maxlevelsbin a 0
 maxlevelsres 0
 ejectiles g n p a d t h
 
