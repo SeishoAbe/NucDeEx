@@ -453,7 +453,7 @@ int main(int argc, char* argv[]){
 	}
 	// end of Nucleus loop in NucleusTable
 
-	tree->Write();
+	//tree->Write();
 	rootf->Close();
 	delete rootf;
 
