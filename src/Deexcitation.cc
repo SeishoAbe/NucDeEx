@@ -38,6 +38,7 @@ Deexcitation::Deexcitation(const int ld, const bool p_o)
 	eventID=0;
 	ldmodel=ld;
 	parity_optmodall=p_o;
+	tree=0;
 	for(int p=0;p<num_particle;p++){
 		g_br[p]=0;
 	}
@@ -135,7 +136,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 	name_target = (string)nuc_target->name;
 
 	// Read ROOT file
-	if( ! OpenROOT(name_target.c_str()) ){
+	if( ! OpenROOT(Zt,Nt,Z,N,0) ){
 		cout << "We don't have deexcitation profile for this nucleus: " 
 				 << name_target.c_str() << endl;
 		AddGSNucleus(Z,N,mom);
@@ -215,19 +216,15 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 		nuc_target = nuc_daughter;
 		name_target = (string)nuc_target->name;
 		cout << endl;
+
+		// --- Need this to release memory of TGraph
+		//		TGraph memory looks not relased only by closing & deleting root file...
+		DeleteTGraphs();
 	}
-		
-	// --- Need this to release memory of TGraph
-	//		TGraph memory looks not relased only by closing & deleting root file...
-	for(int p=0;p<num_particle;p++){
-		delete g_br[p];
-		g_br[p]=0;
-	}
-	delete g_br_ex;
-	g_br_ex=0;
 
 	rootf->Close();
 	delete rootf;
+	tree=0;
 
 	return 1;
 }
@@ -677,13 +674,24 @@ int Deexcitation::PDGion(int Z, int N)
 	return pdg;
 }
 
+
 /////////////////////////////////////////////
-bool Deexcitation::OpenROOT(const char* name)
+bool Deexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N, 
+														const bool tree)
 /////////////////////////////////////////////
 {
 	os.str("");
-	os << getenv("TALYS_WORK") << "/output/" << name 
-		 << "/Br_" << name << "_ldmodel" << ldmodel;
+	os << getenv("TALYS_WORK") << "/output/";
+	// single nucleon hole
+	if(Zt+Nt==Z+N+1){
+		if(Zt==6&&Nt==6) os << "12C/";
+		else if(Zt==8&&Nt==8) os << "16O/";
+		else return 0; // not supported
+	}else{
+		// multi-nucleon hole
+		;
+	}
+	os << "Br_" << name_target.c_str() << "_ldmodel" << ldmodel;
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << ".root"; 
 	//
@@ -691,6 +699,45 @@ bool Deexcitation::OpenROOT(const char* name)
 	if(! rootf->IsOpen()) return 0;
 	if(verbose>1){
 		cout << "OpenRoot: " << os.str().c_str() << endl;
+	}
+	if(!tree) return 1;
+	else return GetTTree(Z,N);
+}
+
+/////////////////////////////////////////////
+bool Deexcitation::GetTTree(const int Z, const int N)
+/////////////////////////////////////////////
+{
+	tree = (TTree*)rootf->Get("tree");
+	if(tree==0) return 0; // not ttree
+	tree->SetBranchAddress("Z",&_Z);
+	tree->SetBranchAddress("N",&_N);
+	tree->SetBranchAddress("Ex_bin",&_Ex_bin);
+	tree->SetBranchAddress("Ex",&_Ex);
+	tree->SetBranchAddress("Br",&_Br);
+	tree->SetBranchAddress("REx_bin",&_REx_bin);
+	tree->SetBranchAddress("REx",&_REx);
+	tree->SetBranchAddress("RBr",&_RBr);
+	return 1;
+}
+
+
+/////////////////////////////////////////////
+bool Deexcitation::CreateTGraph(const int Z, const int N)
+/////////////////////////////////////////////
+{
+	bool found=0;
+	for(int i=0;i<tree->GetEntries();i++){
+		tree->GetEntry(i);
+		if(Z==_Z && N==_N){
+			found=1;
+			break;
+		}
+	}
+	if(!found) return 0;
+
+	for(int p=0;p<num_particle;p++){
+		g_br[p] = new TGraph(_Ex_bin[p],_Ex[p],_Br[p]);
 	}
 	return 1;
 }
@@ -732,6 +779,20 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 
 	return point;
 }
+
+
+/////////////////////////////////////////////
+void Deexcitation::DeleteTGraphs()
+/////////////////////////////////////////////
+{
+	for(int p=0;p<num_particle;p++){
+		delete g_br[p];
+		g_br[p]=0;
+	}
+	delete g_br_ex;
+	g_br_ex=0;
+}
+
 
 /////////////////////////////////////////////
 void Deexcitation::InitParticleVector()

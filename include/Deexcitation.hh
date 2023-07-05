@@ -59,9 +59,6 @@ class Deexcitation{
 	// return  1: Sucess
 	//        -1 : Fatal error
 	
-	void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
-	// Just add g.s. nucleus to the vector.
-	// this function will be used in p1/2-hole, etc.
 	int ExtoShell(const int Zt, const int Nt, const double Ex);
 
 	void SetSeed(int s){ rndm->SetSeed(s) ;};
@@ -74,19 +71,36 @@ class Deexcitation{
 	NucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
 	int GetShell(){return _shell;};
 
+
 	private:
+
 	// --- Simulation method called by DoDeex() --- //
 	int DecayMode(const double Ex);
 	bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
 	void Decay(const bool breakflag);
+	void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
+		// Just add g.s. nucleus to the vector.
+		// this function will be used in p1/2-hole, etc.
+
 
 	// --- ROOT related methods & members --- //
 	bool OpenROOT(const char* name);
+	bool OpenROOT(const int Zt,const int Nt, const int Z, const int N, const bool tree=1);
+	bool GetTTree(const int Z,const int N);
+	bool CreateTGraph(const int Z, const int N);
 	bool GetBrTGraph(const string st);
 	int  GetBrExTGraph(const string st, const double ex_t, const int mode); 
 		// The nearest TGraph point will be returned
+	void DeleteTGraphs();
 	TFile* rootf;
-	//TTree* tree;
+	TTree* tree;
+	int _Z, _N, _Ex_bin[num_particle];
+	float _Ex[num_particle][bins];
+	float _Br[num_particle][bins];
+	int _REx_bin[num_particle][bins];
+	float _REx[num_particle][bins][bins];
+	float _RBr[num_particle][bins][bins];
+
 	TGraph* g_br[num_particle];
 	TGraph* g_br_ex;
 	TRandom3* rndm;

@@ -22,14 +22,15 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-	if(argc<4){
-		cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [Random Seed (optional)]" << endl;
+	if(argc<5){
+		cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi] [Random Seed (optional)]" << endl;
 		return 0;
 	}
 	const int ldmodel=atoi(argv[2]);
 	const bool parity_optmodall=(bool)atoi(argv[3]);
+	const bool flag_jpi = (bool) atoi(argv[4]);
 	int seed=1; // default: 1
-	if(argc==5) seed = atoi(argv[4]);
+	if(argc==6) seed = atoi(argv[5]);
 	cout << "SEED = " << seed << endl;
 
 	// ---- FIXME --- // 
@@ -54,6 +55,7 @@ int main(int argc, char* argv[]){
 	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
 	const int Z = nuc->Z;
 	const int N = nuc->N;
+	const int A = Z+N;
 	int Zt,Nt;
 	if(Z+N==11) Zt=6,Nt=6;
 	if(Z+N==15) Zt=8,Nt=8;
@@ -61,7 +63,13 @@ int main(int argc, char* argv[]){
 
 	// prepare output root file
 	os.str("");	
-	os << "sim_out/" << argv[1] << "_ldmodel" << ldmodel;
+	os << "sim_out/";
+	if(flag_jpi){
+		if(A==11) os << "12C/";
+		else if(A==15) os << "16O/";
+		else abort();
+	}
+	os << argv[1] << "_ldmodel" << ldmodel;
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
@@ -119,12 +127,18 @@ int main(int argc, char* argv[]){
 
 	// Set Ex and mom tables (from SF) and proton separation energy
 	os.str("");	
-	if(Z+N==11){ // 12C
-		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
-		S = nucleus_table->GetNucleusPtr("12C")->S[2];
-	}else if(Z+N==15){
-		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
-		S = nucleus_table->GetNucleusPtr("16O")->S[2];
+	if(flag_jpi){
+		if(Z+N==11){ // 12C
+			os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
+			S = nucleus_table->GetNucleusPtr("12C")->S[2];
+		}else if(Z+N==15){
+			os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
+			S = nucleus_table->GetNucleusPtr("16O")->S[2];
+		}
+	}else{
+		cerr << "flag_jpi = " << flag_jpi << endl;
+		cerr << "This is not supported" << endl;
+		return -1;
 	}
 	cout << "S = " << S << endl;
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
@@ -135,13 +149,21 @@ int main(int argc, char* argv[]){
 	delete rootf;
 
 
-	TCanvas* c_detail = new TCanvas("c_detail","",0,0,800,800);
-	os.str("");
-	os << "fig_sim/fig_" << argv[1] << "_ldmodel" << ldmodel;
-	if(parity_optmodall) os << "_parity_optmodall";
-	os << "_detail.pdf";
-	string pdfname = os.str();
+	TCanvas* c_detail;
+	string pdfname;
 	if(flag_fig){
+		os.str("");
+		os << "fig_sim/";
+		if(flag_jpi){
+			if(A==11) os << "12C/";
+			else if(A==15) os << "16O/";
+			else abort();
+		}
+		os << "fig_" << argv[1] << "_ldmodel" << ldmodel;
+		if(parity_optmodall) os << "_parity_optmodall";
+		os << "_detail.pdf";
+		pdfname = os.str();
+	  c_detail = new TCanvas("c_detail","",0,0,800,800);
 		c_detail->Print( (pdfname + (string)"[").c_str() );
 		c_detail->Update();
 		c_detail->Clear();
@@ -314,8 +336,10 @@ int main(int argc, char* argv[]){
 		}
 		eventID++;
 	}
-	if(flag_fig)c_detail->Print( (pdfname + (string)"]").c_str() );
-	delete c_detail;
+	if(flag_fig){
+		c_detail->Print( (pdfname + (string)"]").c_str() );
+		delete c_detail;
+	}
 
 
 	TCanvas* c = new TCanvas("c","c",0,0,800,600);
@@ -370,7 +394,13 @@ int main(int argc, char* argv[]){
 	h_sf_p_random->GetYaxis()->SetTitle("Events/bin");
 	h_sf_p_random->Draw("HIST");
 	os.str("");
-	os << "fig_sim/fig_" << argv[1] << "_ldmodel" << ldmodel;
+	os << "fig_sim/";
+	if(flag_jpi){
+		if(A==11) os << "12C/";
+		else if(A==15) os << "16O/";
+		else abort();
+	}
+	os << "fig_" << argv[1] << "_ldmodel" << ldmodel;
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << "_sf.pdf";
 	c->Print(os.str().c_str());
