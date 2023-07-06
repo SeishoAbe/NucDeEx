@@ -16,7 +16,6 @@
 #include <TRandom3.h>
 #include <TParticlePDG.h>
 #include <TParticle.h>
-#include <TGeoPhysicalConstants.h>
 
 using namespace std;
 
