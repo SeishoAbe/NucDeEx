@@ -656,9 +656,9 @@ void Deexcitation::Decay(const bool breakflag)
 double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 /////////////////////////////////////////////
 {
-	double mass = ele->MassNo()*(TGeoUnit::amu_c2/TGeoUnit::MeV)
+	double mass = ele->MassNo()*amu_c2
 									 + ele->MassEx(); // (MeV)
-	double mass_amu = mass/(TGeoUnit::amu_c2/TGeoUnit::MeV);
+	double mass_amu = mass/amu_c2;
 	if(verbose>0){
 		cout << "mass (MeV) = " << mass 
 				 << "    (amu) = " << mass_amu << endl;

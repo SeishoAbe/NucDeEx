@@ -24,4 +24,6 @@ static const int color_root[num_particle]
 		 416+1,// green+1
 		 616 // magenta
 		};
+static const double amu_c2 =  931.494028 ;
+// copied from TGeoPhysicalConstants.h
 #endif
