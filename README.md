@@ -4,7 +4,7 @@ For neutrino interaction and proton decay
 ## Contact 
 Seisho Abe: seisho@km.icrr.u-tokyo.ac.jp
 
-### Compile
+## Compile
 ```
 make
 ```
