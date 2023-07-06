@@ -8,11 +8,24 @@ Seisho Abe: seisho@km.icrr.u-tokyo.ac.jp
 ```
 make
 ```
-You need ROOT libraries.
+You need ROOT libraries like
+```
+root-config --evelibs
+```
 
+## Deexcitation Simulation
+You just need to declare "Deexcitation" object and call
+```
+Deexcitation::DoDeex(Zt,Nt,Z,N,shell,Ex,Pinit)
+```
+- Zt(Nt): Z(N) number of the target nucleus
+- Z(N): Z(N) number of the residual nucleus
+- shell: shell flag for the hole state
+- Ex: Excitation energy in MeV
+- Pinit: 3D momentum of the residual nucleus
 
-## Example Code of Simulation
-### How to run the simulation
+### Example Code of Simulation
+#### How to run the simulation
 ```
 make 
 ./bin/simulation (TARGET) 2 1 
