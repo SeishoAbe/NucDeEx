@@ -4,9 +4,9 @@ old*
 /output*/*/output*
 /output*/output*
 sim_out*
-bin
-obj
-lib
+bin/*
+obj/*
+lib/*
 !.gitignore
 log*
 
