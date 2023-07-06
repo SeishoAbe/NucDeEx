@@ -4,7 +4,14 @@ For neutrino interaction and proton decay
 ## Contact 
 Seisho Abe: seisho@km.icrr.u-tokyo.ac.jp
 
-## Simulation
+### Compile
+```
+make
+```
+You need ROOT libraries.
+
+
+## Example Code of Simulation
 ### How to run the simulation
 ```
 make 
