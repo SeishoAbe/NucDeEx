@@ -164,7 +164,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 
 			// --- Get mass using ROOT libraries
 			if(decay_mode<=2){ // obtained from TDatabasePDG
-				mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/1e3;// GeV2MeV
+				mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
 			}else{ // obtained from TGeoElementRN
 				int a_particle = (PDG_particle[decay_mode]%1000)/10;
 				int z_particle = ((PDG_particle[decay_mode]%1000000)-a_particle*10)/10000;
@@ -342,7 +342,7 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			decay_mode=2; // proton
 			Ex_target  = E_p32_15N[index];
 			Ex_daughter=0;
-		  mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/1e3;// GeV2MeV
+		  mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
 			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
 			Z_daughter = Z_target-1;
 			N_daughter = N_target;
@@ -387,7 +387,7 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			decay_mode=2; // proton
 			Ex_target  = E_p32_15O[index];
 			Ex_daughter=0;
-		  mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()/1e3;// GeV2MeV
+		  mass_particle = pdg->GetParticle(PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
 			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
 			Z_daughter = Z_target-1;
 			N_daughter = N_target;
