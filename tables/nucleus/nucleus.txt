@@ -6,7 +6,7 @@
 14O 8 6 0
 13O 8 5 0
 12O 8 4 0
-11O 8 3 0
+#11O 8 3 0 # no element table in root
 #
 15N 7 8 16
 14N 7 7 9
