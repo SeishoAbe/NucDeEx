@@ -1,4 +1,5 @@
-PROGRAMS = plot_decay cout_input simulation
+#PROGRAMS = plot_decay cout_input simulation
+PROGRAMS = neut nuwro genie
 
 CXX=g++ 
 CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
@@ -11,6 +12,14 @@ CXXFLAGS        += $(shell root-config --cflags)
 #LDFLAGS         += $(shell root-config --libs) # <- Print regular ROOT libraries
 #LDFLAGS         += $(shell root-config --glibs) # <- Print regular + GUI ROOT libraries
 LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
+
+## neut libs
+CXXFLAGS += -I$(NEUT_ROOT)/include
+LDFLAGS += -L$(NEUT_ROOT)/lib -lNEUT -lNEUTClass -lNEUTClassUtils
+
+## nuwro libs
+CXXFLAGS += -I$(NUWRO)/src
+LDFLAGS += $(NUWRO)/bin/event1.so
 
 LIBDIR=lib
 LIBNAME=${LIBDIR}/libTALYStool.a
