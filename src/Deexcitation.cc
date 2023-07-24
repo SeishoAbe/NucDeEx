@@ -71,7 +71,10 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 	eventID++;
 
 	int status=-1;
-	_shell=-1;
+
+	if(shell>0) _shell=shell;
+	else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
+	else abort();
 
 	if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
 		cerr << "This tool does not support the target nucleus" << endl;
@@ -85,10 +88,7 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 		InitParticleVector();
 		AddGSNucleus(Z,N,mom);
 		status=0;
-	}else if(Zt+Nt == Z+N+1){
-		if(shell>0) _shell=shell;
-		else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
-		else abort();
+	}else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
 		// --- Single nucleon disapperance
 		if(_shell==3){ 
 			// p1/2-hole. nothing to do
