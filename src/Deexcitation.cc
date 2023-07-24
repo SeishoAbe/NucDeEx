@@ -71,6 +71,7 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 	eventID++;
 
 	int status=-1;
+	_shell=-1;
 
 	if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
 		cerr << "This tool does not support the target nucleus" << endl;
@@ -85,7 +86,6 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 		AddGSNucleus(Z,N,mom);
 		status=0;
 	}else if(Zt+Nt == Z+N+1){
-		_shell=-1;
 		if(shell>0) _shell=shell;
 		else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
 		else abort();
@@ -249,7 +249,7 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 	double random = rndm->Rndm();
 
 	//-----------11B------------//
-	if(Z==5 || N==6){
+	if(Z==5 && N==6){
 	//--------------------------//
 		int index=0;
 		double Br_integ=0;
@@ -279,7 +279,7 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			Decay(1); // breakflag on
 		}
 	//-----------11C------------//
-	}else if(Z==6 || N==5){
+	}else if(Z==6 && N==5){
 	//--------------------------//
 		int index=0;
 		double Br_integ=0;
@@ -309,7 +309,7 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 			Decay(1); // breakflag on
 		}
 	//-----------15N------------//
-	}else if(Z==7 || N==8){
+	}else if(Z==7 && N==8){
 	//--------------------------//
 		int index=0;
 		double Br_integ=0;
@@ -357,7 +357,7 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 		// return -1;
 		}
 	//-----------15O------------//
-	}else if(Z==8 || N==7){
+	}else if(Z==8 && N==7){
 	//--------------------------//
 		int index=0;
 		double Br_integ=0;
