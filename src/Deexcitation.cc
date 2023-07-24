@@ -132,6 +132,12 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 	Ex_target  = Ex;
 	mom_target = mom;
 	nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
+	if(nuc_target==NULL){
+		cout << "We don't have deexcitation profile for this nucleus: "
+				 << name_target.c_str() << endl;
+		//AddGSNucleus(Z,N,mom); // nothing can be done for this case...(no mass profile)
+		return 0;
+	}
 	name_target = (string)nuc_target->name;
 
 	// Read ROOT file
@@ -768,6 +774,7 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 	}
 	if(abs(ex-ex_t)>diff_ex) point--;
 	if(point==g_br[mode]->GetN()) point--;
+	if(point<0) point=0;
 	if(verbose>0){
 		cout << "GetBrExTGraph(): nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << endl;
 	}
