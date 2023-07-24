@@ -106,6 +106,7 @@ Nucleus* NucleusTable::GetNucleusPtr(const char* name)
 Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
 ///////////////
 {
+	if(Z>8) return NULL;
 	ostringstream os;
 	os << Z+N << nuc_name[Z];
 	return GetNucleusPtr(os.str().c_str());
