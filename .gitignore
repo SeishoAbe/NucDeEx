@@ -3,6 +3,9 @@
 old*
 /output*/*/output*
 /output*/output*
+/output_nuwro*
+/output_genie*
+/output_neut*
 sim_out*
 bin/*
 obj/*
@@ -22,4 +25,3 @@ cs??????
 tr??????
 ecis.invin
 ecisinv.inp
-
