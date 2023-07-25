@@ -1,10 +1,6 @@
 #include <iostream>
 #include <string>
 
-#include "neutvtx.h"
-#include "neutvect.h"
-#include "neutpart.h"
-
 #include "TTree.h"
 #include "TStyle.h"
 #include "TFile.h"
@@ -12,7 +8,12 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TLatex.h"
+#include "TLegend.h"
 #include "THStack.h"
+
+#include "neutvtx.h"
+#include "neutvect.h"
+#include "neutpart.h"
 
 #include "NucleusTable.hh"
 #include "Deexcitation.hh"
@@ -28,11 +29,11 @@ int main(int argc, char* argv[]){
 	int seed=1;
 	//-----------------.//
 
-	int Zt, Nt;
-	double S;
 	ostringstream os;
 
-	// prepare deex tools
+	// --- prepare deex tools
+	int Zt, Nt;
+	double S;
 	Deexcitation* deex = new Deexcitation(2, 1);
 	deex->SetSeed(seed);
 	deex->SetVerbose(1);
@@ -56,17 +57,17 @@ int main(int argc, char* argv[]){
 	root->Close();
 	delete root;
 
-	//--- input neut root
+	// --- input neut root
 	os.str("");
 	os << "output_neut/" << prefix.c_str() << ".root";
   TFile* rootf = new TFile(os.str().c_str(),"READ");
 	cout << os.str().c_str() << endl;
-  
   TTree  *tree = (TTree *)(rootf->Get("neuttree"));
   NeutVtx *nvtx = new NeutVtx();
   NeutVect *nvect = new NeutVect();
   tree->SetBranchAddress("vertexbranch",&nvtx);
   tree->SetBranchAddress("vectorbranch",&nvect);
+
   gStyle->SetTextFont(132);
   gStyle->SetTextSize(0.08);
   gStyle->SetTitleSize(0.05,"XYZ");
@@ -75,7 +76,6 @@ int main(int argc, char* argv[]){
   gStyle->SetLabelFont(132,"XYZ");
   gStyle->SetLegendFont(132);
   gStyle->SetTitleYOffset(0.95);
-
 
 	TH1D* h_nmulti_postFSI = new TH1D("h_nmulti_postFSI","",10,-0.5,9.5);
 	TH1D* h_nmulti_postdeex = new TH1D("h_nmulti_postdeex","",10,-0.5,9.5);
@@ -87,10 +87,9 @@ int main(int argc, char* argv[]){
 		h_Ex[i] = new TH1D(os.str().c_str(),"",500,-100,400);
 	}
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
-
-
+	
+	// --- read root
   int nevents = tree->GetEntries()/50;
-
   for ( int j = 0 ; j < nevents ; j++ ){
 		tree->GetEntry(j);
 		cout << "---------------------------------------------" << "\n";
@@ -193,9 +192,7 @@ int main(int argc, char* argv[]){
 	}
 
 
-
-
-
+	// --- plot
 	TCanvas* c_nmulti_postFSI = new TCanvas("c_nmulti_postFSI","c_nmulti_postFSI",0,0,800,600);
 	h_nmulti_postFSI->GetXaxis()->SetTitle("Neutron multiplicity");
 	h_nmulti_postFSI->GetYaxis()->SetTitle("Events/bin");
@@ -219,7 +216,6 @@ int main(int argc, char* argv[]){
 	os << "fig_neut/fig_nmulti_postFSI_" << prefix.c_str() << ".pdf";
 	c_nmulti_postFSI->Print(os.str().c_str());
 
-/*
 	TCanvas* c_MissE = new TCanvas("c_MissE","c_MissE",0,0,800,600);
 	h_MissE->GetXaxis()->SetTitle("Missing energy (MeV)");
 	h_MissE->GetYaxis()->SetTitle("Events/bin");
@@ -228,9 +224,6 @@ int main(int argc, char* argv[]){
 	os.str("");
 	os << "fig_neut/fig_MissE_" << prefix.c_str() << ".pdf";
 	c_MissE->Print(os.str().c_str());
-*/
-
-
 
 	TCanvas* c_Ex = new TCanvas("c_Ex","c_Ex",0,0,800,600);
 	h_Ex[0]->GetXaxis()->SetTitle("Missing energy (MeV)");
@@ -267,13 +260,18 @@ int main(int argc, char* argv[]){
 	os.str("");
 	os << "fig_neut/fig_Ex_" << prefix.c_str() << ".pdf";
 	c_Ex->Print(os.str().c_str());
-
-
+	
+	// --- save 
 	os.str("");
 	os << "output_neut/histogram_deex_" << prefix.c_str() << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	h_nmulti_postFSI->Write();
+	h_nmulti_postdeex->Write();
 	h_MissE->Write();
+	for(int i=0;i<4;i++){
+		h_Ex[i]->Write();
+	}
+	h_Ex_multi->Write();
 	outf->Close();
 	delete outf;
 
