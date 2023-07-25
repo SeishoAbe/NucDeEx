@@ -92,6 +92,7 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 		// --- Single nucleon disapperance
 		if(_shell==3){ 
 			// p1/2-hole. nothing to do
+			cout << "(p1/2)-hole" <<endl;
 			InitParticleVector();
 			AddGSNucleus(Z,N,mom);
 			status=1;
@@ -417,6 +418,7 @@ void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 {
 	mass_target = ElementMassInMeV(element_table->GetElementRN(Z+N, Z));
 	nuc_target = _nucleus_table->GetNucleusPtr(Z,N);
+	if(nuc_target==NULL) return; // do nothing
 	name_target = (string)nuc_target->name;
 	Particle nucleus(PDGion(Z,N),
 								   mass_target, // w/o excitation E
@@ -424,6 +426,7 @@ void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 								   name_target, 
 									 1,0); // track flag on // zero ex
 	_particle->push_back(nucleus);
+	cout << "AddGSNucleus(): " << name_target << endl;
 }
 
 
