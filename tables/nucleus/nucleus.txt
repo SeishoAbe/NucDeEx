@@ -1,6 +1,8 @@
 # numofline
 # nucleus Z N maxlevelsbin
 #
+16F 9 7 0
+#
 16O 8 8 4
 15O 8 7 6
 14O 8 6 0
@@ -8,6 +10,7 @@
 12O 8 4 0
 #11O 8 3 0 # no element table in root
 #
+16N 7 9 0
 15N 7 8 16
 14N 7 7 9
 13N 7 6 0
