@@ -73,9 +73,10 @@ int main(int argc, char* argv[]){
   gStyle->SetLegendFont(132);
   gStyle->SetTitleYOffset(0.95);
 
+	TH1D* h_Pinit = new TH1D("h_Pinit","",100,0,500);
 	TH1D* h_nmulti_postFSI = new TH1D("h_nmulti_postFSI","",10,-0.5,9.5);
 	TH1D* h_nmulti_postdeex = new TH1D("h_nmulti_postdeex","",10,-0.5,9.5);
-	TH1D* h_MissE = new TH1D("h_MissE","",200,0,200);
+	TH1D* h_MissE = new TH1D("h_MissE","",400,0,200);
 	TH1D* h_Ex[4]; // single [0]: all
 	for(int i=0;i<4;i++){
 		os.str("");
@@ -83,6 +84,7 @@ int main(int argc, char* argv[]){
 		h_Ex[i] = new TH1D(os.str().c_str(),"",500,-100,400);
 	}
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
+	TH2D* h_MissE_Pinit = new TH2D("h_MissE","",100,0,500,400,0,200);
 
 	// --- read root
   for(int j=0;j<tree->GetEntries();j++){
@@ -94,6 +96,9 @@ int main(int argc, char* argv[]){
 		double massnuc=event->in[1].mass();
     double MissE = Ev-Evv-Enucc + massnuc;
 		h_MissE->Fill(MissE);
+
+		h_Pinit->Fill(event->in[1].momentum());
+		h_MissE_Pinit->Fill(event->in[1].momentum(),MissE);
 
 		int nmulti = event->fof(2112);
 		h_nmulti_postFSI->Fill(nmulti);
@@ -122,6 +127,17 @@ int main(int argc, char* argv[]){
 		}
 		h_nmulti_postdeex->Fill(nmulti);
   }
+
+
+	// --- plot
+	TCanvas* c_Pinit = new TCanvas("c_Pinit","c_Pinit",0,0,800,600);
+	h_Pinit->GetXaxis()->SetTitle("Momentum of target nucleon (MeV)");
+	h_Pinit->GetYaxis()->SetTitle("Events/bin");
+	h_Pinit->GetYaxis()->SetMaxDigits(2);
+	h_Pinit->Draw("HIST");
+	os.str("");
+	os << "fig_nuwro/fig_Pinit_" << prefix.c_str() << ".pdf";
+	c_Pinit->Print(os.str().c_str());
 
 	TCanvas* c_nmulti_postFSI = new TCanvas("c_nmulti_postFSI","c_nmulti_postFSI",0,0,800,600);
 	h_nmulti_postFSI->GetXaxis()->SetTitle("Neutron multiplicity");
@@ -190,11 +206,23 @@ int main(int argc, char* argv[]){
 	os.str("");
 	os << "fig_nuwro/fig_Ex_" << prefix.c_str() << ".pdf";
 	c_Ex->Print(os.str().c_str());
-	
+
+	TCanvas* c_MissE_Pinit = new TCanvas("c_MissE_Pinit","c_MissE_Pinit",0,0,800,600);
+	gPad->SetLogz();
+	h_MissE_Pinit->GetXaxis()->SetTitle("Momentum of target nucleon (MeV)");
+	h_MissE_Pinit->GetYaxis()->SetTitle("Missing energy (MeV)");
+	h_MissE_Pinit->GetYaxis()->SetRangeUser(0,100);
+	h_MissE_Pinit->SetStats(0);
+	h_MissE_Pinit->Draw("colz");
+	os.str("");
+	os << "fig_nuwro/fig_MissE_Pinit_" << prefix.c_str() << ".pdf";
+	c_MissE_Pinit->Print(os.str().c_str());
+
 	// --- save 
 	os.str("");
 	os << "output_nuwro/histogram_deex_" << prefix.c_str() << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
+	h_Pinit->Write();
 	h_nmulti_postFSI->Write();
 	h_nmulti_postdeex->Write();
 	h_MissE->Write();
@@ -202,6 +230,7 @@ int main(int argc, char* argv[]){
 		h_Ex[i]->Write();
 	}
 	h_Ex_multi->Write();
+	h_MissE_Pinit->Write();
 	outf->Close();
 	delete outf;
 
