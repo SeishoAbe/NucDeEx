@@ -38,6 +38,7 @@ int main(int argc, char* argv[]){
 	deex->SetSeed(seed);
 	deex->SetVerbose(1);
   NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
+	bool flag_O=0;
 	if(prefix.find("_C_")!=string::npos){
 		Zt=6;
 		Nt=6;
@@ -48,6 +49,7 @@ int main(int argc, char* argv[]){
 		Nt=8;
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
 		S = nucleus_table->GetNucleusPtr("16O")->S[2];
+		flag_O=1;
 	}
 	cout << "Separation E = " << S << endl;
 	TFile* root = new TFile(os.str().c_str(),"READ");
@@ -89,7 +91,7 @@ int main(int argc, char* argv[]){
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
 	
 	// --- read root
-  int nevents = tree->GetEntries()/50;
+  int nevents = tree->GetEntries();
   for ( int j = 0 ; j < nevents ; j++ ){
 		tree->GetEntry(j);
 		cout << "---------------------------------------------" << "\n";
@@ -174,14 +176,15 @@ int main(int argc, char* argv[]){
 		h_MissE->Fill(MissE);
 
 		double Ex = MissE-S;
-		cout << MissE << "   "  << S <<  "  " << Ex << endl;
+		//cout << MissE << "   "  << S <<  "  " << Ex << endl;
 		h_Ex[0]->Fill(Ex);
 
+		// --- DOIT --- //
 		deex->DoDeex(Zt,Nt,Z,N,0,Ex,TVector3(0,0,0));
+
+		// --- Scoring --- //
 		int shell = deex->GetShell();
 		h_Ex[shell]->Fill(Ex);
-
-		// add these elements to the neut output
 		vector<Particle>* particle = deex->GetParticleVector();
 		int size=particle->size();
 		for(int i=0;i<size;i++){
@@ -249,7 +252,7 @@ int main(int argc, char* argv[]){
 	os << "Prob(p3/2)=" << fixed << setprecision(1) << (double)h_Ex[2]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
 	TText* t_p32 = new TText(40,h_Ex[0]->GetMaximum()*0.8,os.str().c_str());
 	t_p32->Draw("same");
-	if(prefix.find("_O_")!=string::npos){
+	if(flag_O==1){
 		os.str("");
 		os << "Prob(p1/2)=" << fixed << setprecision(1) << (double)h_Ex[3]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
 		TText* t_p12 = new TText(40,h_Ex[0]->GetMaximum()*0.7,os.str().c_str());
