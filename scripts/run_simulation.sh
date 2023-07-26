@@ -42,7 +42,7 @@ do
 			if [ $parity_optmodall -eq 1 ] ; then
 				LogFile+="_parity_optmodall"
 			fi
-			(time -f "Memory %M KB" ./bin/simulation $TARGET $ldmodel $parity_optmodall $flag_jpi) > $LogFile 2>&1 &
+			(time -f "CPU time %E Memory %M KB" ./bin/simulation $TARGET $ldmodel $parity_optmodall $flag_jpi) > $LogFile 2>&1 &
 		done
 	done
 done

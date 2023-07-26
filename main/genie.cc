@@ -1,12 +1,18 @@
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "TTree.h"
 #include "TStyle.h"
 #include "TFile.h"
 #include "TCanvas.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TLatex.h"
+#include "TLegend.h"
+#include "THStack.h"
+
+#include "NucleusTable.hh"
+#include "Deexcitation.hh"
 
 using namespace std;
 
@@ -23,15 +29,46 @@ int main(int argc, char* argv[]){
 	const int flavor=atoi(argv[1]);
 	string target = argv[2];
 	string tune = argv[3];
+	int seed=1;
 	// ------------- //
 
 	ostringstream os;
+
+	// --- prepare deex tools
+	int Zt, Nt;
+	double S;
+	Deexcitation* deex = new Deexcitation(2, 1);
+	deex->SetSeed(seed);
+	deex->SetVerbose(1);
+  NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
+	bool flag_O=0;
+	if(target.find("C")!=string::npos){
+		Zt=6;
+		Nt=6;
+		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
+		S = nucleus_table->GetNucleusPtr("12C")->S[2];
+	}else if(target.find("O")!=string::npos){
+		Zt=8;
+		Nt=8;
+		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
+		S = nucleus_table->GetNucleusPtr("16O")->S[2];
+		flag_O=1;
+	}
+	cout << "Separation E = " << S << endl;
+	TFile* root = new TFile(os.str().c_str(),"READ");
+	TH2D* h_sf_int = (TH2D*) root->Get("h_sf_int");
+	h_sf_int->SetDirectory(0);
+	gRandom->SetSeed(seed); // for TH2 GetRandom2
+	root->Close();
+	delete root;
+
+	// --- input neut root
 	os.str("");
 	os << "CCQE." << flavor << "." << target.c_str() 
 		 << "." << tune.c_str();
 	string prefix = os.str();
 	os.str("");
-	os << "output/gntp." << prefix.c_str() << ".gst.root";
+	os << "output_genie/gntp." << prefix.c_str() << ".gst.root";
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
 	TTree* tree = (TTree*)rootf->Get("gst");
 	const int kNPmax = 250;
@@ -94,24 +131,24 @@ int main(int argc, char* argv[]){
   gStyle->SetLegendFont(132);
   gStyle->SetTitleYOffset(0.95);
 
-	TH1D* h_Ev = new TH1D("h_Ev","",500,0,1e4);
 	TH1D* h_Pinit = new TH1D("h_Pinit","",100,0,500);
-  TH1D* h_PID_postFSI = new TH1D("h_PID_postFSI","",5000,-2500,2500);
-  //TH1D* h_nmulti_preFSI = new TH1D("h_nmulti_preFSI","",10,-0.5,9.5);
-  TH1D* h_nmulti_postFSI = new TH1D("h_nmulti_postFSI","",10,-0.5,9.5);
-  TH1D* h_kEn = new TH1D("h_kEn","",500,0,1000);
-  TH1D* h_kEp = new TH1D("h_kEp","",500,0,1000);
-  TH1D* h_kEg = new TH1D("h_kEg","",200,0,10);
-  TH1D* h_lowkEn = new TH1D("h_lowkEn","",100,0,50);
-  TH1D* h_lowkEp = new TH1D("h_lowkEp","",100,0,50);
-  TH1D* h_MissE = new TH1D("h_MissE","",400,0,200);
-
+	TH1D* h_nmulti_postFSI = new TH1D("h_nmulti_postFSI","",10,-0.5,9.5);
+	TH1D* h_nmulti_postdeex = new TH1D("h_nmulti_postdeex","",10,-0.5,9.5);
+	TH1D* h_MissE = new TH1D("h_MissE","",400,0,200);
+	TH1D* h_Ex[4]; // single [0]: all
+	for(int i=0;i<4;i++){
+		os.str("");
+		os << "h_Ex_" << i;
+		h_Ex[i] = new TH1D(os.str().c_str(),"",500,-100,400);
+	}
+	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
+	TH2D* h_MissE_Pinit = new TH2D("h_MissE","",100,0,500,400,0,200);
 
 	//--- GeV2MeV --- //
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
+		double Pinit = sqrt(pxn*pxn+pyn*pyn+pzn*pzn)*1e3;
 
-		h_Ev->Fill(Ev*1e3); 
 		h_Pinit->Fill( sqrt(pxn*pxn+pyn*pyn+pzn*pzn)*1e3 );
 
 		double Enucc=0;
@@ -123,21 +160,29 @@ int main(int argc, char* argv[]){
 		else if (hitnuc==2212) massnuc = mass_proton*1e-3; // MeV2GeV
 		double MissE=(Ev-El-Enucc+massnuc)*1e3;
 		h_MissE->Fill(MissE);
+		h_MissE_Pinit->Fill(Pinit,MissE);
 		//cout << MissE << "   " << Ev << "   " << El << "   " << Enucc
 		//		 << "   " << massnuc << endl;
-
-
+	
+		// init
+		int Z=Zt,N=Nt;
+		if(neu==14){
+			Z++;
+			N--;
+		}else if(neu==-14){
+			Z--;
+			N++;
+		}
+		
+		// postFSI
 		int nmulti=0;
 		for(int f=0;f<nf;f++){
 			if(pdgf[f]==2112){//neutron
-				h_kEn->Fill(Ef[f]*1e3-mass_neutron);
-				h_lowkEn->Fill(Ef[f]*1e3-mass_neutron);
 				nmulti++;
+				N--;
 			}else if(pdgf[f]==2212){//proton
-				h_kEp->Fill(Ef[f]*1e3-mass_proton);
-				h_lowkEp->Fill(Ef[f]*1e3-mass_proton);
+				Z--;
 			}
-			h_PID_postFSI->Fill(pdgf[f]);
 		}
 		h_nmulti_postFSI->Fill(nmulti);
 
@@ -145,141 +190,134 @@ int main(int argc, char* argv[]){
 			cerr << "something wrong happens.." << endl;
 			abort();
 		}
-	}
+
+		double Ex = MissE-S;
+		//cout << MissE << "   "  << S <<  "  " << Ex << endl;
+		h_Ex[0]->Fill(Ex);
+
+		// --- DOIT --- //
+		deex->DoDeex(Zt,Nt,Z,N,0,Ex,TVector3(0,0,0));
+
+		// --- Scoring --- //
+		int shell = deex->GetShell();
+		h_Ex[shell]->Fill(Ex);
+		vector<Particle>* particle = deex->GetParticleVector();
+		int size=particle->size();
+		for(int i=0;i<size;i++){
+			Particle p = particle->at(i);
+			if(p._PDG==2112) nmulti++;
+		}
+		h_nmulti_postdeex->Fill(nmulti);
+  }
 
 
-
-
-
-
-
-
-
-	TCanvas* c_Ev = new TCanvas("c_Ev","c_Ev",0,0,800,600);
-	h_Ev->GetXaxis()->SetTitle("Incoming neutrino energy (MeV)");
-	h_Ev->GetYaxis()->SetTitle("Events/bin");
-	h_Ev->GetYaxis()->SetMaxDigits(2);
-	h_Ev->Draw("HIST");
-	os.str("");
-	os << "fig/fig_Ev_" << prefix.c_str() << ".pdf";
-	c_Ev->Print(os.str().c_str());
-
-
+	// --- plot
 	TCanvas* c_Pinit = new TCanvas("c_Pinit","c_Pinit",0,0,800,600);
 	h_Pinit->GetXaxis()->SetTitle("Momentum of target nucleon (MeV)");
 	h_Pinit->GetYaxis()->SetTitle("Events/bin");
 	h_Pinit->GetYaxis()->SetMaxDigits(2);
 	h_Pinit->Draw("HIST");
 	os.str("");
-	os << "fig/fig_Pinit_" << prefix.c_str() << ".pdf";
+	os << "fig_genie/fig_Pinit_" << prefix.c_str() << ".pdf";
 	c_Pinit->Print(os.str().c_str());
-
-
-	TCanvas* c_PID_postFSI = new TCanvas("c_PID_postFSI","c_PID_postFSI",0,0,800,600);
-	gPad->SetLogy();
-	h_PID_postFSI->GetXaxis()->SetTitle("PID code (postFSI)");
-	h_PID_postFSI->GetYaxis()->SetTitle("Particles/bin");
-	h_PID_postFSI->Draw("HIST");
-	os.str("");
-	os << "fig/fig_PID_postFSI_" << prefix.c_str() << ".pdf";
-	c_PID_postFSI->Print(os.str().c_str());
-
 
 	TCanvas* c_nmulti_postFSI = new TCanvas("c_nmulti_postFSI","c_nmulti_postFSI",0,0,800,600);
 	h_nmulti_postFSI->GetXaxis()->SetTitle("Neutron multiplicity");
 	h_nmulti_postFSI->GetYaxis()->SetTitle("Events/bin");
-	h_nmulti_postFSI->GetYaxis()->SetMaxDigits(2);
+	h_nmulti_postFSI->GetYaxis()->SetMaxDigits(3);
+	h_nmulti_postFSI->SetStats(0);
+	h_nmulti_postFSI->Scale(1./h_nmulti_postFSI->GetEntries());
 	h_nmulti_postFSI->Draw("HIST");
+	h_nmulti_postdeex->SetLineColor(kRed);
+	h_nmulti_postdeex->Scale(1./h_nmulti_postdeex->GetEntries());
+	h_nmulti_postdeex->Draw("HISTsame");
 	os.str("");
 	os << "Mean n multi. = " << fixed << setprecision(3) << h_nmulti_postFSI->GetMean();
 	TLatex* l_mean_nmulti = new TLatex(3,h_nmulti_postFSI->GetMaximum()*0.7,os.str().c_str());
 	l_mean_nmulti->Draw("same");
 	os.str("");
-	os << "fig/fig_nmulti_postFSI_" << prefix.c_str() << ".pdf";
+	os << "Mean n multi. = " << fixed << setprecision(3) << h_nmulti_postdeex->GetMean();
+	TLatex* l_mean_nmulti_postdeex = new TLatex(3,h_nmulti_postFSI->GetMaximum()*0.6,os.str().c_str());
+	l_mean_nmulti_postdeex->SetTextColor(kRed);
+	l_mean_nmulti_postdeex->Draw("same");
+	os.str("");
+	os << "fig_genie/fig_nmulti_postFSI_" << prefix.c_str() << ".pdf";
 	c_nmulti_postFSI->Print(os.str().c_str());
-
-
-	TCanvas* c_kE = new TCanvas("c_kE","c_kE",0,0,1600,600);
-	c_kE->Divide(2);
-	c_kE->cd(1);
-	h_kEp->SetTitle("Protons");
-	h_kEp->GetXaxis()->SetTitle("Kinetic energy (MeV)");
-	h_kEp->GetYaxis()->SetTitle("Particles/bin");
-	h_kEp->GetYaxis()->SetMaxDigits(2);
-	h_kEp->GetXaxis()->SetRangeUser(0,500);
-	h_kEp->Draw("HIST");
-	c_kE->cd(2);
-	h_kEn->SetTitle("Neutrons");
-	h_kEn->GetXaxis()->SetTitle("Kinetic energy (MeV)");
-	h_kEn->GetYaxis()->SetTitle("Particles/bin");
-	h_kEn->GetYaxis()->SetMaxDigits(2);
-	h_kEn->GetXaxis()->SetRangeUser(0,500);
-	h_kEn->Draw("HIST");
-	os.str("");
-	os << "fig/fig_kE_" << prefix.c_str() << ".pdf";
-	c_kE->Print(os.str().c_str());
-
-	if(h_kEg->GetEntries()>0){
-		TCanvas* c_kEg = new TCanvas("c_kEg","c_kEg",0,0,800,600);
-		h_kEg->SetTitle("Gammas");
-		h_kEg->GetXaxis()->SetTitle("Kinetic energy (MeV)");
-		h_kEg->GetYaxis()->SetTitle("Particles/bin");
-		h_kEg->GetYaxis()->SetMaxDigits(2);
-		h_kEg->Draw("HIST");
-		os.str("");
-		os << "fig/fig_kEg_" << prefix.c_str() << ".pdf";
-		c_kEg->Print(os.str().c_str());
-	}
-
-
-
-	TCanvas* c_lowkE = new TCanvas("c_lowkE","c_lowkE",0,0,1600,600);
-	c_lowkE->Divide(2);
-	c_lowkE->cd(1);
-	h_lowkEp->SetTitle("Protons");
-	h_lowkEp->GetXaxis()->SetTitle("Kinetic energy (MeV)");
-	h_lowkEp->GetYaxis()->SetTitle("Particles/bin");
-	h_lowkEp->GetYaxis()->SetMaxDigits(2);
-	h_lowkEp->Draw("HIST");
-	c_lowkE->cd(2);
-	h_lowkEn->SetTitle("Neutrons");
-	h_lowkEn->GetXaxis()->SetTitle("Kinetic energy (MeV)");
-	h_lowkEn->GetYaxis()->SetTitle("Particles/bin");
-	h_lowkEn->GetYaxis()->SetMaxDigits(2);
-	h_lowkEn->Draw("HIST");
-	os.str("");
-	os << "fig/fig_lowkE_" << prefix.c_str() << ".pdf";
-	c_lowkE->Print(os.str().c_str());
-
-
 
 	TCanvas* c_MissE = new TCanvas("c_MissE","c_MissE",0,0,800,600);
 	h_MissE->GetXaxis()->SetTitle("Missing energy (MeV)");
 	h_MissE->GetYaxis()->SetTitle("Events/bin");
 	h_MissE->GetYaxis()->SetMaxDigits(2);
-	h_MissE->GetXaxis()->SetRangeUser(0,100);
 	h_MissE->Draw("HIST");
 	os.str("");
-	os << "fig/fig_MissE_" << prefix.c_str() << ".pdf";
+	os << "fig_genie/fig_MissE_" << prefix.c_str() << ".pdf";
 	c_MissE->Print(os.str().c_str());
 
-
-
+	TCanvas* c_Ex = new TCanvas("c_Ex","c_Ex",0,0,800,600);
+	h_Ex[0]->GetXaxis()->SetTitle("Missing energy (MeV)");
+	h_Ex[0]->GetYaxis()->SetTitle("Events/bin");
+	h_Ex[0]->GetYaxis()->SetMaxDigits(2);
+	h_Ex[0]->GetXaxis()->SetRangeUser(-10,100);
+	h_Ex[0]->SetStats(0);
+	h_Ex[0]->Draw("HIST");
+	THStack* h_s_Ex = new THStack("h_s_Ex","");
+	const int color[4]={1,600-7,632-7,920};
+	for(int i=1;i<4;i++){
+		h_Ex[i]->SetFillColor(color[i]);
+		h_s_Ex->Add(h_Ex[i]);
+	}
+	h_s_Ex->Draw("same");
+	//
 	os.str("");
-	os << "output/histogram_" << prefix.c_str() << ".root";
+	os << "Prob(s1/2)=" << fixed << setprecision(1) << (double)h_Ex[1]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
+	TText* t_s12 = new TText(40,h_Ex[0]->GetMaximum()*0.9,os.str().c_str());
+	t_s12->Draw("same");
+	//
+	os.str("");
+	os << "Prob(p3/2)=" << fixed << setprecision(1) << (double)h_Ex[2]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
+	TText* t_p32 = new TText(40,h_Ex[0]->GetMaximum()*0.8,os.str().c_str());
+	t_p32->Draw("same");
+	if(flag_O==1){
+		os.str("");
+		os << "Prob(p1/2)=" << fixed << setprecision(1) << (double)h_Ex[3]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
+		TText* t_p12 = new TText(40,h_Ex[0]->GetMaximum()*0.7,os.str().c_str());
+		t_p12->Draw("same");
+	}
+	//
+	gPad->RedrawAxis();
+	os.str("");
+	os << "fig_genie/fig_Ex_" << prefix.c_str() << ".pdf";
+	c_Ex->Print(os.str().c_str());
+
+	TCanvas* c_MissE_Pinit = new TCanvas("c_MissE_Pinit","c_MissE_Pinit",0,0,800,600);
+	gPad->SetLogz();
+	h_MissE_Pinit->GetXaxis()->SetTitle("Momentum of target nucleon (MeV)");
+	h_MissE_Pinit->GetYaxis()->SetTitle("Missing energy (MeV)");
+	h_MissE_Pinit->GetYaxis()->SetRangeUser(0,100);
+	h_MissE_Pinit->SetStats(0);
+	h_MissE_Pinit->Draw("colz");
+	os.str("");
+	os << "fig_genie/fig_MissE_Pinit_" << prefix.c_str() << ".pdf";
+	c_MissE_Pinit->Print(os.str().c_str());
+
+	// --- save 
+	os.str("");
+	os << "output_genie/histogram_" << prefix.c_str() << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	h_Pinit->Write();
 	h_nmulti_postFSI->Write();
-	h_kEn->Write();
-	h_kEp->Write();
-	h_lowkEn->Write();
-	h_lowkEp->Write();
+	h_nmulti_postdeex->Write();
 	h_MissE->Write();
+	for(int i=0;i<4;i++){
+		h_Ex[i]->Write();
+	}
+	h_Ex_multi->Write();
+	h_MissE_Pinit->Write();
 	outf->Close();
+	delete outf;
 
-
-
-
+	rootf->Close();
+	delete rootf;
 
 	return 0;
 }

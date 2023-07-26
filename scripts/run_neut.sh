@@ -8,5 +8,5 @@ LogDir=./log_neut
 for prefix in $prefix_tmp
 do
 	LogFile=$LogDir/log_$prefix
-	$Exe $prefix > $LogFile 2>&1 &
+	(time -f "CPU time %E: Memory %M KB" $Exe $prefix) > $LogFile 2>&1 &
 done 
