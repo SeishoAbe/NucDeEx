@@ -82,9 +82,10 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 	}
 
 	// --- Call sub functions according to shell and nucleus conditions- --//
-	if(Zt+Nt == Z+N){
-		// --- No change in nucleus (Coherent scattering etc.)
+	if(Zt+Nt == Z+N || Ex<=0){
+		// --- No change in nucleus (Coherent scattering etc.) or no nucleon emission
 		//     Currently not supported. Nothing to do.
+		// --- Negative Ex
 		InitParticleVector();
 		AddGSNucleus(Z,N,mom);
 		status=0;
@@ -418,7 +419,7 @@ void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 {
 	mass_target = ElementMassInMeV(element_table->GetElementRN(Z+N, Z));
 	nuc_target = _nucleus_table->GetNucleusPtr(Z,N);
-	if(nuc_target==NULL) return; // do nothing
+	if(nuc_target==NULL || mass_target<0) return; // do nothing
 	name_target = (string)nuc_target->name;
 	Particle nucleus(PDGion(Z,N),
 								   mass_target, // w/o excitation E
@@ -664,6 +665,7 @@ void Deexcitation::Decay(const bool breakflag)
 double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 /////////////////////////////////////////////
 {
+	if(ele==0) return -1; // no profile can be found.
 	double mass = ele->MassNo()*amu_c2
 									 + ele->MassEx(); // (MeV)
 	double mass_amu = mass/amu_c2;
