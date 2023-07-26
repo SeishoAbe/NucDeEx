@@ -34,16 +34,18 @@ int main(int argc, char* argv[]){
 	deex->SetSeed(seed);
 	deex->SetVerbose(1);
   NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
-	if(prefix.find("_C_")!=string::npos){
+	bool flag_O=0;
+	if(prefix.find("CCQE_C")!=string::npos){
 		Zt=6;
 		Nt=6;
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
 		S = nucleus_table->GetNucleusPtr("12C")->S[2];
-	}else if(prefix.find("_O_")!=string::npos){
+	}else if(prefix.find("CCQE_O")!=string::npos){
 		Zt=8;
 		Nt=8;
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
 		S = nucleus_table->GetNucleusPtr("16O")->S[2];
+		flag_O=1;
 	}
 	cout << "Separation E = " << S << endl;
 	TFile* root = new TFile(os.str().c_str(),"READ");
@@ -83,8 +85,8 @@ int main(int argc, char* argv[]){
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
 
 	// --- read root
-  for(int i=0;i<tree->GetEntries();i++){
-    tree->GetEntry(i);
+  for(int j=0;j<tree->GetEntries();j++){
+    tree->GetEntry(j);
     // -- calculate missing E (pre-FSI)
     double Ev = event->in[0].E();
     double Evv = event->out[0].E(); // mass E inc
@@ -92,19 +94,33 @@ int main(int argc, char* argv[]){
 		double massnuc=event->in[1].mass();
     double MissE = Ev-Evv-Enucc + massnuc;
 		h_MissE->Fill(MissE);
-		
-		cout << "Init    " << event->in[1].pdg << "   " << event->in[1].Ek()
-				 << "    " << event->in[1].momentum() 
-				 << "   (" << event->in[1].p().x 
-				 << "   " << event->in[1].p().y
-				 << "   " << event->in[1].p().z << ")" << endl;
-		cout << "preFSI  " << event->out[1].pdg << "   " << event->out[1].Ek()
-		     << "    " << event->out[1].momentum()
-				 << "   (" << event->out[1].p().x 
-				 << "   " << event->out[1].p().y
-				 << "   " << event->out[1].p().z << ")" << endl;
 
-		h_nmulti_postFSI->Fill(event->fof(2112));
+		int nmulti = event->fof(2112);
+		h_nmulti_postFSI->Fill(nmulti);
+		double Ex = MissE-S;
+		//cout << MissE << "   "  << S <<  "  " << Ex << endl;
+		h_Ex[0]->Fill(Ex);
+		cout << "###" << endl;
+		cout << "Z=" << event->pr << "  N=" << event->nr << "  f()="
+				 << event->f() << "   " << event->in[1].momentum() << endl;
+		for(int i=1;i<event->f();i++){
+			cout << "   " << event->post[i].pdg << "   " << event->post[i].momentum();
+		}
+		cout << endl;
+
+		// --- DOIT --- //
+		deex->DoDeex(Zt,Nt,event->pr,event->nr,0,Ex,TVector3(0,0,0));
+
+		// --- Scoring --- //
+		int shell = deex->GetShell();
+		h_Ex[shell]->Fill(Ex);
+		vector<Particle>* particle = deex->GetParticleVector();
+		int size=particle->size();
+		for(int i=0;i<size;i++){
+			Particle p = particle->at(i);
+			if(p._PDG==2112) nmulti++;
+		}
+		h_nmulti_postdeex->Fill(nmulti);
   }
 
 	TCanvas* c_nmulti_postFSI = new TCanvas("c_nmulti_postFSI","c_nmulti_postFSI",0,0,800,600);
@@ -163,7 +179,7 @@ int main(int argc, char* argv[]){
 	os << "Prob(p3/2)=" << fixed << setprecision(1) << (double)h_Ex[2]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
 	TText* t_p32 = new TText(40,h_Ex[0]->GetMaximum()*0.8,os.str().c_str());
 	t_p32->Draw("same");
-	if(prefix.find("_O_")!=string::npos){
+	if(flag_O==1){
 		os.str("");
 		os << "Prob(p1/2)=" << fixed << setprecision(1) << (double)h_Ex[3]->GetEntries()/h_Ex[0]->GetEntries()*100 << "%";
 		TText* t_p12 = new TText(40,h_Ex[0]->GetMaximum()*0.7,os.str().c_str());
