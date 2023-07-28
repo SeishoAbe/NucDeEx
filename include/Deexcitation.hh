@@ -151,7 +151,7 @@ class Deexcitation{
 
 	// Constatnts for Ex to shell
 	const double Ex_12C_s12=16.0;
-	const double Ex_16O_s12=14.0;
+	const double Ex_16O_s12=16.0;
 	const double Ex_16O_p32=4.0;
 
 	// Constants for (p3/2)-1 Br
