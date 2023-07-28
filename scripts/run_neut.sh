@@ -1,6 +1,7 @@
 #!/bin/bash
 
 prefix_tmp="neut_1GeV_numu_CCQE_C_MDLQE422 neut_1GeV_numub_CCQE_C_MDLQE422 neut_1GeV_numu_CCQE_O_MDLQE422_NUCDEXITE0 neut_1GeV_numub_CCQE_O_MDLQE422_NUCDEXITE0"
+#prefix_tmp="neut_1GeV_numu_NCQE_C_MDLQE422 neut_1GeV_numub_NCQE_C_MDLQE422 neut_1GeV_numu_NCQE_O_MDLQE422_NUCDEXITE0 neut_1GeV_numub_NCQE_O_MDLQE422_NUCDEXITE0"
 
 Exe=./bin/neut
 LogDir=./log_neut
