@@ -10,7 +10,8 @@ class Particle{
 	public:
 	Particle();
 	Particle(const int PDG,const double mass, const TVector3& mom,
-					 const string name, const bool flag=1, const double Ex=0);
+					 const string name, const bool flag=1, const double Ex=0,
+					 const int v=1);
 		// TVector3 is called by referecnce
 	~Particle(){;};
 	
