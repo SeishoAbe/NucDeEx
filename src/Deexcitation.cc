@@ -177,7 +177,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 				int a_particle = (PDG_particle[decay_mode]%1000)/10;
 				int z_particle = ((PDG_particle[decay_mode]%1000000)-a_particle*10)/10000;
 				TGeoElementRN* element_rn =	element_table->GetElementRN(a_particle,z_particle); // (A,Z)
-				cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
+				if(verbose>0) cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
 				mass_particle = ElementMassInMeV(element_rn);
 			}
 			// this rarely happens...
@@ -425,7 +425,7 @@ void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 								   mass_target, // w/o excitation E
 									 mom,
 								   name_target, 
-									 1,0); // track flag on // zero ex
+									 1,0,verbose); // track flag on // zero ex
 	_particle->push_back(nucleus);
 	cout << "AddGSNucleus(): " << name_target << endl;
 }
@@ -604,7 +604,7 @@ void Deexcitation::Decay(const bool breakflag)
 											mass_particle,
 											mom_particle,
 											particle_name[decay_mode],
-											1,0);// trace flag==1, Ex_daughter==0
+											1,0,verbose);// trace flag==1, Ex_daughter==0
 	double totalE_particle_bef = p_particle.totalE();
 	p_particle.Boost(totalE_target,mom_target);// BOOST!
 	double totalE_particle_aft = p_particle.totalE();
@@ -613,7 +613,7 @@ void Deexcitation::Decay(const bool breakflag)
 											mass_daughter, // w/o excitation E
 											mom_daughter,
 											name_daughter,
-											0,Ex_daughter); // intermediate state in default
+											0,Ex_daughter,verbose); // intermediate state in default
 
 	double totalE_daughter_bef = p_daughter.totalE();
 	p_daughter.Boost(totalE_target,mom_target);
@@ -622,21 +622,23 @@ void Deexcitation::Decay(const bool breakflag)
 	// 
 	double kE_target = totalE_target - mass_target;
 	double totalE_ex_target = totalE_target + Ex_target; // w/ excitation E
-	cout << "totalE_target = " << totalE_target << endl;
-	cout << "kE_target = " << kE_target << endl;
-	cout << "Ex_target = " << Ex_target << endl;
-	cout << "totalE_ex_target = " << totalE_ex_target << endl;
 
 	double totalE_bef = totalE_particle_bef + totalE_daughter_bef;
 	double totalE_aft = totalE_particle_aft + totalE_daughter_aft;
-	cout << "totalE_bef = " << totalE_bef << endl;
-	cout << "totalE_aft = " << totalE_aft << endl;
-	cout << "  diff = " << totalE_aft-totalE_bef << endl;
-
 	double totalE_ex_bef = totalE_bef + Ex_daughter; // w/ excitation E
 	double totalE_ex_aft = totalE_aft + Ex_daughter;
-	cout << "totalE_ex_bef = " << totalE_ex_bef << endl;
-	cout << "totalE_ex_aft = " << totalE_ex_aft << endl;
+
+	if(verbose>0){
+		cout << "totalE_target = " << totalE_target << endl;
+		cout << "kE_target = " << kE_target << endl;
+		cout << "Ex_target = " << Ex_target << endl;
+		cout << "totalE_ex_target = " << totalE_ex_target << endl;
+		cout << "totalE_bef = " << totalE_bef << endl;
+		cout << "totalE_aft = " << totalE_aft << endl;
+		cout << "  diff = " << totalE_aft-totalE_bef << endl;
+		cout << "totalE_ex_bef = " << totalE_ex_bef << endl;
+		cout << "totalE_ex_aft = " << totalE_ex_aft << endl;
+	}
 
 
 	// --- Check Energy conservation (4dim energy including momentum)
@@ -657,8 +659,10 @@ void Deexcitation::Decay(const bool breakflag)
 	if(breakflag) p_daughter._flag=1;
 	_particle->push_back(p_daughter);
 
-	cout << "flag_particle = " << p_particle._flag << endl;
-	cout << "flag_daughter = " << p_daughter._flag << endl;
+	if(verbose>0){
+		cout << "flag_particle = " << p_particle._flag << endl;
+		cout << "flag_daughter = " << p_daughter._flag << endl;
+	}
 }
 
 /////////////////////////////////////////////
