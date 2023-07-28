@@ -10,7 +10,7 @@ int random_sf(){
 	const int numofevent=1e6; // to be generated
 
 	const double Ex_p32 =4.0;
-	const double Ex_s12 =14;
+	const double Ex_s12 =16;
 	string target="16O";
 	//
 	/*
