@@ -9,15 +9,15 @@ int random_sf(){
 	// --------------------//
 	const int numofevent=1e6; // to be generated
 
-	const double Ex_p32 =4.0;
-	const double Ex_s12 =16;
-	string target="16O";
-	//
-	/*
-
 	const double Ex_p32 =-1e9;
 	const double Ex_s12 =16.0;
 	string target="12C";
+	//
+	/*
+
+	const double Ex_p32 =4.0;
+	const double Ex_s12 =16;
+	string target="16O";
 	*/
 	double max_mom=500;
 	// --------------------//
@@ -33,15 +33,26 @@ int random_sf(){
 	deex->SetVerbose(1);
   NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
 	Nucleus* nuc = nucleus_table->GetNucleusPtr(target.c_str());
-	gStyle->SetTextSize(0.08);
-	gStyle->SetTitleSize(0.045);
-	gStyle->SetTitleXSize(0.045);
-	gStyle->SetTitleYSize(0.045);
-	gStyle->SetTitleYOffset(0.95);
+	gStyle->SetTextFont(132);
+  gStyle->SetTextSize(0.08);
+  gStyle->SetTitleSize(0.06,"XYZ");
+  gStyle->SetTitleFont(132,"XYZ");
+  gStyle->SetLabelSize(0.06,"XYZ");
+  gStyle->SetLabelFont(132,"XYZ");
+  gStyle->SetLegendFont(132);
+  //gStyle->SetLegendTextSize(0.04);
+  gStyle->SetTitleYOffset(1.05);
 	TH2D* h_sf_random = new TH2D("h_sf_random","",400,0,800,400,0,400);
 	TH1D* h_sf_E_random = new TH1D("h_sf_E_random","",400,0,400); // missing E
 	TH1D* h_sf_p_random = new TH1D("h_sf_p_random","",400,0,800);
-	TH1D* h_sf_Ex_random = new TH1D("h_sf_Ex_random","",500,-100,400);  // excitation E
+	TH1D* h_sf_Ex_random[4];
+	const int color[4]={1,600-7,632-7,920};
+	for(int i=0;i<4;i++){
+		os.str("");
+		os << "h_sf_Ex_random_" << i;
+		h_sf_Ex_random[i]= new TH1D(os.str().c_str(),"",500,-100,400);  // excitation E
+		h_sf_Ex_random[i]->SetFillColor(color[i]);
+	}
 
 	// Set Ex and mom tables (from SF) and proton separation energy
 	double MissE, Ex, S;
@@ -74,19 +85,28 @@ int random_sf(){
 		h_sf_random->Fill(PinitMag,MissE);
 		h_sf_E_random->Fill(MissE);
 		h_sf_p_random->Fill(PinitMag);
-		h_sf_Ex_random->Fill(Ex);
+		h_sf_Ex_random[0]->Fill(Ex);
 		eventID++;
 	}
 	
 	int total=0;
 	int p12=0, p32=0, s12=0;
 	for(int b=1;b<=500;b++){
-		int cont = h_sf_Ex_random->GetBinContent(b);
-		double Ex = h_sf_Ex_random->GetBinCenter(b);
+		int cont = h_sf_Ex_random[0]->GetBinContent(b);
+		double Ex = h_sf_Ex_random[0]->GetBinCenter(b);
 		total += cont;
-		if(Ex>Ex_s12) s12+=cont;
-		else if(Ex>Ex_p32) p32+=cont;
-		else p12+=cont;
+		if(Ex>Ex_s12){
+			s12+=cont;
+			h_sf_Ex_random[1]->SetBinContent(b,cont);
+		}
+		else if(Ex>Ex_p32){
+			p32+=cont;
+			h_sf_Ex_random[2]->SetBinContent(b,cont);
+		}
+		else{
+			p12+=cont;
+			h_sf_Ex_random[3]->SetBinContent(b,cont);
+		}
 	}
 	cout << "p12 = " << p12 << endl;
 	cout << "p32 = " << p32 << endl;
@@ -95,50 +115,59 @@ int random_sf(){
 	cout << "Prob(p32) = " << (double)p32/total*100 << endl;
 	cout << "Prob(s12) = " << (double)s12/total*100 << endl;
 
+	h_sf_Ex_random[0]->Scale(1./h_sf_Ex_random[0]->GetEntries());
+	for(int i=1;i<4;i++){
+		h_sf_Ex_random[i]->Scale(1./h_sf_Ex_random[0]->GetEntries());
+	}
+
 
 	TCanvas* c = new TCanvas("c","c",0,0,800,600);
 	c->Divide(2,2);
 	c->cd(1);
-	h_sf_Ex_random->GetXaxis()->SetRangeUser(-10,100);
-	h_sf_Ex_random->SetStats(0);
-	h_sf_Ex_random->SetMinimum(0);
-	h_sf_Ex_random->GetXaxis()->SetTitle("Excitation energy (MeV)");
-	h_sf_Ex_random->GetYaxis()->SetTitle("Events/bin");
-	h_sf_Ex_random->GetYaxis()->SetMaxDigits(2);
-	h_sf_Ex_random->Draw("HIST");
-	TLine* l_Ex_p32 = new TLine(Ex_p32,0,Ex_p32,h_sf_Ex_random->GetMaximum()*1.05);
-	l_Ex_p32->SetLineStyle(2);
+	h_sf_Ex_random[0]->GetXaxis()->SetRangeUser(-10,100);
+	h_sf_Ex_random[0]->SetStats(0);
+	h_sf_Ex_random[0]->SetMinimum(0);
+	h_sf_Ex_random[0]->GetXaxis()->SetTitle("Excitation energy (MeV)");
+	h_sf_Ex_random[0]->GetYaxis()->SetTitle("A.U.");
+	h_sf_Ex_random[0]->GetYaxis()->SetNdivisions(505);
+	h_sf_Ex_random[0]->Draw("HIST");
+	for(int i=1;i<4;i++){
+		h_sf_Ex_random[i]->Draw("HISTsame");
+	}
+	TLine* l_Ex_p32 = new TLine(Ex_p32,0,Ex_p32,h_sf_Ex_random[0]->GetMaximum()*1.05);
+	l_Ex_p32->SetLineStyle(7);
 	l_Ex_p32->SetLineWidth(2);
-	l_Ex_p32->SetLineColor(kRed);
+	l_Ex_p32->SetLineColor(kBlack);
 	if(Ex_p32>0) l_Ex_p32->Draw("same");
-	TLine* l_Ex_s12 = new TLine(Ex_s12,0,Ex_s12,h_sf_Ex_random->GetMaximum()*1.05);
-	l_Ex_s12->SetLineStyle(2);
+	TLine* l_Ex_s12 = new TLine(Ex_s12,0,Ex_s12,h_sf_Ex_random[0]->GetMaximum()*1.05);
+	l_Ex_s12->SetLineStyle(7);
 	l_Ex_s12->SetLineWidth(2);
-	l_Ex_s12->SetLineColor(kRed);
+	l_Ex_s12->SetLineColor(kBlack);
 	if(Ex_s12>0) l_Ex_s12->Draw("same");
 	os.str("");
 	os << "Prob(p3/2) = " << fixed << setprecision(1) << (double)p12/total*100 << "%";
-	TText* t_p12 = new TText(40,h_sf_Ex_random->GetMaximum()*0.5,os.str().c_str());
+	TText* t_p12 = new TText(40,h_sf_Ex_random[0]->GetMaximum()*0.5,os.str().c_str());
 	if(p12>0) t_p12->Draw("same");
 	os.str("");
 	os << "Prob(p3/2) = " << fixed << setprecision(1) << (double)p32/total*100 << "%";
-	TText* t_p32 = new TText(40,h_sf_Ex_random->GetMaximum()*0.35,os.str().c_str());
+	TText* t_p32 = new TText(40,h_sf_Ex_random[0]->GetMaximum()*0.35,os.str().c_str());
 	t_p32->Draw("same");
 	os.str("");
 	os << "Prob(s1/2) = " << fixed << setprecision(1) << (double)s12/total*100 << "%";
-	TText* t_s12 = new TText(40,h_sf_Ex_random->GetMaximum()*0.2,os.str().c_str());
+	TText* t_s12 = new TText(40,h_sf_Ex_random[0]->GetMaximum()*0.2,os.str().c_str());
 	t_s12->Draw("same");
 	//
 	os.str("");
 	os << "Ex (p1/2<->p3/2) = " << Ex_p32 << " MeV";
-	TText* t_Ex_p32 = new TText(20,h_sf_Ex_random->GetMaximum()*0.9,os.str().c_str());
+	TText* t_Ex_p32 = new TText(20,h_sf_Ex_random[0]->GetMaximum()*0.9,os.str().c_str());
 	t_Ex_p32->SetTextColor(kRed);
 	if(Ex_p32>0) t_Ex_p32->Draw("same");
 	os.str("");
 	os << "Ex (p3/2<->s1/2) = " << Ex_s12 << " MeV";
-	TText* t_Ex_s12 = new TText(20,h_sf_Ex_random->GetMaximum()*0.7,os.str().c_str());
+	TText* t_Ex_s12 = new TText(20,h_sf_Ex_random[0]->GetMaximum()*0.7,os.str().c_str());
 	t_Ex_s12->SetTextColor(kRed);
 	if(Ex_s12>0) t_Ex_s12->Draw("same");
+	gPad->RedrawAxis();
 	//
 	c->cd(2);
 	gPad->SetLogz();
@@ -186,6 +215,26 @@ int random_sf(){
 	os.str("");
 	os << "figure/fig_sf_random_" << target.c_str() << ".pdf";
 	c->Print(os.str().c_str());
+
+
+
+	TCanvas* c_Ex = new TCanvas("c_Ex","c_Ex",0,0,800,600);
+	gPad->SetRightMargin(0.05);
+	gPad->SetTopMargin(0.05);
+	gPad->SetLeftMargin(0.12);
+	gPad->SetBottomMargin(0.12);
+	h_sf_Ex_random[0]->Draw("HIST");
+	h_sf_Ex_random[0]->GetXaxis()->CenterTitle();
+	h_sf_Ex_random[0]->GetYaxis()->CenterTitle();
+	if(Ex_p32>0) l_Ex_p32->Draw("same");
+	if(Ex_s12>0) l_Ex_s12->Draw("same");
+	for(int i=1;i<4;i++){
+		h_sf_Ex_random[i]->Draw("HISTsame");
+	}
+	gPad->RedrawAxis();
+	os.str("");
+	os << "figure/fig_sf_random_" << target.c_str() << "_Ex.pdf";
+	c_Ex->Print(os.str().c_str());
 
 	return 0;
 }
