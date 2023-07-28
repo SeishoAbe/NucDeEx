@@ -146,7 +146,7 @@ class Deexcitation{
 	int verbose;
 	int eventID;
 	ostringstream os;
-	const double check_criteria=1e-3;
+	const double check_criteria=5e-3;
 	int _shell;
 
 	// Constatnts for Ex to shell
