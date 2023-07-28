@@ -23,8 +23,9 @@ int main(int argc, char* argv[]){
 	//------------------//
 	//string prefix = "neut_1GeV_numu_CCQE_C_MDLQE422";
 	//string prefix = "neut_1GeV_numub_CCQE_C_MDLQE422";
-	string prefix = "neut_1GeV_numu_CCQE_O_MDLQE422_NUCDEXITE0";
+	//string prefix = "neut_1GeV_numu_CCQE_O_MDLQE422_NUCDEXITE0";
 	//string prefix = "neut_1GeV_numub_CCQE_O_MDLQE422_NUCDEXITE0";
+	string prefix = "neut_1GeV_numu_NCQE_O_MDLQE422_NUCDEXITE0";
 	if(argc==2) prefix = argv[1];
 	int seed=1;
 	//-----------------.//
@@ -59,6 +60,9 @@ int main(int argc, char* argv[]){
 	root->Close();
 	delete root;
 
+	bool flag_CC=1;//1: CC, 0: NC
+	if(prefix.find("NCQE")!=string::npos) flag_CC=0;
+
 	// --- input neut root
 	os.str("");
 	os << "output_neut/" << prefix.c_str() << ".root";
@@ -90,7 +94,7 @@ int main(int argc, char* argv[]){
 		h_Ex[i] = new TH1D(os.str().c_str(),"",500,-100,400);
 	}
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
-	TH2D* h_MissE_Pinit = new TH2D("h_MissE","",100,0,500,400,0,200);
+	TH2D* h_MissE_Pinit = new TH2D("h_MissE_Pinit","",100,0,500,400,0,200);
 
 	// --- read root
   int nevents = tree->GetEntries();
@@ -128,14 +132,19 @@ int main(int argc, char* argv[]){
 				if(abs(fPID)==14){ //init nu
 					Ev=kE;
 					NuPID=fPID;
-					if(fPID==14){// n->p
-						Z++;
-						N--;
-					}else if(fPID==-14){//p->n
-						Z--;
-						N++;
-					}
 				}else{// target nuc
+					if(flag_CC){ // CC
+						if(fPID==2112){// n->p
+							Z++;
+							N--;
+						}else if(fPID==2212){//p->n
+							Z--;
+							N++;
+						}
+					}else{
+						if(fPID==2112)N--;
+						else if(fPID==2212) Z--;
+					}
 					Massnuc=fMass; 
 					Pinit = sqrt( pow(nvect->PartInfo(i)->fP.Px(),2)
 					             + pow(nvect->PartInfo(i)->fP.Py(),2)
@@ -145,8 +154,8 @@ int main(int argc, char* argv[]){
 			}else if(fIsAlive==0 && Enucc<0){ // intermediate
 				Enucc=part->fP.E();
 			}else if(fIsAlive==1){ // postFSI
-				if(abs(fPID)==13) Evv=part->fP.E(); // charged lepton
-				else if(Enucc<0 && ( (NuPID>0 && fPID==2212) || (NuPID<0 && fPID==2112) )) Enucc = part->fP.E();// fsi target nuc
+				if(abs(fPID)==13 || abs(fPID)==14) Evv=part->fP.E(); // charged lepton
+				else if(Enucc<0 && (fPID==2212 || fPID==2112))Enucc = part->fP.E();// fsi target nuc
 				if(fPID==2212) Z--;
 				else if(fPID==2112){
 					N--;

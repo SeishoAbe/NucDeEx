@@ -20,15 +20,16 @@ const double mass_neutron=939.566;//MeV
 const double mass_proton=938.272;//MeV
 
 int main(int argc, char* argv[]){
-	if(argc!=4){
-		cerr << "Input: " << argv[0] << " [flavor] [target] [tune]" << endl;
+	if(argc!=5){
+		cerr << "Input: " << argv[0] << " [list] [flavor] [target] [tune]" << endl;
 		return 1;
 	}
 
 	// --- FIXME --- //
-	const int flavor=atoi(argv[1]);
-	string target = argv[2];
-	string tune = argv[3];
+	string list = argv[1];
+	const int flavor=atoi(argv[2]);
+	string target = argv[3];
+	string tune = argv[4];
 	int seed=1;
 	// ------------- //
 
@@ -64,7 +65,7 @@ int main(int argc, char* argv[]){
 
 	// --- input neut root
 	os.str("");
-	os << "CCQE." << flavor << "." << target.c_str() 
+	os << list.c_str() << "." << flavor << "." << target.c_str() 
 		 << "." << tune.c_str();
 	string prefix = os.str();
 	os.str("");
@@ -142,7 +143,7 @@ int main(int argc, char* argv[]){
 		h_Ex[i] = new TH1D(os.str().c_str(),"",500,-100,400);
 	}
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
-	TH2D* h_MissE_Pinit = new TH2D("h_MissE","",100,0,500,400,0,200);
+	TH2D* h_MissE_Pinit = new TH2D("h_MissE_Pinit","",100,0,500,400,0,200);
 
 	//--- GeV2MeV --- //
 	for(int i=0;i<tree->GetEntries();i++){
@@ -166,12 +167,14 @@ int main(int argc, char* argv[]){
 	
 		// init
 		int Z=Zt,N=Nt;
-		if(neu==14){
-			Z++;
-			N--;
-		}else if(neu==-14){
-			Z--;
-			N++;
+		if(list=="CCQE"){
+			if(neu==14){
+				Z++;
+				N--;
+			}else if(neu==-14){
+				Z--;
+				N++;
+			}
 		}
 		
 		// postFSI

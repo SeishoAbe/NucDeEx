@@ -35,12 +35,12 @@ int main(int argc, char* argv[]){
 	deex->SetVerbose(1);
   NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
 	bool flag_O=0;
-	if(prefix.find("CCQE_C")!=string::npos){
+	if(prefix.find("QE_C")!=string::npos){
 		Zt=6;
 		Nt=6;
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
 		S = nucleus_table->GetNucleusPtr("12C")->S[2];
-	}else if(prefix.find("CCQE_O")!=string::npos){
+	}else if(prefix.find("QE_O")!=string::npos){
 		Zt=8;
 		Nt=8;
 		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]){
 		h_Ex[i] = new TH1D(os.str().c_str(),"",500,-100,400);
 	}
 	TH1D* h_Ex_multi = new TH1D("h_Ex_multi","",500,-100,400); // multi nucleon hole
-	TH2D* h_MissE_Pinit = new TH2D("h_MissE","",100,0,500,400,0,200);
+	TH2D* h_MissE_Pinit = new TH2D("h_MissE_Pinit","",100,0,500,400,0,200);
 
 	// --- read root
   for(int j=0;j<tree->GetEntries();j++){
