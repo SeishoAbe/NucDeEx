@@ -19,7 +19,7 @@ Particle::Particle()
 
 ///////////////
 Particle::Particle(const int PDG, const double mass, const TVector3& mom, 
-									 const string name, const bool flag, const double Ex)
+									 const string name, const bool flag, const double Ex, const int v)
 ///////////////
 {
 	_PDG=PDG;
@@ -28,7 +28,7 @@ Particle::Particle(const int PDG, const double mass, const TVector3& mom,
 	_name=name;
 	_flag=flag;
 	_Ex=Ex;
-	verbose=1;
+	verbose=v;
 }
 
 
