@@ -8,16 +8,16 @@ using namespace std;
 int random_sf(){
 	// --------------------//
 	const int numofevent=1e6; // to be generated
-
+	//
 	const double Ex_p32 =-1e9;
 	const double Ex_s12 =16.0;
 	string target="12C";
-	//
 	/*
 
 	const double Ex_p32 =4.0;
 	const double Ex_s12 =16;
 	string target="16O";
+
 	*/
 	double max_mom=500;
 	// --------------------//
@@ -145,16 +145,16 @@ int random_sf(){
 	l_Ex_s12->SetLineColor(kBlack);
 	if(Ex_s12>0) l_Ex_s12->Draw("same");
 	os.str("");
-	os << "Prob(p3/2) = " << fixed << setprecision(1) << (double)p12/total*100 << "%";
-	TText* t_p12 = new TText(40,h_sf_Ex_random[0]->GetMaximum()*0.5,os.str().c_str());
+	os << "#font[12]{p}_{1/2}-hole: " << fixed << setprecision(1) << (double)p12/total*100 << "%";
+	TLatex* t_p12 = new TLatex(40,h_sf_Ex_random[0]->GetMaximum()*0.5,os.str().c_str());
 	if(p12>0) t_p12->Draw("same");
 	os.str("");
-	os << "Prob(p3/2) = " << fixed << setprecision(1) << (double)p32/total*100 << "%";
-	TText* t_p32 = new TText(40,h_sf_Ex_random[0]->GetMaximum()*0.35,os.str().c_str());
+	os << "#font[12]{p}_{3/2}-hole: " << fixed << setprecision(1) << (double)p32/total*100 << "%";
+	TLatex* t_p32 = new TLatex(40,h_sf_Ex_random[0]->GetMaximum()*0.35,os.str().c_str());
 	t_p32->Draw("same");
 	os.str("");
-	os << "Prob(s1/2) = " << fixed << setprecision(1) << (double)s12/total*100 << "%";
-	TText* t_s12 = new TText(40,h_sf_Ex_random[0]->GetMaximum()*0.2,os.str().c_str());
+	os << "#font[12]{s}_{1/2}-hole: " << fixed << setprecision(1) << (double)s12/total*100 << "%";
+	TLatex* t_s12 = new TLatex(40,h_sf_Ex_random[0]->GetMaximum()*0.2,os.str().c_str());
 	t_s12->Draw("same");
 	//
 	os.str("");
@@ -231,6 +231,9 @@ int random_sf(){
 	for(int i=1;i<4;i++){
 		h_sf_Ex_random[i]->Draw("HISTsame");
 	}
+	if(p12>0) t_p12->Draw("same");
+	t_p32->Draw("same");
+	t_s12->Draw("same");
 	gPad->RedrawAxis();
 	os.str("");
 	os << "figure/fig_sf_random_" << target.c_str() << "_Ex.pdf";
