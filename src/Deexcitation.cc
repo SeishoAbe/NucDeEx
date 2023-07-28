@@ -458,6 +458,7 @@ int Deexcitation::DecayMode(const double Ex)
 	double Br_sum=0;
 	for(int p=0;p<num_particle;p++){
 		Br[p] = g_br[p]->Eval(Ex);
+		if(Br[p]<0) Br[p]=0;
 		Br_sum += Br[p];
 		if(verbose>0){
 			cout << "Br(" << particle_name[p].substr(0,1) << ") = " << Br[p] << endl;
