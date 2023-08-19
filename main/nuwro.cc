@@ -205,7 +205,7 @@ int main(int argc, char* argv[]){
 	gPad->RedrawAxis();
 	os.str("");
 	os << "fig_nuwro/fig_Ex_" << prefix.c_str() << ".pdf";
-	c_Ex->Print(os.str().c_str());
+	c_Ex->Print(os.str().c_str()); 
 
 	TCanvas* c_MissE_Pinit = new TCanvas("c_MissE_Pinit","c_MissE_Pinit",0,0,800,600);
 	gPad->SetLogz();
