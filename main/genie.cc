@@ -149,9 +149,14 @@ int main(int argc, char* argv[]){
 	for(int i=0;i<tree->GetEntries();i++){
 		tree->GetEntry(i);
 		double Pinit = sqrt(pxn*pxn+pyn*pyn+pzn*pzn)*1e3;
+		double MissE;
 
-		h_Pinit->Fill( sqrt(pxn*pxn+pyn*pyn+pzn*pzn)*1e3 );
+		// --- Use Benhar SF --- //
+		h_sf_int->GetRandom2(Pinit,MissE); 
 
+		h_Pinit->Fill(Pinit);
+
+/*
 		double Enucc=0;
 		for(int k=0;k<ni;k++){
 			if(pdgi[k]==2212 || pdgi[k]==2112) Enucc=Ei[k];
@@ -160,6 +165,8 @@ int main(int argc, char* argv[]){
 		if(hitnuc==2112) massnuc = mass_neutron*1e-3; // MeV2GeV
 		else if (hitnuc==2212) massnuc = mass_proton*1e-3; // MeV2GeV
 		double MissE=(Ev-El-Enucc+massnuc)*1e3;
+*/
+
 		h_MissE->Fill(MissE);
 		h_MissE_Pinit->Fill(Pinit,MissE);
 		//cout << MissE << "   " << Ev << "   " << El << "   " << Enucc
@@ -305,7 +312,7 @@ int main(int argc, char* argv[]){
 
 	// --- save 
 	os.str("");
-	os << "output_genie/histogram_" << prefix.c_str() << ".root";
+	os << "output_genie/histogram_deex_" << prefix.c_str() << ".root";
 	TFile* outf = new TFile(os.str().c_str(),"RECREATE");
 	h_Pinit->Write();
 	h_nmulti_postFSI->Write();
