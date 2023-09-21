@@ -20,8 +20,8 @@ int plot_simulation_11B(){
 	const double Ex_min =16;
 	const double Ex_max =35;
 		// negative -> not applied
-	const int ldmodel=1;
-	const bool parity_optmodall=0;
+	const int ldmodel=2;
+	const bool parity_optmodall=1;
 	const bool flag_decay=1;
 		// 0 -> use string w/ "g" (gamma)
 		// 1- > use string w/o "g" (gamma) <- use this 
@@ -46,7 +46,7 @@ int plot_simulation_11B(){
 
 	ostringstream os;
 	os.str("");
-	os << "sim_out/" << target.c_str() << "_ldmodel" << ldmodel;
+	os << "sim_out/12C/" << target.c_str() << "_ldmodel" << ldmodel;
 	if(parity_optmodall) os << "_parity_optmodall";
 	os << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
@@ -93,6 +93,7 @@ int plot_simulation_11B(){
 	gStyle->SetLabelSize(0.05,"XYZ");
 	gStyle->SetLabelFont(132,"XYZ");
 	gStyle->SetLegendFont(132);
+	gStyle->SetLegendTextSize(0.04);
 	gStyle->SetTitleYOffset(0.95);
 	
 	TH1D* h_Ex = new TH1D("h_Ex","",500,-100,400);
@@ -479,6 +480,9 @@ int plot_simulation_11B(){
 		h_nda[i]->Fill(i,env->GetValue("rbr_nda_n",-9999.));
 		h_nda[i]->Fill(i+nda_data+3,env->GetValue("rbr_nda_da",-9999.));
 		h_nda[i]->SetFillColor(nda_color[i]);
+		//h_nda[i]->SetLineColor(nda_color[i]);
+		//h_nda[i]->SetLineWidth(2);
+		if(i==2) h_nda[i]->SetFillStyle(3445);
 	}
 	TH1D* h_nda_this = new TH1D("h_nda_this","",20,-10,10);
 	h_nda_this->Fill(-1,rbr_nda_n*1e2);
@@ -487,15 +491,16 @@ int plot_simulation_11B(){
 
 
 	TCanvas* c_nda =new TCanvas("c_nda","c_nda",0,0,800,600);
-	TH1F* waku_nda = gPad->DrawFrame(-2,0,10,85);
+	TH1F* waku_nda = gPad->DrawFrame(-2,0,10,88);
 	waku_nda->GetXaxis()->SetLabelSize(0);
 	waku_nda->GetXaxis()->SetTickSize(0);
 	waku_nda->GetYaxis()->SetTitle("Relative branching ratio (%)");
+	waku_nda->GetYaxis()->CenterTitle();
 	for(int i=0;i<nda_data;i++){
 		h_nda[i]->Draw("HISTsame");
 	}
 	h_nda_this->Draw("HISTsame");
-	TLegend* leg_nda = new TLegend(0.6,0.6,0.9,0.89);
+	TLegend* leg_nda = new TLegend(0.6,0.55,0.9,0.89);
 	leg_nda->SetBorderSize(0);
 	leg_nda->SetFillStyle(0);
 	leg_nda->AddEntry(h_nda_this,"This work","F");
@@ -526,8 +531,9 @@ int plot_simulation_11B(){
 	TH1D* h_br_this  = new TH1D("h_br_this","",50,-10,40);
 	TH1D* h_br_2b_this  = new TH1D("h_br_2b_this","",50,-10,40);
 	h_br_this->SetLineColor(br_color_this);
-	h_br_2b_this->SetFillStyle(3445);
-	h_br_2b_this->SetLineColor(br_color_this);
+	//h_br_2b_this->SetFillStyle(3445);
+	//h_br_2b_this->SetLineColor(br_color_this);
+	h_br_2b_this->SetLineColor(1);
 	h_br_2b_this->SetFillColor(br_color_this);
 	//
 	h_br_this->Fill(-1,rbr_th[1]/2);
@@ -542,7 +548,7 @@ int plot_simulation_11B(){
 	h_br_2b_this->Fill(-1+br_data*6,rbr_th_2b[6]);
 
 
-	const int br_color[br_data]={416+2,800+6,600,1};
+	const int br_color[br_data]={416+2,800+6,600-7,1};
 	string br_data_name[br_data]={"SAbe_Tohoku_2023","Hu","CASCADE","Yosoi"};
 	string br_data_legend[br_data]={"Abe et al. (2023)","Hu et al. (2022)","CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
 	TFile* rootf_br[br_data];
@@ -614,24 +620,27 @@ int plot_simulation_11B(){
 		}
 		//
 		h_br[i]->SetLineColor(br_color[i]);
-		h_br_2b[i]->SetFillStyle(3445);
-		h_br_2b[i]->SetLineColor(br_color[i]);
+		//h_br_2b[i]->SetFillStyle(3445);
+		if(i==3)  h_br_2b[i]->SetFillStyle(3445);
+		//h_br_2b[i]->SetLineColor(br_color[i]);
+		h_br_2b[i]->SetLineColor(1);
 		h_br_2b[i]->SetFillColor(br_color[i]);
 	}
 
 
-	const double max_br_plot=32;
+	const double max_br_plot=34;
 	TCanvas* c_br =new TCanvas("c_br","c_br",0,0,800,600);
 	TH1F* waku_br = gPad->DrawFrame(-3,0,30,max_br_plot);
 	waku_br->GetXaxis()->SetLabelSize(0);
 	waku_br->GetXaxis()->SetTickSize(0);
 	waku_br->GetYaxis()->SetTitle("Branching ratio (%)");
+	waku_br->GetYaxis()->CenterTitle();
 	h_br_this->Draw("HISTsame");
 	h_br_2b_this->Draw("HISTsame");
-	TLegend* leg_br = new TLegend(0.6,0.6,0.9,0.9);
+	TLegend* leg_br = new TLegend(0.53,0.56,0.9,0.9);
 	leg_br->SetBorderSize(0);
 	leg_br->SetFillStyle(0);
-	leg_br->AddEntry(h_br_this,"This work","l");
+	leg_br->AddEntry(h_br_2b_this,"This work","f");
 	for(int i=0;i<br_data;i++){
 		h_br[i]->Draw("HISTsame");
 		h_br_2b[i]->Draw("HISTsame");
@@ -641,7 +650,7 @@ int plot_simulation_11B(){
 		}
 		os.str("");
 		os << br_data_legend[i].c_str();
-		leg_br->AddEntry(h_br[i],os.str().c_str(),"l");
+		leg_br->AddEntry(h_br_2b[i],os.str().c_str(),"f");
 	}
 	leg_br->Draw("same");
 	//
@@ -655,7 +664,7 @@ int plot_simulation_11B(){
 	os << "#chi^{2} = " << chi2;
 	TLatex* l_chi2 = new TLatex(br_data*1.5,max_br_plot*0.9,os.str().c_str());
 	l_chi2->SetTextSize(0.07);
-	l_chi2->Draw("same");
+	//l_chi2->Draw("same");
 	//
 	int index=0;
 	for(int p=1;p<num_particle;p++){
@@ -667,6 +676,7 @@ int plot_simulation_11B(){
 		l_br->SetTextFont(12);
 		index++;
 	}
+	gPad->RedrawAxis();
 	//
 	os.str("");
 	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel;

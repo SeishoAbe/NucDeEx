@@ -2,9 +2,9 @@
 
 ### FIXME ###
 target_tmp="C O"
-tune_tmp="G18_10a_02_11a G18_10a_02_11b G18_10b_02_11a G18_10b_02_11b G23_10b_02_11a G23_10b_02_11b"
+#tune_tmp="G18_10a_02_11a G18_10a_02_11b G18_10b_02_11a G18_10b_02_11b G23_10b_02_11a G23_10b_02_11b"
 #tune_tmp="G18_10a_02_11a G18_10a_02_11b"
-#tune_tmp="G18_10b_02_11a G18_10b_02_11b"
+tune_tmp="G18_10b_02_11a G18_10b_02_11b"
 #tune_tmp="G23_10b_02_11a G23_10b_02_11b"
 
 List_tmp="NCEL CCQE"
