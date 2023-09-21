@@ -465,7 +465,7 @@ int plot_simulation_11B(){
 	const int nda_color[nda_data]={416+2,800+6,600-6};
 	const int	nda_color_this = 616-6;
 	string nda_data_name[nda_data]={"SAbe_Tohoku_2023","Hu","Panin"};
-	string nda_data_legend[nda_data]={"Abe et al. (2023)","Hu et al. (2022)","Panin et al. (2016)"};
+	string nda_data_legend[nda_data]={"Abe et al. (TALYS)","Hu et al. (TALYS)","Exp. by Panin et al."};
 	TFile* rootf_nda[nda_data];
 	TH1D* h_nda[nda_data];
 	for(int i=0;i<nda_data;i++){
@@ -480,17 +480,23 @@ int plot_simulation_11B(){
 		h_nda[i]->Fill(i,env->GetValue("rbr_nda_n",-9999.));
 		h_nda[i]->Fill(i+nda_data+3,env->GetValue("rbr_nda_da",-9999.));
 		h_nda[i]->SetFillColor(nda_color[i]);
-		//h_nda[i]->SetLineColor(nda_color[i]);
 		//h_nda[i]->SetLineWidth(2);
-		if(i==2) h_nda[i]->SetFillStyle(3445);
+		if(i==2){
+			 h_nda[i]->SetFillStyle(3445);
+				h_nda[i]->SetLineColor(nda_color[i]);
+		}
+		else h_nda[i]->SetLineColor(1);
 	}
 	TH1D* h_nda_this = new TH1D("h_nda_this","",20,-10,10);
 	h_nda_this->Fill(-1,rbr_nda_n*1e2);
 	h_nda_this->Fill(-1+nda_data+3,rbr_nda_da*1e2);
 	h_nda_this->SetFillColor(nda_color_this);
+	h_nda_this->SetLineColor(1);
 
 
 	TCanvas* c_nda =new TCanvas("c_nda","c_nda",0,0,800,600);
+	gPad->SetRightMargin(0.02);
+	gPad->SetTopMargin(0.02);
 	TH1F* waku_nda = gPad->DrawFrame(-2,0,10,88);
 	waku_nda->GetXaxis()->SetLabelSize(0);
 	waku_nda->GetXaxis()->SetTickSize(0);
@@ -500,10 +506,10 @@ int plot_simulation_11B(){
 		h_nda[i]->Draw("HISTsame");
 	}
 	h_nda_this->Draw("HISTsame");
-	TLegend* leg_nda = new TLegend(0.6,0.55,0.9,0.89);
+	TLegend* leg_nda = new TLegend(0.65,0.6,0.97,0.97);
 	leg_nda->SetBorderSize(0);
 	leg_nda->SetFillStyle(0);
-	leg_nda->AddEntry(h_nda_this,"This work","F");
+	leg_nda->AddEntry(h_nda_this,"This work (TALYS)","F");
 	for(int i=0;i<nda_data;i++){
 		os.str("");
 		os << nda_data_legend[i].c_str();
@@ -512,10 +518,13 @@ int plot_simulation_11B(){
 	leg_nda->Draw("same");
 	TLatex* l_n = new TLatex(1,-8,"n");
 	l_n->SetTextFont(12);
+	l_n->SetTextSize(0.07);
 	l_n->Draw("same");
 	TLatex* l_da = new TLatex(0.5+nda_data+3,-8,"d/#alpha");
 	l_da->SetTextFont(12);
+	l_da->SetTextSize(0.07);
 	l_da->Draw("same");
+	gPad->RedrawAxis();
 	//
 	os.str("");
 	os << "fig_sim/fig_" << target.c_str() << "_ldmodel" << ldmodel;
@@ -550,7 +559,7 @@ int plot_simulation_11B(){
 
 	const int br_color[br_data]={416+2,800+6,600-7,1};
 	string br_data_name[br_data]={"SAbe_Tohoku_2023","Hu","CASCADE","Yosoi"};
-	string br_data_legend[br_data]={"Abe et al. (2023)","Hu et al. (2022)","CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
+	string br_data_legend[br_data]={"Abe et al. (TALYS)","Hu et al. (TALYS)","Yosoi et al. (CASCADE)", "Exp. by Yosoi et al."};
 	TFile* rootf_br[br_data];
 	TH1D* h_br[br_data];
 	TH1D* h_br_2b[br_data];
@@ -630,6 +639,8 @@ int plot_simulation_11B(){
 
 	const double max_br_plot=34;
 	TCanvas* c_br =new TCanvas("c_br","c_br",0,0,800,600);
+	gPad->SetRightMargin(0.02);
+	gPad->SetTopMargin(0.02);
 	TH1F* waku_br = gPad->DrawFrame(-3,0,30,max_br_plot);
 	waku_br->GetXaxis()->SetLabelSize(0);
 	waku_br->GetXaxis()->SetTickSize(0);
@@ -637,10 +648,10 @@ int plot_simulation_11B(){
 	waku_br->GetYaxis()->CenterTitle();
 	h_br_this->Draw("HISTsame");
 	h_br_2b_this->Draw("HISTsame");
-	TLegend* leg_br = new TLegend(0.53,0.56,0.9,0.9);
+	TLegend* leg_br = new TLegend(0.6,0.62,0.97,0.97);
 	leg_br->SetBorderSize(0);
 	leg_br->SetFillStyle(0);
-	leg_br->AddEntry(h_br_2b_this,"This work","f");
+	leg_br->AddEntry(h_br_2b_this,"This work (TALYS)","f");
 	for(int i=0;i<br_data;i++){
 		h_br[i]->Draw("HISTsame");
 		h_br_2b[i]->Draw("HISTsame");
@@ -657,8 +668,8 @@ int plot_simulation_11B(){
 	TLine* line_br_n = new TLine(br_data,0,br_data,max_br_plot);
 	line_br_n->SetLineStyle(2);
 	line_br_n->Draw("same");
-	TLatex* l_br_n_factor = new TLatex(-1,max_br_plot*0.9,"#times 1/2");
-	l_br_n_factor->SetTextSize(0.07);
+	TLatex* l_br_n_factor = new TLatex(0,max_br_plot*0.9,"#times 1/2");
+	l_br_n_factor->SetTextSize(0.06);
 	l_br_n_factor->Draw("same");
 	os.str("");
 	os << "#chi^{2} = " << chi2;
@@ -674,6 +685,7 @@ int plot_simulation_11B(){
 		else l_br = new TLatex(br_data*index*1.5+1,-2.5,particle_name[p].substr(0,1).c_str());
 		l_br->Draw("same");
 		l_br->SetTextFont(12);
+		l_br->SetTextSize(0.07);
 		index++;
 	}
 	gPad->RedrawAxis();
