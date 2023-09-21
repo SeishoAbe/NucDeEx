@@ -501,7 +501,7 @@ int plot_simulation_15N(){
 
 	const int br_color[br_data]={600-7,1};
 	string br_data_name[br_data]={"CASCADE","Yosoi"};
-	string br_data_legend[br_data]={"CASCADE (Yosoi et al.)", "Yosoi et al. (exp.)"};
+	string br_data_legend[br_data]={"Yosoi et al. (CASCADE)", "Exp. by Yosoi et al."};
 	TFile* rootf_br[br_data];
 	TH1D* h_br[br_data];
 	TH1D* h_br_2b[br_data];
@@ -579,6 +579,8 @@ int plot_simulation_15N(){
 
 	const double max_br_plot=34;
 	TCanvas* c_br =new TCanvas("c_br","c_br",0,0,800,600);
+	gPad->SetRightMargin(0.02);
+	gPad->SetTopMargin(0.02);
 	TH1F* waku_br = gPad->DrawFrame(-4,0,20,max_br_plot);
 	waku_br->GetXaxis()->SetLabelSize(0);
 	waku_br->GetXaxis()->SetTickSize(0);
@@ -586,10 +588,10 @@ int plot_simulation_15N(){
 	waku_br->GetYaxis()->CenterTitle();
 	h_br_this->Draw("HISTsame");
 	h_br_2b_this->Draw("HISTsame");
-	TLegend* leg_br = new TLegend(0.53,0.55,0.9,0.9);
+	TLegend* leg_br = new TLegend(0.60,0.62,0.97,0.97);
 	leg_br->SetBorderSize(0);
 	leg_br->SetFillStyle(0);
-	leg_br->AddEntry(h_br_2b_this,"This work","f");
+	leg_br->AddEntry(h_br_2b_this,"This work (TALYS)","f");
 	for(int i=0;i<br_data;i++){
 		h_br[i]->Draw("HISTsame");
 		h_br_2b[i]->Draw("HISTsame");
@@ -606,8 +608,8 @@ int plot_simulation_15N(){
 	TLine* line_br_n = new TLine(br_data,0,br_data,max_br_plot);
 	line_br_n->SetLineStyle(2);
 	line_br_n->Draw("same");
-	TLatex* l_br_n_factor = new TLatex(-2,max_br_plot*0.9,"#times 1/2");
-	l_br_n_factor->SetTextSize(0.07);
+	TLatex* l_br_n_factor = new TLatex(-1,max_br_plot*0.9,"#times 1/2");
+	l_br_n_factor->SetTextSize(0.06);
 	l_br_n_factor->Draw("same");
 	os.str("");
 	os << "#chi^{2} = " << chi2;
@@ -620,9 +622,11 @@ int plot_simulation_15N(){
 		if(particle_name[p]=="helium-3") continue;
 		TLatex* l_br;
 		if(particle_name[p]=="alpha") l_br = new TLatex(br_data*index*2.0,-2.5,"#alpha");
+		else if(particle_name[p]=="neutron") l_br = new TLatex(-1,-2.5,particle_name[p].substr(0,1).c_str());
 		else l_br = new TLatex(br_data*index*2.0,-2.5,particle_name[p].substr(0,1).c_str());
 		l_br->Draw("same");
 		l_br->SetTextFont(12);
+		l_br->SetTextSize(0.07);
 		index++;
 	}
 	gPad->RedrawAxis();
