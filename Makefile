@@ -14,12 +14,16 @@ CXXFLAGS        += $(shell root-config --cflags)
 LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
 
 ## neut libs
+ifdef NEUT_ROOT
 CXXFLAGS += -I$(NEUT_ROOT)/include
 LDFLAGS += -L$(NEUT_ROOT)/lib -lNEUT -lNEUTClass -lNEUTClassUtils
+endif
 
 ## nuwro libs
+ifdef NUWRO
 CXXFLAGS += -I$(NUWRO)/src
 LDFLAGS += $(NUWRO)/bin/event1.so
+endif
 
 LIBDIR=lib
 LIBNAME=${LIBDIR}/libTALYStool.a
@@ -48,11 +52,9 @@ $(EXEOBJDIR)/%.o: main/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 lib:  $(OBJS)
-	rm -rf $(LIBNAME)
 	ar $(ARFLAGS) -rv $(LIBNAME) $^
 
 dylib:  $(OBJS)
-	rm -rf $(LIBNAME:.a=.so)
 	$(CXX) -shared -o $(LIBNAME:.a=.so) $^
 
 clean: 
