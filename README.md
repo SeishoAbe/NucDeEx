@@ -66,10 +66,10 @@ An example code for simulation is provided:
 - `./macro`: ROOT macro files to check the output
 
 ### Tables, output, etc.
-- `output`
+- `./output`
 	- Files converted from TALYS' output
 	- These contain branching ratios.
-- `sim_out`
+- `./sim_out`
 	- Event simulation output 
 - `./tables`
   - `./nucleus`
