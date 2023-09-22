@@ -1,5 +1,5 @@
-#PROGRAMS = plot_decay cout_input simulation
-PROGRAMS = neut nuwro genie
+PROGRAMS = plot_decay cout_input simulation
+#PROGRAMS = neut nuwro genie #<- You need NEUT and NuWro env settings
 
 CXX=g++ 
 CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
