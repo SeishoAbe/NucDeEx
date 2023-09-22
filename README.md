@@ -1,16 +1,25 @@
-# Nuclear Deexcitation Simulator
-For neutrino interaction and proton decay
+# Nuclear Deexcitation Simulator (NucDeEx)
+This is a nucler deexcitation simulator (NucDeEx) for neutrino interaction and proton decay.
 
 ## Contact 
-Seisho Abe: seisho@km.icrr.u-tokyo.ac.jp
+Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
+
+## Citing NucDeEx
+Comming soon.
 
 ## Compile
+
+### Dependence
+This simulator depends on ROOT.
+At least it work with the following gcc versions and ROOT versions.
+- gcc 7.5.0 and ROOT v6.18.04 (ubuntu 18.04)
+- gcc 8.5.0 and ROOT v5.34.38 (redhut 8.5.0-4)
+
+### Build
+
 ```
+source setup.sh
 make
-```
-You need ROOT libraries like
-```
-root-config --evelibs
 ```
 
 ## Deexcitation Simulation
