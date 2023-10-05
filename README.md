@@ -1,6 +1,6 @@
 # Nuclear Deexcitation Simulator (NucDeEx)
-This is a nuclear deexcitation simulator (NucDeEx) for neutrino interaction and proton decay.  
-This simulator is composed of two parts: [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html) and a kinematics simulator based on [ROOT](https://root.cern/).  
+This is a nuclear deexcitation simulator (NucDeEx) for neutrino interactions and proton decays.  
+It is composed of two parts: [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html) and a kinematics simulator based on [ROOT](https://root.cern/).  
 Note that this simulator reads files containing branching ratios calculated with TALYS.  
 Therefore, the simulator codes themselves are independent of the TALYS code.
 
@@ -9,7 +9,8 @@ Therefore, the simulator codes themselves are independent of the TALYS code.
 Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
-Coming soon.
+
+You also should also cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002)
 
 ## Compile
 
