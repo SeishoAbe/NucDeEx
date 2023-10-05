@@ -10,7 +10,7 @@ Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
 
-You also should also cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002)
+You also should also cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002).
 
 ## Compile
 
