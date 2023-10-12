@@ -87,13 +87,13 @@ int plot_simulation_15N(){
 	// --- Draw --- // 
 	gStyle->SetTextFont(132);
 	gStyle->SetTextSize(0.08);
-	gStyle->SetTitleSize(0.05,"XYZ");
+	gStyle->SetTitleSize(0.06,"XYZ");
 	gStyle->SetTitleFont(132,"XYZ");
-	gStyle->SetLabelSize(0.05,"XYZ");
+	gStyle->SetLabelSize(0.06,"XYZ");
 	gStyle->SetLabelFont(132,"XYZ");
 	gStyle->SetLegendFont(132);
-	gStyle->SetLegendTextSize(0.04);
-	gStyle->SetTitleYOffset(0.95);
+	gStyle->SetLegendTextSize(0.045);
+	gStyle->SetTitleYOffset(0.80);
 
 	TH1D* h_kEg[numofnuc]; // gamma kE spectrum for each nuc
 	for(int i=0;i<numofnuc;i++){
@@ -588,7 +588,7 @@ int plot_simulation_15N(){
 	waku_br->GetYaxis()->CenterTitle();
 	h_br_this->Draw("HISTsame");
 	h_br_2b_this->Draw("HISTsame");
-	TLegend* leg_br = new TLegend(0.60,0.62,0.97,0.97);
+	TLegend* leg_br = new TLegend(0.55,0.62,0.97,0.97);
 	leg_br->SetBorderSize(0);
 	leg_br->SetFillStyle(0);
 	leg_br->AddEntry(h_br_2b_this,"This work (TALYS)","f");

@@ -2,8 +2,8 @@ using namespace std;
 
 
 int plot_comparison(){
-	string target = "C";
-	//string target = "O";
+	//string target = "C";
+	string target = "O";
 	
   gStyle->SetTextFont(132);
   gStyle->SetTextSize(0.06);
@@ -131,6 +131,8 @@ int plot_comparison(){
 	os << "fig_comparison/fig_deex_mean_nmulti_" << target.c_str() << ".pdf";
 	c->Print(os.str().c_str());
 
+
+
 	TCanvas* c_nu = new TCanvas("c_nu","c_nu",0,0,800,600);
 	gPad->SetRightMargin(0.05);
 	gPad->SetTopMargin(0.05);
@@ -143,7 +145,6 @@ int plot_comparison(){
 	if(target=="O") leg->AddEntry(h_nmulti[1][0],"NEUT original deex (5.6.3)","l");
 	leg->AddEntry(h_nmulti[2][0],"NuWro (21.09.02)","l");
 	leg->AddEntry(h_nmulti[3][0],"GENIE (3.04.00)","l");
-
 	for(int f=0;f<numfile;f++){
 		if(target!="O" && f==1) continue;
 		h_nmulti[f][0]->SetStats(0);
@@ -160,6 +161,15 @@ int plot_comparison(){
 		h_nmulti[f][0]->Draw("HISTsame");
 	}
 	leg->Draw("same");
+	os.str("");
+	if(target=="C"){
+		os << "#nu_{#mu} + ^{12}C";
+	}else{
+		os << "#nu_{#mu} + ^{16}O";
+	}
+	TLatex* t_nu = new TLatex(4,0.2,os.str().c_str());
+	t_nu->SetTextSize(0.08);
+	t_nu->Draw("same");
 	os.str("");
 	os << "fig_comparison/fig_deex_nmulti_" << target.c_str() << "_nu.pdf";
 	c_nu->Print(os.str().c_str());
@@ -187,6 +197,15 @@ int plot_comparison(){
 		h_nmulti[f][1]->Draw("HISTsame");
 	}
 	leg->Draw("same");
+	os.str("");
+	if(target=="C"){
+		os << "#bar{#nu}_{#mu} + ^{12}C";
+	}else{
+		os << "#bar{#nu}_{#mu} + ^{16}O";
+	}
+	TLatex* t_nub = new TLatex(4,0.2,os.str().c_str());
+	t_nub->SetTextSize(0.08);
+	t_nub->Draw("same");
 	os.str("");
 	os << "fig_comparison/fig_deex_nmulti_" << target.c_str() << "_nub.pdf";
 	c_nub->Print(os.str().c_str());
