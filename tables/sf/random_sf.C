@@ -9,14 +9,14 @@ int random_sf(){
 	// --------------------//
 	const int numofevent=1e6; // to be generated
 	//
-	const double Ex_p32 =-1e9;
-	const double Ex_s12 =16.0;
-	string target="12C";
-	/*
-
 	const double Ex_p32 =4.0;
 	const double Ex_s12 =16;
 	string target="16O";
+	/*
+
+	const double Ex_p32 =-1e9;
+	const double Ex_s12 =16.0;
+	string target="12C";
 
 	*/
 	double max_mom=500;
@@ -34,10 +34,10 @@ int random_sf(){
   NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
 	Nucleus* nuc = nucleus_table->GetNucleusPtr(target.c_str());
 	gStyle->SetTextFont(132);
-  gStyle->SetTextSize(0.08);
-  gStyle->SetTitleSize(0.06,"XYZ");
+  gStyle->SetTextSize(0.07);
+  gStyle->SetTitleSize(0.07,"XYZ");
   gStyle->SetTitleFont(132,"XYZ");
-  gStyle->SetLabelSize(0.06,"XYZ");
+  gStyle->SetLabelSize(0.07,"XYZ");
   gStyle->SetLabelFont(132,"XYZ");
   gStyle->SetLegendFont(132);
   //gStyle->SetLegendTextSize(0.04);
@@ -219,10 +219,10 @@ int random_sf(){
 
 
 	TCanvas* c_Ex = new TCanvas("c_Ex","c_Ex",0,0,800,600);
-	gPad->SetRightMargin(0.05);
-	gPad->SetTopMargin(0.05);
-	gPad->SetLeftMargin(0.12);
-	gPad->SetBottomMargin(0.12);
+	gPad->SetRightMargin(0.04);
+	gPad->SetTopMargin(0.04);
+	gPad->SetLeftMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	h_sf_Ex_random[0]->Draw("HIST");
 	h_sf_Ex_random[0]->GetXaxis()->CenterTitle();
 	h_sf_Ex_random[0]->GetYaxis()->CenterTitle();
