@@ -16,7 +16,7 @@ bool NucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
 	// --- Read nucleus / separation energy tables ---//
-	string filename1= (string)getenv("TALYS_WORK_TABLES")+(string)"/nucleus/nucleus.txt";
+	string filename1= (string)getenv("NUCDEEX_TABLES")+(string)"/nucleus/nucleus.txt";
   ifstream ifs(filename1);
   if(!ifs.is_open()){
     cerr << "ERROR : Cannot open " << filename1 << endl;
@@ -60,7 +60,7 @@ bool NucleusTable::ReadTables(const bool init_flag)
 		_nucleus[index].maxlevelsbin = maxlevelsbin;
 
 		// read separation energy table
-		string filename2= (string)getenv("TALYS_WORK_TABLES")
+		string filename2= (string)getenv("NUCDEEX_TABLES")
 														+ (string)"/separation_energy/separation_energy_"
 														+ (string)Name
 														+ (string)".txt";
