@@ -696,7 +696,7 @@ bool Deexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N,
 /////////////////////////////////////////////
 {
 	os.str("");
-	os << getenv("TALYS_WORK") << "/output/";
+	os << getenv("NUCDEEX_ROOT") << "/output/";
 	// single nucleon hole
 	if(Zt+Nt==Z+N+1){
 		if(Zt==6&&Nt==6) os << "12C/";
