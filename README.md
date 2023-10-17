@@ -1,5 +1,5 @@
 # Nuclear Deexcitation Simulator (NucDeEx)
-NUcDeEx is a nuclear deexcitation simulator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).
+NUcDeEx is a nuclear deexcitation simulator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).  
 It is composed of two parts: [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html) and a kinematics simulator based on [ROOT](https://root.cern/).  
 Note that this simulator reads files containing branching ratios calculated with TALYS.  
 Therefore, the simulator codes themselves are independent of the TALYS code.
@@ -19,7 +19,7 @@ Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
       primaryClass={hep-ph}
 }
 ```
-It would be better to additionally cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002).
+It would be better to also cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002).  
 In addition, please consider citing the following references, explaining the predecessor deexcitation simulator to NucDeEx.
 ```
 @article{Abe_2021,
