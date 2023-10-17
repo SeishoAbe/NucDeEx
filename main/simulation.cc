@@ -129,10 +129,10 @@ int main(int argc, char* argv[]){
 	os.str("");	
 	if(flag_jpi){
 		if(Z+N==11){ // 12C
-			os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
+			os << getenv("NUCDEEX_TABLES") << "/sf/pke12_tot.root";
 			S = nucleus_table->GetNucleusPtr("12C")->S[2];
 		}else if(Z+N==15){
-			os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
+			os << getenv("NUCDEEX_TABLES") << "/sf/pke16.root";
 			S = nucleus_table->GetNucleusPtr("16O")->S[2];
 		}
 	}else{

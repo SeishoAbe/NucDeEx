@@ -38,12 +38,12 @@ int main(int argc, char* argv[]){
 	if(prefix.find("QE_C")!=string::npos){
 		Zt=6;
 		Nt=6;
-		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
+		os << getenv("NUCDEEX_TABLES") << "/sf/pke12_tot.root";
 		S = nucleus_table->GetNucleusPtr("12C")->S[2];
 	}else if(prefix.find("QE_O")!=string::npos){
 		Zt=8;
 		Nt=8;
-		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
+		os << getenv("NUCDEEX_TABLES") << "/sf/pke16.root";
 		S = nucleus_table->GetNucleusPtr("16O")->S[2];
 		flag_O=1;
 	}
