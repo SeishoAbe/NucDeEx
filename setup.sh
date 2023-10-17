@@ -1,4 +1,4 @@
 #!bin/bash
 
-export TALYS_WORK=`pwd`
-export TALYS_WORK_TABLES=$TALYS_WORK/tables
+export NUCDEEX_ROOT=`pwd`
+export NUCDEEX_TABLES=$NUCDEEX_ROOT/tables
