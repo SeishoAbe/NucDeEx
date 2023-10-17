@@ -9,7 +9,17 @@ Therefore, the simulator codes themselves are independent of the TALYS code.
 Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
-
+Please cite this on arXiv [URL](https://arxiv.org/abs/2310.10394).
+```
+@misc{abe2023nuclear,
+      title={Nuclear deexcitation simulator for neutrino interactions and nucleon decays of $^{12}\text{C}$ and $^{16}\text{O}$ based on TALYS}, 
+      author={Seisho Abe},
+      year={2023},
+      eprint={2310.10394},
+      archivePrefix={arXiv},
+      primaryClass={hep-ph}
+}
+```
 You also should also cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002).
 
 ## Compile
