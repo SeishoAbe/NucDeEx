@@ -58,12 +58,12 @@ journal = {Journal of Physics: Conference Series},
 
 ## Compile
 
-This simulator depends on ROOT.
+This simulator depends on **ROOT**.
 At least it works with the following gcc versions and ROOT versions.
 - gcc 7.5.0 and ROOT v6.18.04 (ubuntu 18.04)
 - gcc 8.5.0 and ROOT v5.34.38 (redhut 8.5.0-4)
 
-To build NucDeEx, just type:
+To build NucDeEx, after preparing general root enviroment, just type:
 ```
 source setup.sh
 make
@@ -104,7 +104,7 @@ An example code for simulation is provided:
 
 ### Codes
 - `./main`: main codes for TALYS calculation and event simulation
-- `./src` & `include/`: TALYS output analyzer and simulator codes
+- `./src` & `./include`: TALYS output analyzer and simulator codes
 - `./bin`: Executables
 - `./lib`: Library directory
 - `./obj`: Object file directory
