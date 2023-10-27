@@ -1,5 +1,5 @@
 PROGRAMS = plot_decay cout_input simulation
-#PROGRAMS = neut nuwro genie #<- You need NEUT and NuWro env settings
+PROGRAMS += genie
 
 CXX=g++ 
 CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
@@ -15,12 +15,14 @@ LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve
 
 ## neut libs
 ifdef NEUT_ROOT
+PROGRAMS += neut
 CXXFLAGS += -I$(NEUT_ROOT)/include
 LDFLAGS += -L$(NEUT_ROOT)/lib -lNEUT -lNEUTClass -lNEUTClassUtils
 endif
 
 ## nuwro libs
 ifdef NUWRO
+PROGRAMS += nuwro
 CXXFLAGS += -I$(NUWRO)/src
 LDFLAGS += $(NUWRO)/bin/event1.so
 endif
@@ -58,4 +60,4 @@ dylib:  $(OBJS)
 	$(CXX) -shared -o $(LIBNAME:.a=.so) $^
 
 clean: 
-	rm -rf $(OBJDIR)/*.o $(BINDIR)/* $(LIBNAME)
+	rm -rf $(OBJDIR)/*.o $(BINDIR)/* $(LIBDIR)/*
