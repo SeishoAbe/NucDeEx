@@ -82,12 +82,13 @@ Deexcitation::DoDeex(Zt,Nt,Z,N,shell,Ex,Pinit)
 
 An example code for simulation is provided:
 ```
-./bin/simulation (TARGET) 2 1 
+./bin/simulation (TARGET) 2 1 1 (SEED)
 ```
 - argv[1]: Target nucleus. 11C, 11B, 15O, 15N is available as of June 23rd.
 - argv[2]: Flag for level density model. "2 (Back-shifted Fermi gas)" is recommended
-- argv[3]: Flag for the optical model. "1" is recommended. <br>
-
+- argv[3]: Flag for the optical model. "1" is recommended.
+- argv[4]: Flag for J^\pi specification. Set "1".
+- argv[5]: Random seed (optional). If this is not specified, seed "1" is set. <be>
 
 ## TALYS information & calculation
 - The branching ratios are calculated using [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html).
