@@ -84,7 +84,7 @@ An example code for simulation is provided:
 ```
 ./bin/simulation (TARGET) 2 1 1 (SEED)
 ```
-- argv[1]: Target nucleus. 11C, 11B, 15O, 15N is available as of June 23rd.
+- argv[1]: Target nucleus. 11C, 11B, 15O, 15N are available now.
 - argv[2]: Flag for level density model. "2 (Back-shifted Fermi gas)" is recommended
 - argv[3]: Flag for the optical model. "1" is recommended.
 - argv[4]: Flag for J^\pi specification. Set "1".
