@@ -77,8 +77,12 @@ Deexcitation::DoDeex(Zt,Nt,Z,N,shell,Ex,Pinit)
 - Zt(Nt): Z(N) number of the target nucleus
 - Z(N): Z(N) number of the residual nucleus
 - shell: shell flag for the hole state
+  - 0: Automatically determined according to the excitation energy.
+  - 1: s1/2-hole state
+  - 2: p3/2-hole state
+  - 3: p1/2-hole state
 - Ex: Excitation energy in MeV 
-- Pinit: 3D momentum of the residual nucleus
+- Pinit: 3D momentum (TVector3) of the residual nucleus
 
 An example code for simulation is provided:
 ```

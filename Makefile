@@ -1,6 +1,10 @@
 PROGRAMS = plot_decay cout_input simulation
 PROGRAMS += genie
 
+ifndef ROOTSYS
+@echo "$(error "Please set ROOT enviromental variables")"
+endif
+
 CXX=g++ 
 CXXFLAGS= -Wno-deprecated -g -Wall -ggdb3 -fPIC -O2
 
