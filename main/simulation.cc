@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
 	const bool flag_fig=0;
-	//const int numofevent=1000; // to be generated
+	//const int numofevent=100; // to be generated
 	//const bool flag_fig=1;
 
 	const double Ex_min =-1;
