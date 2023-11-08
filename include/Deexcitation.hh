@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ostream>
+#include <sstream>
 #include <vector>
 #include "consts.hh"
 #include "NucleusTable.hh"
