@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <iomanip>
 
 #include "TTree.h"
 #include "TStyle.h"
@@ -133,7 +134,9 @@ int main(int argc, char* argv[]){
 	TCanvas* c_Pinit = new TCanvas("c_Pinit","c_Pinit",0,0,800,600);
 	h_Pinit->GetXaxis()->SetTitle("Momentum of target nucleon (MeV)");
 	h_Pinit->GetYaxis()->SetTitle("Events/bin");
+#ifndef ROOT5
 	h_Pinit->GetYaxis()->SetMaxDigits(2);
+#endif
 	h_Pinit->Draw("HIST");
 	os.str("");
 	os << "fig_nuwro/fig_Pinit_" << prefix.c_str() << ".pdf";
@@ -142,7 +145,9 @@ int main(int argc, char* argv[]){
 	TCanvas* c_nmulti_postFSI = new TCanvas("c_nmulti_postFSI","c_nmulti_postFSI",0,0,800,600);
 	h_nmulti_postFSI->GetXaxis()->SetTitle("Neutron multiplicity");
 	h_nmulti_postFSI->GetYaxis()->SetTitle("Events/bin");
+#ifndef ROOT5
 	h_nmulti_postFSI->GetYaxis()->SetMaxDigits(3);
+#endif
 	h_nmulti_postFSI->SetStats(0);
 	h_nmulti_postFSI->Scale(1./h_nmulti_postFSI->GetEntries());
 	h_nmulti_postFSI->Draw("HIST");
@@ -165,7 +170,9 @@ int main(int argc, char* argv[]){
 	TCanvas* c_MissE = new TCanvas("c_MissE","c_MissE",0,0,800,600);
 	h_MissE->GetXaxis()->SetTitle("Missing energy (MeV)");
 	h_MissE->GetYaxis()->SetTitle("Events/bin");
+#ifndef ROOT5
 	h_MissE->GetYaxis()->SetMaxDigits(2);
+#endif
 	h_MissE->Draw("HIST");
 	os.str("");
 	os << "fig_nuwro/fig_MissE_" << prefix.c_str() << ".pdf";
@@ -174,7 +181,9 @@ int main(int argc, char* argv[]){
 	TCanvas* c_Ex = new TCanvas("c_Ex","c_Ex",0,0,800,600);
 	h_Ex[0]->GetXaxis()->SetTitle("Missing energy (MeV)");
 	h_Ex[0]->GetYaxis()->SetTitle("Events/bin");
+#ifndef ROOT5
 	h_Ex[0]->GetYaxis()->SetMaxDigits(2);
+#endif
 	h_Ex[0]->GetXaxis()->SetRangeUser(-10,100);
 	h_Ex[0]->SetStats(0);
 	h_Ex[0]->Draw("HIST");
