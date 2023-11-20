@@ -8,6 +8,15 @@ old*
 bin/*
 obj/*
 lib/*
+fig
+fig_2*
+fig_neut*
+fig_nuwro*
+fig_genie*
+fig_comparison*
+fig_sim_*
+fig_paper*
+sim_out_*
 !.gitignore
 log*
 
