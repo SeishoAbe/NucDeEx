@@ -113,7 +113,7 @@ An example code for simulation is provided:
 - `./bin`: Executables
 - `./lib`: Library directory
 - `./obj`: Object file directory
-- `./macro`: ROOT macro files to check the output
+- `./macro`: ROOT macro files to check the output. This is a private submodule.
 
 ### Tables, output, etc.
 - `./output`
