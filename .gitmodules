@@ -1,0 +1,3 @@
+[submodule "macro"]
+	path = macro
+	url = git@github.com:SeishoAbe/NucDeEx_macro.git
