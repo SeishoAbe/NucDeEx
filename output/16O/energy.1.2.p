@@ -1,0 +1,1 @@
+/home/seisho/talys_1.96/work-dir_talys_1.96/tables/energy_distribution/energy.1.2.p
