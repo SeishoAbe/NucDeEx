@@ -131,4 +131,4 @@ An example code for simulation is provided:
   - `./sf`
 	- Benhar SF used in event simulation
 - `./data`
-  - Reference data (other predictions, experimental data) are stored.
+  - Reference data (other predictions, experimental data) are stored. A private submodule.

@@ -4,3 +4,6 @@
 [submodule "output_talys1.95_2022"]
 	path = output_talys1.95_2022
 	url = git@github.com:SeishoAbe/output_talys1.95_2022.git
+[submodule "data"]
+	path = data
+	url = git@github.com:SeishoAbe/NucDeEx_ext_data.git
