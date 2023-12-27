@@ -18,11 +18,19 @@
 #include <TGeoManager.h>
 #include <TGeoElement.h>
 
+#ifdef INCL_DEEXCITATION_NUCDEEX
+#include "G4INCLConfig.hh"
+#endif
+
 using namespace std;
 
 class Deexcitation{
 	public:
 	Deexcitation(const int ldmodel=1, const bool parity_optmodall=1);
+#ifdef INCL_DEEXCITATION_NUCDEEX
+	Deexcitation(const int ldmodel=1, const bool parity_optmodall=1, G4INCL::Config *config=0);
+#endif
+
 	virtual ~Deexcitation();
 
 	// --- Main function ---//
@@ -72,8 +80,8 @@ class Deexcitation{
 	NucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
 	int GetShell(){return _shell;};
 
-
 	private:
+  void Init(const int ldmodel, const bool parity_optmodall);
 
 	// --- Simulation method called by DoDeex() --- //
 	int DecayMode(const double Ex);
@@ -177,5 +185,7 @@ class Deexcitation{
 	const double E_p32_15O[Nlevel_p32_15O]={6.18,9.61,10.48};
 	const double Br_p32_15O[Nlevel_p32_15O]={0.872,0.064,0.064}; // guess
 	//const double Br_p32_15O[Nlevel_p32_15O]={1.,0,0}; // original Ejiri's value
+
+  string PATH_NucDeEx_root;
 };
 #endif
