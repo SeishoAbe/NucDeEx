@@ -23,12 +23,48 @@ using namespace std;
 Deexcitation::Deexcitation(const int ld, const bool p_o)
 ///////////////////////////
 {
+  Init(ld,p_o);
+
 	// Prepare nuc table
 	_nucleus_table = new NucleusTable();
 	if(!_nucleus_table->ReadTables(0)){
 		cerr << "Fatal Error" << endl;
 		abort();
 	}
+  // Get PATH from ENV
+  const char* env = getenv("NUCDEEX_ROOT");
+  if(env!=NULL){
+    PATH_NucDeEx_root = env;
+  }else{
+    cerr << "PATH to nucleus table is not specified" << endl;
+    exit(1);
+  }
+  //cout << PATH_NucDeEx_root.c_str() << endl;
+}
+
+#ifdef INCL_DEEXCITATION_NUCDEEX
+///////////////////////////
+Deexcitation::Deexcitation(const int ld, const bool p_o, G4INCL::Config *config)
+///////////////////////////
+{ 
+  Init(ld,p_o);
+
+	// Prepare nuc table
+	_nucleus_table = new NucleusTable(config);
+	if(!_nucleus_table->ReadTables(0)){
+		cerr << "Fatal Error" << endl;
+		abort();
+	}
+  // Get PATH from config istead of NUCDEEX_ROOT
+  PATH_NucDeEx_root = config->getNucDeExDataFilePath();
+  //cout << PATH_NucDeEx_root.c_str() << endl;
+}
+#endif
+
+///////////////////////////
+void Deexcitation::Init(const int ld, const bool p_o)
+///////////////////////////
+{
 	verbose=0;
 	rndm = new TRandom3(0); // 0: seed is from time
 	pdg = new TDatabasePDG();
@@ -44,6 +80,7 @@ Deexcitation::Deexcitation(const int ld, const bool p_o)
 	g_br_ex=0;
 	_particle=0;
 }
+
 
 ///////////////////////////
 Deexcitation::~Deexcitation()
@@ -696,7 +733,7 @@ bool Deexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N,
 /////////////////////////////////////////////
 {
 	os.str("");
-	os << getenv("NUCDEEX_ROOT") << "/output/";
+	os << PATH_NucDeEx_root << "/output/";
 	// single nucleon hole
 	if(Zt+Nt==Z+N+1){
 		if(Zt==6&&Nt==6) os << "12C/";
