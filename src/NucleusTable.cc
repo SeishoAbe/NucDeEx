@@ -9,14 +9,43 @@
 
 #include "NucleusTable.hh"
 #include "consts.hh"
+
+#ifdef INCL_DEEXCITATION_NUCDEEX
+#include "G4INCLConfig.hh"
+#endif
 using namespace std;
+
+///////////////
+NucleusTable::NucleusTable()
+///////////////
+{
+  num_of_nuc=-1;
+  const char* env = getenv("NUCDEEX_TABLES");
+  if(env!=NULL){
+    PATH_NucDeEx_table = env;
+  }else{
+    cerr << "PATH to nucleus table is not specified" << endl;
+    exit(1);
+  }
+}
+
+#ifdef INCL_DEEXCITATION_NUCDEEX
+///////////////
+NucleusTable::NucleusTable(G4INCL::Config *config)
+///////////////
+{
+  num_of_nuc=-1;
+  PATH_NucDeEx_table = config->getNucDeExDataFilePath() + "/tables";
+  //cout << PATH_NucDeEx_table.c_str() << endl;
+}
+#endif
 
 ///////////////
 bool NucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
 	// --- Read nucleus / separation energy tables ---//
-	string filename1= (string)getenv("NUCDEEX_TABLES")+(string)"/nucleus/nucleus.txt";
+	string filename1= PATH_NucDeEx_table+(string)"/nucleus/nucleus.txt";
   ifstream ifs(filename1);
   if(!ifs.is_open()){
     cerr << "ERROR : Cannot open " << filename1 << endl;
@@ -60,10 +89,10 @@ bool NucleusTable::ReadTables(const bool init_flag)
 		_nucleus[index].maxlevelsbin = maxlevelsbin;
 
 		// read separation energy table
-		string filename2= (string)getenv("NUCDEEX_TABLES")
-														+ (string)"/separation_energy/separation_energy_"
-														+ (string)Name
-														+ (string)".txt";
+		string filename2= PATH_NucDeEx_table
+                      + (string)"/separation_energy/separation_energy_"
+                      + (string)Name
+                      + (string)".txt";
 		ifstream ifs2(filename2);
 		if(!ifs2.is_open()){
 			cerr << "We do not have separation energy file for " << Name << endl;
