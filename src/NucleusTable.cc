@@ -19,7 +19,7 @@ using namespace std;
 NucleusTable::NucleusTable()
 ///////////////
 {
-  verbose=0;
+  verbose=1;
   num_of_nuc=-1;
   const char* env = getenv("NUCDEEX_TABLES");
   if(env!=NULL){
@@ -35,7 +35,7 @@ NucleusTable::NucleusTable()
 NucleusTable::NucleusTable(G4INCL::Config *config)
 ///////////////
 {
-  verbose=0;
+  verbose=1;
   num_of_nuc=-1;
   PATH_NucDeEx_table = config->getNucDeExDataFilePath() + "/tables";
   //cout << PATH_NucDeEx_table.c_str() << endl;
