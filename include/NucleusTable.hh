@@ -4,11 +4,18 @@
 #include <map>
 #include "Nucleus.hh"
 
+#ifdef INCL_DEEXCITATION_NUCDEEX
+#include "G4INCLConfig.hh"
+#endif
+
 using namespace std;
 
 class NucleusTable{
   public:
-	NucleusTable(){num_of_nuc=-1;};
+  NucleusTable();
+#ifdef INCL_DEEXCITATION_NUCDEEX
+  NucleusTable(G4INCL::Config *config);
+#endif
   virtual ~NucleusTable(){;};
 
   bool ReadTables(const bool init_flag=1);
@@ -27,5 +34,6 @@ class NucleusTable{
 	Nucleus* _nucleus;
 	map<string, int> _nucleus_id;
 	map<string, int> :: iterator _p_id;
+  string PATH_NucDeEx_table;
 };
 #endif
