@@ -21,6 +21,7 @@ class NucleusTable{
   bool ReadTables(const bool init_flag=1);
 	int getID(const char* name);
 	int GetNumofNuc(){return num_of_nuc;};
+  void SetVerbose(const int v){verbose=v;};
 	
 	Nucleus* GetNucleusPtr(const char* name);
 	Nucleus* GetNucleusPtr(int id);
@@ -35,5 +36,6 @@ class NucleusTable{
 	map<string, int> _nucleus_id;
 	map<string, int> :: iterator _p_id;
   string PATH_NucDeEx_table;
+  int verbose;
 };
 #endif
