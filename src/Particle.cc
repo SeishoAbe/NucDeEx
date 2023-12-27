@@ -14,7 +14,7 @@ Particle::Particle()
 	_PDG=0;
 	_mass=0;
 	_momentum.SetXYZ(0,0,0);
-	verbose=1;
+	verbose=0;
 }
 
 ///////////////
@@ -68,7 +68,7 @@ void Particle::Boost(const double totalE_parent,const TVector3& mom_parent)
 		cerr << "Inputed Mass = " << _mass << endl;
 		abort();
 	}
-	if(verbose>0){
+	if(verbose>1){
 		cout << "Bef boost: ";
 		lv.Print();
 	}
@@ -77,7 +77,7 @@ void Particle::Boost(const double totalE_parent,const TVector3& mom_parent)
 	lv.Boost(beta);
 
 	_momentum = lv.Vect(); // save new vectors after boost
-	if(verbose>0){
+	if(verbose>1){
 		cout << "Aft boost: ";
 		lv.Print();
 		_momentum.Print();

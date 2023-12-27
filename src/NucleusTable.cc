@@ -19,6 +19,7 @@ using namespace std;
 NucleusTable::NucleusTable()
 ///////////////
 {
+  verbose=0;
   num_of_nuc=-1;
   const char* env = getenv("NUCDEEX_TABLES");
   if(env!=NULL){
@@ -34,6 +35,7 @@ NucleusTable::NucleusTable()
 NucleusTable::NucleusTable(G4INCL::Config *config)
 ///////////////
 {
+  verbose=0;
   num_of_nuc=-1;
   PATH_NucDeEx_table = config->getNucDeExDataFilePath() + "/tables";
   //cout << PATH_NucDeEx_table.c_str() << endl;
@@ -51,7 +53,7 @@ bool NucleusTable::ReadTables(const bool init_flag)
     cerr << "ERROR : Cannot open " << filename1 << endl;
 		return 0;
   }else{
-		cout << "Read: " << filename1 << endl;
+		if(verbose>0) cout << "Read: " << filename1 << endl;
 	}
 
 	// at first get num of nucleus in the table
@@ -95,15 +97,15 @@ bool NucleusTable::ReadTables(const bool init_flag)
                       + (string)".txt";
 		ifstream ifs2(filename2);
 		if(!ifs2.is_open()){
-			cerr << "We do not have separation energy file for " << Name << endl;
+			cerr << "Warning: We do not have separation energy file for " << Name << endl;
 		}else{
-			cout << "Read: " << filename2 << endl;
+			if(verbose>0) cout << "Read: " << filename2 << endl;
 			_nucleus[index].flag_s = 1;
 			int particle_index=0;
 			while(ifs2.getline(buf,sizeof(buf))){
 				if(buf[0]=='#') continue;
 				istringstream(buf) >> _nucleus[index].S[particle_index];
-				cout << "SE: " << particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << endl;
+				if(verbose>0) cout << "SE: " << particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << endl;
 				particle_index++;
 			}
 			ifs2.close();
@@ -159,7 +161,7 @@ int NucleusTable::getID(const char* name)
   if(_p_id!=_nucleus_id.end()){
     return (int) ((_p_id->second));
   }else{
-    cerr << "Warning @ NucleusTable: Cannot find such nucleus " << name << endl;
+    if(verbose>0) cerr << "Warning @ NucleusTable: Cannot find such nucleus " << name << endl;
 		return -1;
   }
 }

@@ -49,7 +49,7 @@ int main(int argc, char* argv[]){
 	// Set deex tool
 	Deexcitation* deex = new Deexcitation(ldmodel, parity_optmodall);
 	deex->SetSeed(seed); // 0: time
-	deex->SetVerbose(1);
+	deex->SetVerbose(2);
 	// Get Z and N
   NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
 	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);

@@ -73,7 +73,7 @@ class Deexcitation{
 	void SetSeed(int s){ rndm->SetSeed(s) ;};
 	int  GetSeed(){return rndm->GetSeed();};
 	TRandom3* GetTRandom3(){ return rndm; };
-	void SetVerbose(int v){ verbose=v; };
+	void SetVerbose(const int v);
 	void SetEventID(int id){ eventID=id;};
 	int  GetEventID(){ return eventID; };
 	vector<Particle>* GetParticleVector(){return _particle;};
