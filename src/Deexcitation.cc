@@ -101,10 +101,12 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 													const int Z, const int N, const int shell, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
-	cout << endl << "###################################" << endl;
-	cout << "Deexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
-			 << "," << shell << "," << Ex << ")  eventID=" << eventID << endl;
-	cout << "###################################" << endl;
+	if(verbose>0){
+    cout << endl << "###################################" << endl;
+    cout << "Deexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
+         << "," << shell << "," << Ex << ")  eventID=" << eventID << endl;
+    cout << "###################################" << endl;
+  }
 	eventID++;
 
 	int status=-1;
@@ -130,7 +132,7 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 		// --- Single nucleon disapperance
 		if(_shell==3){ 
 			// p1/2-hole. nothing to do
-			cout << "(p1/2)-hole" <<endl;
+			if(verbose>0) cout << "(p1/2)-hole" <<endl;
 			InitParticleVector();
 			AddGSNucleus(Z,N,mom);
 			status=1;
@@ -159,7 +161,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 													     const int Z, const int N, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
-	cout << "DoDeex_talys()" << endl;
+	if(verbose>0) cout << "DoDeex_talys()" << endl;
 	RESET:
 
 	// --- Initialization --- //
@@ -172,8 +174,10 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 	mom_target = mom;
 	nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
 	if(nuc_target==NULL){
-		cout << "We don't have deexcitation profile for this nucleus: "
-				 << name_target.c_str() << endl;
+		if(verbose>0){
+      cout << "We don't have deexcitation profile for this nucleus: "
+				   << name_target.c_str() << endl;
+    }
 		//AddGSNucleus(Z,N,mom); // nothing can be done for this case...(no mass profile)
 		return 0;
 	}
@@ -181,8 +185,10 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 
 	// Read ROOT file
 	if( ! OpenROOT(Zt,Nt,Z,N,0) ){
-		cout << "We don't have deexcitation profile for this nucleus: " 
-				 << name_target.c_str() << endl;
+    if(verbose>0){
+      cout << "We don't have deexcitation profile for this nucleus: " 
+           << name_target.c_str() << endl;
+    }
 		AddGSNucleus(Z,N,mom);
 		return 0;
 	}
@@ -190,8 +196,10 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 	// Loop until zero excitation energy or null nuc_daughter ptr
 	// Use private members (parameters) named as "_target"
 	while(true){// <- infinite loop. There is break point
-		cout << "### " << name_target << ",   Ex = " << Ex_target;
-		cout << "     mom_target: "; mom_target.Print();
+    if(verbose>0){
+      cout << "### " << name_target << ",   Ex = " << Ex_target;
+      cout << "     mom_target: "; mom_target.Print();
+    }
 
 		// --- Get (TGraph*) br based on name_target
 		if(GetBrTGraph(name_target)){ // TGraph found
@@ -214,20 +222,24 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 				int a_particle = (PDG_particle[decay_mode]%1000)/10;
 				int z_particle = ((PDG_particle[decay_mode]%1000000)-a_particle*10)/10000;
 				TGeoElementRN* element_rn =	element_table->GetElementRN(a_particle,z_particle); // (A,Z)
-				if(verbose>0) cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
+				if(verbose>1) cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << endl;
 				mass_particle = ElementMassInMeV(element_rn);
 			}
 			// this rarely happens...
 			if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
-				cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
-				cout << "Call DoDeex() again!" << endl;
+        if(verbose>0){
+          cout << "Cannot find " << name_daughter << " in TGeoElementRN" << endl;
+          cout << "Call DoDeex() again!" << endl;
+        }
 				goto RESET; // call this fuc again
 			}
 			mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
 			mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
 		}else{ // no tgraph found -> gamma emission to g.s.
-			cout << "Cannot find TGraph" << endl;
-			cout << "Force gamma decay" << endl;
+      if(verbose>0){
+        cout << "Cannot find TGraph" << endl;
+        cout << "Force gamma decay" << endl;
+      }
 			decay_mode=0; 
 			Ex_daughter=0;
 			mass_particle=0;
@@ -238,7 +250,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 		S = nuc_target->S[decay_mode];
 		Qvalue = Ex_target - S - Ex_daughter;
 		if(Qvalue<0) Qvalue=0;
-		if(verbose>0){
+		if(verbose>1){
 			cout << "S = " << S << endl;
 			cout << "Qvalue = " << Qvalue << endl;
 		}
@@ -259,7 +271,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 		mom_target  += mom_daughter;
 		nuc_target = nuc_daughter;
 		name_target = (string)nuc_target->name;
-		cout << endl;
+		if(verbose>0) cout << endl;
 
 		// --- Need this to release memory of TGraph
 		//		TGraph memory looks not relased only by closing & deleting root file...
@@ -287,9 +299,11 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 	mom_target = mom;
 	nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
 	name_target = (string)nuc_target->name;
-	cout << "DoDeex_p32()" << endl;
-	cout << "### " << name_target;
-	cout << "     mom_target: "; mom_target.Print();
+	if(verbose>0){
+    cout << "DoDeex_p32()" << endl;
+    cout << "### " << name_target;
+    cout << "     mom_target: "; mom_target.Print();
+  }
 
 	double random = rndm->Rndm();
 
@@ -464,7 +478,9 @@ void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 								   name_target, 
 									 1,0,verbose); // track flag on // zero ex
 	_particle->push_back(nucleus);
-	cout << "AddGSNucleus(): " << name_target << endl;
+	if(verbose>0){
+	  cout << "AddGSNucleus(): " << name_target << endl;
+  }
 }
 
 
@@ -483,6 +499,13 @@ int Deexcitation::ExtoShell(const int Zt, const int Nt, const double Ex)
 	return -1;
 }
 
+/////////////////////////////////////////////
+void Deexcitation::SetVerbose(const int v)
+/////////////////////////////////////////////
+{ 
+  verbose = v;
+  _nucleus_table->SetVerbose(v);
+}
 
 /////////////////////////////////////////////
 int Deexcitation::DecayMode(const double Ex)
@@ -497,7 +520,7 @@ int Deexcitation::DecayMode(const double Ex)
 		Br[p] = g_br[p]->Eval(Ex);
 		if(Br[p]<0) Br[p]=0;
 		Br_sum += Br[p];
-		if(verbose>0){
+		if(verbose>1){
 			cout << "Br(" << particle_name[p].substr(0,1) << ") = " << Br[p] << endl;
 		}
 	}
@@ -508,7 +531,7 @@ int Deexcitation::DecayMode(const double Ex)
 	for(int p=0;p<num_particle;p++){
 		Br[p] /= Br_sum; // Normalize Br just in case.  
 		Br_integ += Br[p];
-		if(verbose>0){
+		if(verbose>1){
 			cout << "Br_integ(" << particle_name[p].substr(0,1) << ") = " << Br_integ << endl;
 		}
 		if(Br_integ>random){
@@ -545,7 +568,7 @@ int Deexcitation::DecayMode(const double Ex)
 		name_daughter = os.str();
 	}
 
-	if(verbose>0){ 
+	if(verbose>1){ 
 		cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << particle_name[decay_mode] << " + ";
 		cout << name_daughter.c_str() << endl;
 	}
@@ -573,7 +596,7 @@ bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 		Br_integ += br;
 		if(Br_integ>random) break;
 	}
-	if(verbose>0){
+	if(verbose>1){
 		cout << "DaughterExPoint: Random = " << random << " : ex = " << ex
 		     << ",   point = " << point << endl;
 	}
@@ -588,7 +611,9 @@ bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 void Deexcitation::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
-	cout << "Deexcitation::Decay()" << endl;
+	if(verbose>0){
+	  cout << "Deexcitation::Decay()" << endl;
+  }
 	
 	// ---- CM frame --- //
 	// --- Calculate kinematics (CM)
@@ -606,7 +631,7 @@ void Deexcitation::Decay(const bool breakflag)
 		cerr << "Error @ DeexcitationD::Decay: Something wroing in kinematics calculation" << endl;
 		abort();
 	}
-	if(verbose>0){
+	if(verbose>1){
 		cout << "mass_target   = " << mass_target << endl;
 		cout << "mass_particle = " << mass_particle << endl;
 		cout << "mass_daughter = " << mass_daughter << endl;
@@ -624,7 +649,7 @@ void Deexcitation::Decay(const bool breakflag)
 	TVector3 dir( sintheta*cos(phi), sintheta*sin(phi), costheta );
 	mom_particle = -1*cmMomentum*dir; // -P
 	mom_daughter = cmMomentum*dir; // P
-	if(verbose>0){
+	if(verbose>1){
 		cout << "dir:          "; dir.Print();
 		cout << "mom_particle: ";mom_particle.Print();
 		cout << "mom_daughter: ";mom_daughter.Print();
@@ -666,7 +691,7 @@ void Deexcitation::Decay(const bool breakflag)
 	double totalE_ex_bef = totalE_bef + Ex_daughter; // w/ excitation E
 	double totalE_ex_aft = totalE_aft + Ex_daughter;
 
-	if(verbose>0){
+	if(verbose>1){
 		cout << "totalE_target = " << totalE_target << endl;
 		cout << "kE_target = " << kE_target << endl;
 		cout << "Ex_target = " << Ex_target << endl;
@@ -697,7 +722,7 @@ void Deexcitation::Decay(const bool breakflag)
 	if(breakflag) p_daughter._flag=1;
 	_particle->push_back(p_daughter);
 
-	if(verbose>0){
+	if(verbose>1){
 		cout << "flag_particle = " << p_particle._flag << endl;
 		cout << "flag_daughter = " << p_daughter._flag << endl;
 	}
@@ -711,7 +736,7 @@ double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 	double mass = ele->MassNo()*amu_c2
 									 + ele->MassEx(); // (MeV)
 	double mass_amu = mass/amu_c2;
-	if(verbose>0){
+	if(verbose>1){
 		cout << "mass (MeV) = " << mass 
 				 << "    (amu) = " << mass_amu << endl;
 	}
@@ -822,7 +847,7 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 	if(abs(ex-ex_t)>diff_ex) point--;
 	if(point==g_br[mode]->GetN()) point--;
 	if(point<0) point=0;
-	if(verbose>0){
+	if(verbose>1){
 		cout << "GetBrExTGraph(): nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << endl;
 	}
 	os.str("");
