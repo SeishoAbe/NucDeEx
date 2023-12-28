@@ -51,6 +51,7 @@ GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
         Particle.hh
         ReadTALYS.hh
         consts.hh
+        G4NucDeExInterface.hh
 
     SOURCES
         Deexcitation.cc
@@ -58,6 +59,7 @@ GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
         NucleusTable.cc
         Particle.cc
         ReadTALYS.cc
+        G4NucDeExInterface.cc
 
     GRANULAR_DEPENDENCIES
         G4baryons
