@@ -509,7 +509,7 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 /////////////////////////////////////////////
 {
 	// --- Determine decay mode 
-	// ---- Return: (int)decay_mode 
+	// ---- Return: (int)decay_mode_r 
 
 	double Br[NucDeEx::num_particle]={0};
 	double Br_sum=0;
@@ -524,7 +524,7 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 
 	double Br_integ=0;
 	double random = rndm->Rndm();
-	int decay_mode=-1;
+	int decay_mode_r=-1;
 	for(int p=0;p<NucDeEx::num_particle;p++){
 		Br[p] /= Br_sum; // Normalize Br just in case.  
 		Br_integ += Br[p];
@@ -532,32 +532,32 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 			std::cout << "Br_integ(" << NucDeEx::particle_name[p].substr(0,1) << ") = " << Br_integ << std::endl;
 		}
 		if(Br_integ>random){
-			decay_mode=p;
+			decay_mode_r=p;
 			break; 
 		} 
 	}
-	if(decay_mode<0){
-    std::cerr << "Unexpected decay_mode = " << decay_mode << std::endl;
+	if(decay_mode_r<0){
+    std::cerr << "Unexpected decay_mode = " << decay_mode_r << std::endl;
     exit(1);
   }
 
 	// --- Set Z and N for daughter 
 	Z_daughter = Z_target;
 	N_daughter = N_target;
-	if(decay_mode==1){
+	if(decay_mode_r==1){
 		N_daughter--;
-	}else if(decay_mode==2){
+	}else if(decay_mode_r==2){
 		Z_daughter--;
-	}else if(decay_mode==3){
+	}else if(decay_mode_r==3){
 		Z_daughter--;
 		N_daughter--;
-	}else if(decay_mode==4){
+	}else if(decay_mode_r==4){
 		Z_daughter--;
 		N_daughter-=2;
-	}else if(decay_mode==5){
+	}else if(decay_mode_r==5){
 		Z_daughter-=2;
 		N_daughter--;
-	}else if(decay_mode==6){
+	}else if(decay_mode_r==6){
 		Z_daughter-=2;
 		N_daughter-=2;
   }
@@ -570,11 +570,11 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 	}
 
 	if(verbose>1){ 
-		std::cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << NucDeEx::particle_name[decay_mode] << " + ";
+		std::cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << NucDeEx::particle_name[decay_mode_r] << " + ";
 		std::cout << name_daughter.c_str() << std::endl;
 	}
 
-	return decay_mode;
+	return decay_mode_r;
 }
 
 
@@ -748,14 +748,14 @@ double NucDeExDeexcitation::ElementMassInMeV(TGeoElementRN* ele)
 int NucDeExDeexcitation::PDGion(int Z, int N)
 /////////////////////////////////////////////
 {
-	int pdg= 1e9 + Z*1e4 + (Z+N)*1e1;
-	return pdg;
+	int pdg_int= 1e9 + Z*1e4 + (Z+N)*1e1;
+	return pdg_int;
 }
 
 
 /////////////////////////////////////////////
 bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N, 
-														const bool tree)
+														const bool flag_tree)
 /////////////////////////////////////////////
 {
 	os.str("");
@@ -778,8 +778,8 @@ bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const
 	if(verbose>1){
 		std::cout << "OpenRoot: " << os.str().c_str() << std::endl;
 	}
-	if(!tree) return 1;
-	else return GetTTree(Z,N);
+	if(!flag_tree) return 1;
+	else return GetTTree(Z,N); // not supported now
 }
 
 /////////////////////////////////////////////
