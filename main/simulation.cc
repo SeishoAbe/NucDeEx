@@ -19,11 +19,9 @@
 #include <TPaveText.h>
 #include <THStack.h>
 
-using namespace std;
-
 int main(int argc, char* argv[]){
 	if(argc<5){
-		cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi] [Random Seed (optional)]" << endl;
+		std::cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi] [Random Seed (optional)]" << std::endl;
 		return 0;
 	}
 	const int ldmodel=atoi(argv[2]);
@@ -31,7 +29,7 @@ int main(int argc, char* argv[]){
 	const bool flag_jpi = (bool) atoi(argv[4]);
 	int seed=1; // default: 1
 	if(argc==6) seed = atoi(argv[5]);
-	cout << "SEED = " << seed << endl;
+	std::cout << "SEED = " << seed << std::endl;
 
 	// ---- FIXME --- // 
 	const int numofevent=1e5; // to be generated
@@ -44,7 +42,7 @@ int main(int argc, char* argv[]){
 		// negative -> not applied
 	// -------------- //
 
-	ostringstream os,os_remove_g;
+	std::ostringstream os,os_remove_g;
 
 	// Set deex tool
 	Deexcitation* deex = new Deexcitation(ldmodel, parity_optmodall);
@@ -78,12 +76,12 @@ int main(int argc, char* argv[]){
 	double MissE, Ex, S;
 	double PinitMag, PinitX,PinitY,PinitZ;
 	//
-	int PDG[bins];
-	double mass[bins];
-	double totalE[bins],kE[bins];
-	double PMag[bins], PX[bins],PY[bins],PZ[bins];
-	bool flag[bins];
-	double Ex_daughter[bins];
+	int PDG[NucDeEx::bins];
+	double mass[NucDeEx::bins];
+	double totalE[NucDeEx::bins],kE[NucDeEx::bins];
+	double PMag[NucDeEx::bins], PX[NucDeEx::bins],PY[NucDeEx::bins],PZ[NucDeEx::bins];
+	bool flag[NucDeEx::bins];
+	double Ex_daughter[NucDeEx::bins];
 	string decay, decay_remove_g;
 	tree->Branch("eventID",&eventID,"eventID/I");
 	tree->Branch("decay",&decay);
@@ -136,11 +134,11 @@ int main(int argc, char* argv[]){
 			S = nucleus_table->GetNucleusPtr("16O")->S[2];
 		}
 	}else{
-		cerr << "flag_jpi = " << flag_jpi << endl;
-		cerr << "This is not supported" << endl;
+		std::cerr << "flag_jpi = " << flag_jpi << std::endl;
+		std::cerr << "This is not supported" << std::endl;
 		return -1;
 	}
-	cout << "S = " << S << endl;
+	std::cout << "S = " << S << std::endl;
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
 	TH2D* h_sf_int = (TH2D*) rootf->Get("h_sf_int");
 	h_sf_int->SetDirectory(0);
@@ -247,8 +245,8 @@ int main(int argc, char* argv[]){
 				lYZ[i]->SetLineWidth(1);
 				lXZ[i]->SetLineWidth(1);
 				color[i]=400+1;
-				for(int p=0;p<num_particle;p++){
-					if(PDG[i] == PDG_particle[p]) color[i]=color_root[p];
+				for(int p=0;p<NucDeEx::num_particle;p++){
+					if(PDG[i] == NucDeEx::PDG_particle[p]) color[i]=NucDeEx::color_root[p];
 				}
 				lXY[i]->SetLineColor(color[i]);
 				lYZ[i]->SetLineColor(color[i]);
