@@ -4,8 +4,8 @@
 #include <string>
 #include <iomanip> 
 
-#include "consts.hh"
-#include "NucleusTable.hh"
+#include "NucDeExConsts.hh"
+#include "NucDeExNucleusTable.hh"
 #include "ReadTALYS.hh"
 
 #include <TROOT.h>
@@ -37,12 +37,12 @@ int main(int argc, char* argv[]){
 	const bool flag_jpi = (bool) atoi(argv[4]);
   
   std::ostringstream os;
-  NucleusTable* nucleus_table = new NucleusTable();
+  NucDeExNucleusTable* nucleus_table = new NucDeExNucleusTable();
   if(!nucleus_table->ReadTables()){
 		std::cerr << "something wrong" << std::endl;
 		return 1;
 	}
-	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
+	NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
 	const int Zt=nuc->Z;
 	const int Nt=nuc->N;
 	const int At=Zt+Nt;
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]){
 	for(int inuc=0;inuc<num_of_nuc;inuc++){
 		if(!nucleus_table->GetNucleusPtr(inuc)->flag_data) continue; // no data -> continue
 
-		Nucleus* nuc_target = nucleus_table->GetNucleusPtr(inuc); // get pointer of Nulceus
+		NucDeExNucleus* nuc_target = nucleus_table->GetNucleusPtr(inuc); // get pointer of Nulceus
 
 		// check info in Nucleus 
 		if(! (nuc_target->CheckTotalPop() && nuc_target->CheckPop()) ){

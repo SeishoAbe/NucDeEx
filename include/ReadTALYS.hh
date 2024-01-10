@@ -3,13 +3,14 @@
 
 #include <string>
 #include <ostream>
-#include "NucleusTable.hh"
-#include "consts.hh"
+
+#include "NucDeExNucleusTable.hh"
+#include "NucDeExConsts.hh"
 
 class ReadTALYS{
 	public: 
 	//ReadTALYS(){;};
-	ReadTALYS(const char* filename,NucleusTable* nuc);
+	ReadTALYS(const char* filename, NucDeExNucleusTable* nuc);
 	virtual ~ReadTALYS(){;};
 
 	bool Read();
@@ -17,7 +18,7 @@ class ReadTALYS{
 
 	private:
 	std::string _filename;
-	NucleusTable* _nucleus_table;
+	NucDeExNucleusTable* _nucleus_table;
 	std::ifstream* _ifs;
 	int _verbose;
 

@@ -1,4 +1,5 @@
-#include "Particle.hh"
+#include "NucDeExParticle.hh"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -8,7 +9,7 @@
 #include <TLorentzVector.h>
 
 ///////////////
-Particle::Particle()
+NucDeExParticle::NucDeExParticle()
 ///////////////
 {
 	_PDG=0;
@@ -18,7 +19,7 @@ Particle::Particle()
 }
 
 ///////////////
-Particle::Particle(const int PDG, const double mass, const TVector3& mom, 
+NucDeExParticle::NucDeExParticle(const int PDG, const double mass, const TVector3& mom, 
 									 const string name, const bool flag, const double Ex, const int v)
 ///////////////
 {
@@ -33,21 +34,21 @@ Particle::Particle(const int PDG, const double mass, const TVector3& mom,
 
 
 ///////////////
-double Particle::kE()
+double NucDeExParticle::kE()
 ///////////////
 {
 	return sqrt( pow(_momentum.Mag(),2) + pow(_mass,2) ) - _mass;
 }
 
 ///////////////
-double Particle::totalE()
+double NucDeExParticle::totalE()
 ///////////////
 {
 	return sqrt( pow(_momentum.Mag(),2) + pow(_mass,2) );
 }
 
 ///////////////
-void Particle::Boost(const double totalE_parent,const TVector3& mom_parent)
+void NucDeExParticle::Boost(const double totalE_parent,const TVector3& mom_parent)
 ///////////////
 { 
 	// CM frame: parent nucleus 

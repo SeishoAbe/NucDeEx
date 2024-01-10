@@ -1,12 +1,12 @@
-#ifndef __NUCLEUS__HH__
-#define __NUCLEUS__HH__
+#ifndef __NUCDEEXNUCLEUS__HH__
+#define __NUCDEEXNUCLEUS__HH__
 
-#include "consts.hh"
+#include "NucDeExConsts.hh"
 
-class Nucleus{
+class NucDeExNucleus{
   public :
-	Nucleus(){;};
-	~Nucleus();
+	NucDeExNucleus(){;};
+	~NucDeExNucleus();
 	void Init(const bool init_flag=1);
 		// 1: init all parms
 

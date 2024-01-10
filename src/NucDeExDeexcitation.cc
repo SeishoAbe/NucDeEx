@@ -9,22 +9,21 @@
 #include <algorithm>
 #include <vector>
 
-#include "Deexcitation.hh"
-#include "Nucleus.hh"
-#include "consts.hh"
+#include "NucDeExDeexcitation.hh"
+
 #include <TGraph.h>
 #include <TRandom3.h>
 #include <TParticlePDG.h>
 #include <TParticle.h>
 
 ///////////////////////////
-Deexcitation::Deexcitation(const int ld, const bool p_o)
+NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o)
 ///////////////////////////
 {
   Init(ld,p_o);
 
 	// Prepare nuc table
-	_nucleus_table = new NucleusTable();
+	_nucleus_table = new NucDeExNucleusTable();
 	if(!_nucleus_table->ReadTables(0)){
 		std::cerr << "Fatal Error" << std::endl;
 		abort();
@@ -42,7 +41,7 @@ Deexcitation::Deexcitation(const int ld, const bool p_o)
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 ///////////////////////////
-Deexcitation::Deexcitation(const int ld, const bool p_o, G4INCL::Config *config)
+NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::Config *config)
 ///////////////////////////
 { 
   Init(ld,p_o);
@@ -60,7 +59,7 @@ Deexcitation::Deexcitation(const int ld, const bool p_o, G4INCL::Config *config)
 #endif
 
 ///////////////////////////
-void Deexcitation::Init(const int ld, const bool p_o)
+void NucDeExDeexcitation::Init(const int ld, const bool p_o)
 ///////////////////////////
 {
 	verbose=0;
@@ -81,7 +80,7 @@ void Deexcitation::Init(const int ld, const bool p_o)
 
 
 ///////////////////////////
-Deexcitation::~Deexcitation()
+NucDeExDeexcitation::~NucDeExDeexcitation()
 ///////////////////////////
 {
 	delete _nucleus_table;
@@ -95,13 +94,13 @@ Deexcitation::~Deexcitation()
 }
 
 /////////////////////////////////////////////
-int Deexcitation::DoDeex(const int Zt, const int Nt,
+int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
 													const int Z, const int N, const int shell, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
 	if(verbose>0){
     std::cout << std::endl << "###################################" << std::endl;
-    std::cout << "Deexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
+    std::cout << "NucDeExDeexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
          << "," << shell << "," << Ex << ")  eventID=" << eventID << std::endl;
     std::cout << "###################################" << std::endl;
   }
@@ -155,7 +154,7 @@ int Deexcitation::DoDeex(const int Zt, const int Nt,
 }
 
 /////////////////////////////////////////////
-int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
+int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
 													     const int Z, const int N, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
@@ -284,7 +283,7 @@ int Deexcitation::DoDeex_talys(const int Zt, const int Nt,
 }
 
 /////////////////////////////////////////////
-int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
+int NucDeExDeexcitation::DoDeex_p32(const int Zt, const int Nt,
 													   const int Z, const int N, const TVector3& mom)
 /////////////////////////////////////////////
 {
@@ -463,18 +462,18 @@ int Deexcitation::DoDeex_p32(const int Zt, const int Nt,
 }
 
 /////////////////////////////////////////////
-void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
+void NucDeExDeexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 /////////////////////////////////////////////
 {
 	mass_target = ElementMassInMeV(element_table->GetElementRN(Z+N, Z));
 	nuc_target = _nucleus_table->GetNucleusPtr(Z,N);
 	if(nuc_target==NULL || mass_target<0) return; // do nothing
 	name_target = (string)nuc_target->name;
-	Particle nucleus(PDGion(Z,N),
-								   mass_target, // w/o excitation E
-									 mom,
-								   name_target, 
-									 1,0,verbose); // track flag on // zero ex
+	NucDeExParticle nucleus(PDGion(Z,N),
+                          mass_target, // w/o excitation E
+                          mom,
+                          name_target, 
+                          1,0,verbose); // track flag on // zero ex
 	_particle->push_back(nucleus);
 	if(verbose>0){
 	  std::cout << "AddGSNucleus(): " << name_target << std::endl;
@@ -483,7 +482,7 @@ void Deexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 
 
 /////////////////////////////////////////////
-int Deexcitation::ExtoShell(const int Zt, const int Nt, const double Ex)
+int NucDeExDeexcitation::ExtoShell(const int Zt, const int Nt, const double Ex)
 /////////////////////////////////////////////
 {
 	if(Zt==6&&Nt==6){ // 12C
@@ -498,7 +497,7 @@ int Deexcitation::ExtoShell(const int Zt, const int Nt, const double Ex)
 }
 
 /////////////////////////////////////////////
-void Deexcitation::SetVerbose(const int v)
+void NucDeExDeexcitation::SetVerbose(const int v)
 /////////////////////////////////////////////
 { 
   verbose = v;
@@ -506,7 +505,7 @@ void Deexcitation::SetVerbose(const int v)
 }
 
 /////////////////////////////////////////////
-int Deexcitation::DecayMode(const double Ex)
+int NucDeExDeexcitation::DecayMode(const double Ex)
 /////////////////////////////////////////////
 {
 	// --- Determine decay mode 
@@ -579,7 +578,7 @@ int Deexcitation::DecayMode(const double Ex)
 
 
 /////////////////////////////////////////////
-bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
+bool NucDeExDeexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 /////////////////////////////////////////////
 {
 	double ex, br;
@@ -609,11 +608,11 @@ bool Deexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 }
 
 /////////////////////////////////////////////
-void Deexcitation::Decay(const bool breakflag)
+void NucDeExDeexcitation::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
 	if(verbose>0){
-	  std::cout << "Deexcitation::Decay()" << std::endl;
+	  std::cout << "NucDeExDeexcitation::Decay()" << std::endl;
   }
 	
 	// ---- CM frame --- //
@@ -629,7 +628,7 @@ void Deexcitation::Decay(const bool breakflag)
 	double kE_daughter = sqrt( pow(cmMomentum,2) + pow(mass_ex_daughter,2) ) - mass_ex_daughter;
 	double kE_sum = kE_particle + kE_daughter; // just for check
 	if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > check_criteria){
-		std::cerr << "Error @ DeexcitationD::Decay: Something wroing in kinematics calculation" << std::endl;
+		std::cerr << "Error @ NucDeExDeexcitationD::Decay: Something wroing in kinematics calculation" << std::endl;
 		abort();
 	}
 	if(verbose>1){
@@ -664,7 +663,7 @@ void Deexcitation::Decay(const bool breakflag)
 	double totalE_target = sqrt( pow(mom_target.Mag(),2) + pow(mass_target,2) );
 
 	// --- Store info as Particle. then boost it
-	Particle p_particle(NucDeEx::PDG_particle[decay_mode],
+	NucDeExParticle p_particle(NucDeEx::PDG_particle[decay_mode],
 											mass_particle,
 											mom_particle,
 											NucDeEx::particle_name[decay_mode],
@@ -673,7 +672,7 @@ void Deexcitation::Decay(const bool breakflag)
 	p_particle.Boost(totalE_target,mom_target);// BOOST!
 	double totalE_particle_aft = p_particle.totalE();
 
-	Particle p_daughter(PDGion(Z_daughter,N_daughter),
+	NucDeExParticle p_daughter(PDGion(Z_daughter,N_daughter),
 											mass_daughter, // w/o excitation E
 											mom_daughter,
 											name_daughter,
@@ -712,7 +711,7 @@ void Deexcitation::Decay(const bool breakflag)
 	//         = (Total energy of particle after boost) + (Total energy of daughter w/ ex after boost)
 	//						The last two terms are calculated from CM at first, and then boosted.
 	if(totalE_ex_target>0 && (totalE_ex_aft-totalE_ex_target)/totalE_ex_target>check_criteria){
-		std::cerr << "ERROR: @ Deexcitation:Decay(): Energy is not conserved..." << std::endl;
+		std::cerr << "ERROR: @ NucDeExDeexcitation:Decay(): Energy is not conserved..." << std::endl;
 		abort();
 	}
 
@@ -730,7 +729,7 @@ void Deexcitation::Decay(const bool breakflag)
 }
 
 /////////////////////////////////////////////
-double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
+double NucDeExDeexcitation::ElementMassInMeV(TGeoElementRN* ele)
 /////////////////////////////////////////////
 {
 	if(ele==0) return -1; // no profile can be found.
@@ -745,7 +744,7 @@ double Deexcitation::ElementMassInMeV(TGeoElementRN* ele)
 }
 
 /////////////////////////////////////////////
-int Deexcitation::PDGion(int Z, int N)
+int NucDeExDeexcitation::PDGion(int Z, int N)
 /////////////////////////////////////////////
 {
 	int pdg= 1e9 + Z*1e4 + (Z+N)*1e1;
@@ -754,7 +753,7 @@ int Deexcitation::PDGion(int Z, int N)
 
 
 /////////////////////////////////////////////
-bool Deexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N, 
+bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N, 
 														const bool tree)
 /////////////////////////////////////////////
 {
@@ -783,7 +782,7 @@ bool Deexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N,
 }
 
 /////////////////////////////////////////////
-bool Deexcitation::GetTTree(const int Z, const int N)
+bool NucDeExDeexcitation::GetTTree(const int Z, const int N)
 /////////////////////////////////////////////
 {
 	tree = (TTree*)rootf->Get("tree");
@@ -801,7 +800,7 @@ bool Deexcitation::GetTTree(const int Z, const int N)
 
 
 /////////////////////////////////////////////
-bool Deexcitation::CreateTGraph(const int Z, const int N)
+bool NucDeExDeexcitation::CreateTGraph(const int Z, const int N)
 /////////////////////////////////////////////
 {
 	bool found=0;
@@ -821,7 +820,7 @@ bool Deexcitation::CreateTGraph(const int Z, const int N)
 }
 
 /////////////////////////////////////////////
-bool Deexcitation::GetBrTGraph(const string st)
+bool NucDeExDeexcitation::GetBrTGraph(const string st)
 /////////////////////////////////////////////
 {
 	for(int p=0;p<NucDeEx::num_particle;p++){
@@ -834,7 +833,7 @@ bool Deexcitation::GetBrTGraph(const string st)
 }
 
 /////////////////////////////////////////////
-int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mode)
+int NucDeExDeexcitation::GetBrExTGraph(const string st, const double ex_t, const int mode)
 /////////////////////////////////////////////
 { 
 	double ex,br;
@@ -861,7 +860,7 @@ int Deexcitation::GetBrExTGraph(const string st, const double ex_t, const int mo
 
 
 /////////////////////////////////////////////
-void Deexcitation::DeleteTGraphs()
+void NucDeExDeexcitation::DeleteTGraphs()
 /////////////////////////////////////////////
 {
 	for(int p=0;p<NucDeEx::num_particle;p++){
@@ -874,12 +873,12 @@ void Deexcitation::DeleteTGraphs()
 
 
 /////////////////////////////////////////////
-void Deexcitation::InitParticleVector()
+void NucDeExDeexcitation::InitParticleVector()
 /////////////////////////////////////////////
 {
 	if(_particle!=0){
 		_particle->clear();
 		delete _particle;
 	}
-	_particle = new vector<Particle>;
+	_particle = new vector<NucDeExParticle>;
 }
