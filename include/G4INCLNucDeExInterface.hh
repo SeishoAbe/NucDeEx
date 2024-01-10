@@ -5,7 +5,7 @@
 #include "G4INCLIDeExcitation.hh"
 #include "G4INCLEventInfo.hh"
 
-#include "Deexcitation.hh"
+#include "NucDeExDeexcitation.hh"
 
 #include "TVector3.h"
 #include <vector>
@@ -19,11 +19,11 @@ public:
 
 private:
   G4INCL::Config *theConfig;
-  Deexcitation *theNucDeEx;
+  NucDeExDeexcitation *theNucDeEx;
   int Zt,Nt,At;
   TVector3 Pinit;
 
-  std::vector<Particle> *theNucDeExResult;
+  std::vector<NucDeExParticle> *theNucDeExResult;
 };
 
 #endif
