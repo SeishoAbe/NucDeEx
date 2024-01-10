@@ -37,10 +37,10 @@ LDFLAGS += $(NUWRO)/bin/event1.so
 endif
 
 LIBDIR=lib
-LIBNAME=${LIBDIR}/libTALYStool.a
+LIBNAME=${LIBDIR}/libNucDeEx.a
 
-AOBJS =  Nucleus.o NucleusTable.o ReadTALYS.o 
-AOBJS += Particle.o Deexcitation.o
+AOBJS =  NucDeExNucleus.o NucDeExNucleusTable.o ReadTALYS.o 
+AOBJS += NucDeExParticle.o NucDeExDeexcitation.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))

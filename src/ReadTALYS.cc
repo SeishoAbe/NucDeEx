@@ -8,13 +8,11 @@
 #include <cstdlib>
 #include <algorithm>
 
-#include "Nucleus.hh"
-#include "NucleusTable.hh"
+#include "NucDeExNucleus.hh"
 #include "ReadTALYS.hh"
-#include "consts.hh"
 
 ///////////////////////////
-ReadTALYS::ReadTALYS(const char* filename, NucleusTable* nuc)
+ReadTALYS::ReadTALYS(const char* filename, NucDeExNucleusTable* nuc)
 ///////////////////////////
 {
 	_filename = filename;
@@ -59,7 +57,7 @@ bool ReadTALYS::Read()
 		// 1 -> decay mode
 		// 2 -> discrete level mode
 
-	Nucleus* nuc;
+	NucDeExNucleus* nuc;
 	int parity_array=0, parity_array_daughter=0;
 	float pop_r[NucDeEx::bins], Ex_r[NucDeEx::bins];
 	int max_bin_r;
