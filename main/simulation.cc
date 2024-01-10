@@ -4,8 +4,8 @@
 #include <string>
 #include <iomanip> 
 
-#include "NucleusTable.hh"
-#include "Deexcitation.hh"
+#include "NucDeExNucleusTable.hh"
+#include "NucDeExDeexcitation.hh"
 
 #include <TROOT.h>
 #include <TStyle.h>
@@ -45,12 +45,12 @@ int main(int argc, char* argv[]){
 	std::ostringstream os,os_remove_g;
 
 	// Set deex tool
-	Deexcitation* deex = new Deexcitation(ldmodel, parity_optmodall);
+	NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall);
 	deex->SetSeed(seed); // 0: time
 	deex->SetVerbose(2);
 	// Get Z and N
-  NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
-	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
+  NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
+	NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
 	const int Z = nuc->Z;
 	const int N = nuc->N;
 	const int A = Z+N;
@@ -198,7 +198,7 @@ int main(int argc, char* argv[]){
 
 		// scoling
 		shell = deex->GetShell();
-		vector<Particle>* particle = deex->GetParticleVector();
+		vector<NucDeExParticle>* particle = deex->GetParticleVector();
 		PinitX   = Pinit.X();
 		PinitY   = Pinit.Y();
 		PinitZ   = Pinit.Z();
@@ -210,7 +210,7 @@ int main(int argc, char* argv[]){
 		os_remove_g.str("");
 		string pname[size];
 		for(int i=0;i<size;i++){
-			Particle p = particle->at(i);
+			NucDeExParticle p = particle->at(i);
 			PDG[i]=p._PDG;
 			mass[i]=p._mass;
 			totalE[i]=p.totalE();

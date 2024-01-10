@@ -1,5 +1,5 @@
-#ifndef __CONSTS__HH__
-#define __CONSTS__HH__
+#ifndef __NUCDEEXCONSTS__HH__
+#define __NUCDEEXCONSTS__HH__
 
 #include <string>
 

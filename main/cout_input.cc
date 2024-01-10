@@ -4,8 +4,8 @@
 #include <string>
 #include <iomanip> 
 
-#include "consts.hh"
-#include "NucleusTable.hh"
+#include "NucDeExConsts.hh"
+#include "NucDeExNucleusTable.hh"
 
 int main(int argc, char* argv[]){
 	if(argc<=2){
@@ -24,12 +24,12 @@ int main(int argc, char* argv[]){
 
 	std::ostringstream os;
 	
-  NucleusTable* nucleus_table = new NucleusTable();
+  NucDeExNucleusTable* nucleus_table = new NucDeExNucleusTable();
   if(!nucleus_table->ReadTables()){
 		std::cerr << "something wrong" << std::endl;
 		return 1;
 	}
-	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
+	NucDeExNucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
 	const int Z=nuc_target->Z;
 	const int N=nuc_target->N;
 	const int A=Z+N;
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
 		int At = Zt+Nt;
 		int maxlevelsbin=0;
 		for(int i=0;i<nucleus_table->GetNumofNuc();i++){
-			Nucleus* nuc = nucleus_table->GetNucleusPtr(i);
+			NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(i);
 			if(nuc->Z==Zt && nuc->N==Nt  && nuc->A==At){
 				std::cout << nuc->name << std::endl;
 				maxlevelsbin=nuc->maxlevelsbin;
