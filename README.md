@@ -87,6 +87,15 @@ An example code for simulation is provided:
 - `./bin/plot_decay` is an analyzer on TALYS output.
 - The files created by this executable are used in the simulator (`./bin/simulation`).
 
+## Interfaces and build scripts for INCLXX and Geant4
+NucDeEx also provides intefaces and build script for use in [INCL++](https://irfu.cea.fr/dphn/Spallation/incl.html) and [Geant4](https://geant4.web.cern.ch/).
+### INCL++
+- Interfaces: `include/G4INCLNucDeExInterface.hh`, `src/G4INCLNucDeExInterface.cc`
+- Build scrits: `inclxx/`
+### Geant4
+- Interfaces: `include/G4NucDeExInterface.hh`, `src/G4NucDeExInterface.cc`
+- Build scrits: `geant4/`
+
 ## Directory
 
 ### Codes
@@ -114,3 +123,7 @@ An example code for simulation is provided:
 	- Benhar SF used in event simulation
 - `./data`
   - Reference data (other predictions, experimental data) are stored. A private submodule.
+- `./inclxx`
+  - Build scripts for use in INCLXX.
+- `./geant4`
+  - Build scripts for use in Geant4.
