@@ -52,20 +52,18 @@ include_directories(${ROOT_INC_DIR})
 include(Geant4MacroDefineModule)
 GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
     HEADERS
-        Deexcitation.hh
-        Nucleus.hh
-        NucleusTable.hh
-        Particle.hh
-        ReadTALYS.hh
-        consts.hh
+        NucDeExDeexcitation.hh
+        NucDeExNucleus.hh
+        NucDeExNucleusTable.hh
+        NucDeExParticle.hh
+        NucDeExConsts.hh
         G4NucDeExInterface.hh
 
     SOURCES
-        Deexcitation.cc
-        Nucleus.cc
-        NucleusTable.cc
-        Particle.cc
-        ReadTALYS.cc
+        NucDeExDeexcitation.cc
+        NucDeExNucleus.cc
+        NucDeExNucleusTable.cc
+        NucDeExParticle.cc
         G4NucDeExInterface.cc
 
     GRANULAR_DEPENDENCIES
