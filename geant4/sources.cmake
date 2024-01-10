@@ -39,6 +39,13 @@ include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/de_exci
 include_directories(${CMAKE_SOURCE_DIR}/source/track/include)
 include_directories(${CMAKE_SOURCE_DIR}/source/intercoms/include)
 
+execute_process(
+  COMMAND root-config --incdir
+  OUTPUT_VARIABLE ROOT_INC_DIR
+  )
+#message(${ROOT_INC_DIR})
+include_directories(${ROOT_INC_DIR})
+
 #
 # Define the Geant4 Module.
 #
