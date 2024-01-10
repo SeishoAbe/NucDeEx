@@ -1,19 +1,19 @@
-#ifndef __PARTICLE__HH__
-#define __PARTICLE__HH__
+#ifndef __NUCDEEXPARTICLE__HH__
+#define __NUCDEEXPARTICLE__HH__
 
-#include "consts.hh"
+#include "NucDeExConsts.hh"
 #include <TVector3.h>
 
 using namespace std;
 
-class Particle{
+class NucDeExParticle{
 	public:
-	Particle();
-	Particle(const int PDG,const double mass, const TVector3& mom,
+	NucDeExParticle();
+	NucDeExParticle(const int PDG,const double mass, const TVector3& mom,
 					 const string name, const bool flag=1, const double Ex=0,
 					 const int v=1);
 		// TVector3 is called by referecnce
-	~Particle(){;};
+	~NucDeExParticle(){;};
 	
 	double kE(); //kinetic energy
 	double totalE(); // total energy

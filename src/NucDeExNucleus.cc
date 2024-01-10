@@ -1,14 +1,14 @@
-#include "Nucleus.hh"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
 #include <cstdlib>
-#include "consts.hh"
+
+#include "NucDeExNucleus.hh"
 
 ///////////////
-void Nucleus::Init(const bool init_flag)
+void NucDeExNucleus::Init(const bool init_flag)
 ///////////////
 {
 	S = new float[NucDeEx::num_particle];
@@ -71,7 +71,7 @@ void Nucleus::Init(const bool init_flag)
 	}
 }
 //////////////////
-float Nucleus::min_S()
+float NucDeExNucleus::min_S()
 //////////////////
 {
 	float min=1e9;
@@ -84,7 +84,7 @@ float Nucleus::min_S()
 
 
 //////////////////
-float Nucleus::GetPopDaughterBinSum(int p,int mb)
+float NucDeExNucleus::GetPopDaughterBinSum(int p,int mb)
 //////////////////
 {
 	float population=0;
@@ -97,7 +97,7 @@ float Nucleus::GetPopDaughterBinSum(int p,int mb)
 }
 
 //////////////////
-float Nucleus::GetPopParticleDaughterBinSum(int mb)
+float NucDeExNucleus::GetPopParticleDaughterBinSum(int mb)
 //////////////////
 {
 	float population=0;
@@ -108,7 +108,7 @@ float Nucleus::GetPopParticleDaughterBinSum(int mb)
 }
 
 //////////////////
-bool Nucleus::CheckTotalPop()
+bool NucDeExNucleus::CheckTotalPop()
 //////////////////
 {
 	float sum_pop_check=0;
@@ -138,7 +138,7 @@ bool Nucleus::CheckTotalPop()
 }
 
 //////////////////
-bool Nucleus::CheckPop()
+bool NucDeExNucleus::CheckPop()
 //////////////////
 {
 	bool status=1;
@@ -180,7 +180,7 @@ bool Nucleus::CheckPop()
 
 /*
 //////////////////
-bool Nucleus::CheckPop(int i)
+bool NucDeExNucleus::CheckPop(int i)
 //////////////////
 {
 	if(i>=Ex_bin[0]){
@@ -214,7 +214,7 @@ bool Nucleus::CheckPop(int i)
 */
 
 //////////////////
-bool Nucleus::CheckEx()
+bool NucDeExNucleus::CheckEx()
 //////////////////
 {
 	if(Ex_bin[0]!=Ex_bin[1]){
@@ -232,7 +232,7 @@ bool Nucleus::CheckEx()
 }
 
 //////////////////
-Nucleus::~Nucleus(){
+NucDeExNucleus::~NucDeExNucleus(){
 //////////////////
 	/*
 	delete[] pop;

@@ -12,8 +12,8 @@
 #include "TLegend.h"
 #include "THStack.h"
 
-#include "NucleusTable.hh"
-#include "Deexcitation.hh"
+#include "NucDeExNucleusTable.hh"
+#include "NucDeExDeexcitation.hh"
 
 using namespace std;
 
@@ -39,10 +39,10 @@ int main(int argc, char* argv[]){
 	// --- prepare deex tools
 	int Zt=0, Nt=0;
 	double S;
-	Deexcitation* deex = new Deexcitation(2, 1);
+	NucDeExDeexcitation* deex = new NucDeExDeexcitation(2, 1);
 	deex->SetSeed(seed);
 	deex->SetVerbose(1);
-  NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
+  NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
 	bool flag_O=0;
 	if(target.find("C")!=string::npos){
 		Zt=6;
@@ -212,10 +212,10 @@ int main(int argc, char* argv[]){
 		// --- Scoring --- //
 		int shell = deex->GetShell();
 		h_Ex[shell]->Fill(Ex);
-		vector<Particle>* particle = deex->GetParticleVector();
+		vector<NucDeExParticle>* particle = deex->GetParticleVector();
 		int size=particle->size();
 		for(int i=0;i<size;i++){
-			Particle p = particle->at(i);
+			NucDeExParticle p = particle->at(i);
 			if(p._PDG==2112) nmulti++;
 		}
 		h_nmulti_postdeex->Fill(nmulti);
