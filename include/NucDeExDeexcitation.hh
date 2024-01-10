@@ -93,7 +93,7 @@ class NucDeExDeexcitation{
 
 	// --- ROOT related methods & members --- //
 	bool OpenROOT(const char* name);
-	bool OpenROOT(const int Zt,const int Nt, const int Z, const int N, const bool tree=1);
+	bool OpenROOT(const int Zt,const int Nt, const int Z, const int N, const bool flag_tree=1);
 	bool GetTTree(const int Z,const int N);
 	bool CreateTGraph(const int Z, const int N);
 	bool GetBrTGraph(const std::string st);
