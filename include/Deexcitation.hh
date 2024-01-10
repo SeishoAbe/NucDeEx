@@ -22,8 +22,6 @@
 #include "G4INCLConfig.hh"
 #endif
 
-using namespace std;
-
 class Deexcitation{
 	public:
 	Deexcitation(const int ldmodel=1, const bool parity_optmodall=1);
@@ -97,20 +95,20 @@ class Deexcitation{
 	bool OpenROOT(const int Zt,const int Nt, const int Z, const int N, const bool tree=1);
 	bool GetTTree(const int Z,const int N);
 	bool CreateTGraph(const int Z, const int N);
-	bool GetBrTGraph(const string st);
-	int  GetBrExTGraph(const string st, const double ex_t, const int mode); 
+	bool GetBrTGraph(const std::string st);
+	int  GetBrExTGraph(const std::string st, const double ex_t, const int mode); 
 		// The nearest TGraph point will be returned
 	void DeleteTGraphs();
 	TFile* rootf;
 	TTree* tree;
-	int _Z, _N, _Ex_bin[num_particle];
-	float _Ex[num_particle][bins];
-	float _Br[num_particle][bins];
-	int _REx_bin[num_particle][bins];
-	float _REx[num_particle][bins][bins];
-	float _RBr[num_particle][bins][bins];
+	int _Z, _N, _Ex_bin[NucDeEx::num_particle];
+	float _Ex[NucDeEx::num_particle][NucDeEx::bins];
+	float _Br[NucDeEx::num_particle][NucDeEx::bins];
+	int _REx_bin[NucDeEx::num_particle][NucDeEx::bins];
+	float _REx[NucDeEx::num_particle][NucDeEx::bins][NucDeEx::bins];
+	float _RBr[NucDeEx::num_particle][NucDeEx::bins][NucDeEx::bins];
 
-	TGraph* g_br[num_particle];
+	TGraph* g_br[NucDeEx::num_particle];
 	TGraph* g_br_ex;
 	TRandom3* rndm;
 	TDatabasePDG* pdg;
@@ -129,7 +127,7 @@ class Deexcitation{
 	double mass_target;
 	TVector3 mom_target;
 	Nucleus* nuc_target;
-	string name_target;
+	std::string name_target;
 
 	// daughter nucleus info
 	int Z_daughter, N_daughter;
@@ -137,7 +135,7 @@ class Deexcitation{
 	double mass_daughter;
 	TVector3 mom_daughter;
 	Nucleus* nuc_daughter;
-	string name_daughter;
+	std::string name_daughter;
 
 	// decay particle info
 	double mass_particle;
@@ -154,7 +152,7 @@ class Deexcitation{
 	bool parity_optmodall;
 	int verbose;
 	int eventID;
-	ostringstream os;
+	std::ostringstream os;
 	const double check_criteria=5e-3;
 	int _shell;
 
@@ -186,6 +184,6 @@ class Deexcitation{
 	const double Br_p32_15O[Nlevel_p32_15O]={0.872,0.064,0.064}; // guess
 	//const double Br_p32_15O[Nlevel_p32_15O]={1.,0,0}; // original Ejiri's value
 
-  string PATH_NucDeEx_root;
+  std::string PATH_NucDeEx_root;
 };
 #endif
