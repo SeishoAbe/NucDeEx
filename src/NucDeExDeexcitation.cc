@@ -47,7 +47,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::C
   Init(ld,p_o);
 
 	// Prepare nuc table
-	_nucleus_table = new NucleusTable(config);
+	_nucleus_table = new NucDeExNucleusTable(config);
 	if(!_nucleus_table->ReadTables(0)){
 		std::cerr << "Fatal Error" << std::endl;
 		abort();

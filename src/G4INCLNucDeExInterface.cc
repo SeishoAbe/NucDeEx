@@ -8,7 +8,7 @@
 G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
   IDeExcitation(config),
   theConfig(config),
-  theNucDeEx(new Deexcitation(2,1,theConfig))
+  theNucDeEx(new NucDeExDeexcitation(2,1,theConfig))
 {
   theNucDeEx->SetSeed(1);
   theNucDeEx->SetVerbose(0);
@@ -34,7 +34,7 @@ void G4INCLNucDeExInterface::deExciteRemnant(G4INCL::EventInfo *eventInfo, const
   int size = theNucDeExResult->size();
 
   for(int j = 0; j < size ; ++j) { // Copy NucDeEx result to the EventInfo
-    Particle particle = theNucDeExResult->at(j);
+    NucDeExParticle particle = theNucDeExResult->at(j);
     if(!particle._flag) continue; // skip intermediate states
     const int PDG = particle._PDG;
     if(PDG==22){// gamma
