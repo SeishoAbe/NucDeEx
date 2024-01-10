@@ -88,13 +88,13 @@ An example code for simulation is provided:
 - The files created by this executable are used in the simulator (`./bin/simulation`).
 
 ## Interfaces and build scripts for INCLXX and Geant4
-NucDeEx also provides intefaces and build script for use in [INCL++](https://irfu.cea.fr/dphn/Spallation/incl.html) and [Geant4](https://geant4.web.cern.ch/).
+NucDeEx also provides intefaces and build scripts for use in [INCL++](https://irfu.cea.fr/dphn/Spallation/incl.html) and [Geant4](https://geant4.web.cern.ch/).
 ### INCL++
 - Interfaces: `include/G4INCLNucDeExInterface.hh`, `src/G4INCLNucDeExInterface.cc`
-- Build scrits: `inclxx/`
+- Build scrits: `./inclxx`
 ### Geant4
 - Interfaces: `include/G4NucDeExInterface.hh`, `src/G4NucDeExInterface.cc`
-- Build scrits: `geant4/`
+- Build scrits: `./geant4`
 
 ## Directory
 
