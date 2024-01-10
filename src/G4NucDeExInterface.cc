@@ -44,7 +44,7 @@
 
 G4NucDeExInterface::G4NucDeExInterface() :
   G4VPreCompoundModel(NULL, "NucDeEx"),
-  theNucDeEx(new Deexcitation(2,1)), // FIXME
+  theNucDeEx(new NucDeExDeexcitation(2,1)),
   eventNumber(0)
 {
   theNucDeEx->SetSeed(1);
@@ -78,7 +78,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   int size = theNucDeExResult->size();
 
   for(int j = 0; j < size ; ++j) { // Copy NucDeEx result to the EventInfo
-    Particle particle = theNucDeExResult->at(j);
+    NucDeExParticle particle = theNucDeExResult->at(j);
     if(!particle._flag) continue; // skip intermediate states
     const int PDG = particle._PDG;
     int A,Z;
