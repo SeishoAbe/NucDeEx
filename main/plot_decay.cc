@@ -18,15 +18,14 @@
 #include <TText.h>
 #include <TTree.h>
 
-using namespace std;
 
-const string decay_name[num_particle] // for G4
+const std::string decay_name[NucDeEx::num_particle] // for G4
 	= {"IT","Neutron","Proton",
 		 "Deuteron","Triton","He3","Alpha"};
 
 int main(int argc, char* argv[]){
 	if(argc!=5){
-		cerr << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi]" << endl;
+		std::cerr << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi]" << std::endl;
 		return 0;
 	}
   // --- FIXME  --- //
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]){
   std::ostringstream os;
   NucleusTable* nucleus_table = new NucleusTable();
   if(!nucleus_table->ReadTables()){
-		cerr << "something wrong" << endl;
+		std::cerr << "something wrong" << std::endl;
 		return 1;
 	}
 	Nucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
@@ -60,7 +59,7 @@ int main(int argc, char* argv[]){
 	ReadTALYS* read_talys = new ReadTALYS(os.str().c_str(), nucleus_table);
 	read_talys->SetVerboseLevel(1);
 	if(!read_talys->Read()){
-		cerr << "something wrong happend..." << endl;
+		std::cerr << "something wrong happend..." << std::endl;
 		return 0;
 	}
 
@@ -71,7 +70,7 @@ int main(int argc, char* argv[]){
 	for(int inuc=0;inuc<num_of_nuc;inuc++){
 		if(nucleus_table->GetNucleusPtr(inuc)->flag_data==1)  num_nuc_data++;
 	}
-	cout << "# nuclei that has population data = " << num_nuc_data << endl;
+	std::cout << "# nuclei that has population data = " << num_nuc_data << std::endl;
 	
 
 	// prepare output root file
@@ -87,38 +86,38 @@ int main(int argc, char* argv[]){
 	os << ".root";
 	TFile* rootf = new TFile(os.str().c_str(),"RECREATE");
 	TTree* tree = new TTree("tree","tree");
-	string name;
+	std::string name;
 	int Z,N;
-	int Ex_bin[num_particle];
-	float Pop[parity][bins];
-	float Ex[num_particle][bins];
-	float Br[num_particle][bins];
-	int REx_bin[num_particle][bins];
-	float REx[num_particle][bins][bins], RBr[num_particle][bins][bins];
+	int Ex_bin[NucDeEx::num_particle];
+	float Pop[NucDeEx::parity][NucDeEx::bins];
+	float Ex[NucDeEx::num_particle][NucDeEx::bins];
+	float Br[NucDeEx::num_particle][NucDeEx::bins];
+	int REx_bin[NucDeEx::num_particle][NucDeEx::bins];
+	float REx[NucDeEx::num_particle][NucDeEx::bins][NucDeEx::bins], RBr[NucDeEx::num_particle][NucDeEx::bins][NucDeEx::bins];
 	tree->Branch("name",&name);
 	tree->Branch("Z",&Z,"Z/I");
 	tree->Branch("N",&N,"N/I");
 	os.str("");
-	os << "Pop[" << parity << "][" << bins << "]/F";
+	os << "Pop[" << NucDeEx::parity << "][" << NucDeEx::bins << "]/F";
 	tree->Branch("Pop",&Pop,os.str().c_str());
 	os.str("");
-	os << "Ex_bin[" << num_particle << "]/I";
+	os << "Ex_bin[" << NucDeEx::num_particle << "]/I";
 	tree->Branch("Ex_bin",&Ex_bin,os.str().c_str());
 	os.str("");
-	os << "Ex[" << num_particle << "][" << bins << "]/F";
+	os << "Ex[" << NucDeEx::num_particle << "][" << NucDeEx::bins << "]/F";
 	tree->Branch("Ex",&Ex,os.str().c_str());
 	os.str("");
-	os << "Br[" << num_particle << "][" << bins << "]/F";
+	os << "Br[" << NucDeEx::num_particle << "][" << NucDeEx::bins << "]/F";
 	tree->Branch("Br",&Br,os.str().c_str());
 	//
 	os.str("");
-	os << "REx_bin[" << num_particle << "][" << bins << "]/I";
+	os << "REx_bin[" << NucDeEx::num_particle << "][" << NucDeEx::bins << "]/I";
 	tree->Branch("REx_bin",&REx_bin,os.str().c_str());
 	os.str("");
-	os << "REx[" << num_particle << "][" << bins << "][" << bins << "]/F";
+	os << "REx[" << NucDeEx::num_particle << "][" << NucDeEx::bins << "][" << NucDeEx::bins << "]/F";
 	tree->Branch("REx",&REx,os.str().c_str());
 	os.str("");
-	os << "RBr[" << num_particle << "][" << bins << "][" << bins << "]/F";
+	os << "RBr[" << NucDeEx::num_particle << "][" << NucDeEx::bins << "][" << NucDeEx::bins << "]/F";
 	tree->Branch("RBr",&RBr,os.str().c_str());
 
 	// start Nucleus loop in NucleusTable
@@ -129,45 +128,45 @@ int main(int argc, char* argv[]){
 
 		// check info in Nucleus 
 		if(! (nuc_target->CheckTotalPop() && nuc_target->CheckPop()) ){
-			cerr << "ERROR: There was a bug in population info: " << nuc_target->name << endl;
+			std::cerr << "ERROR: There was a bug in population info: " << nuc_target->name << std::endl;
 			return 0;
 		}else{
-			cout << "Population for " << nuc_target->name << " looks OK" << endl;
+			std::cout << "Population for " << nuc_target->name << " looks OK" << std::endl;
 		}
 		if(! (nuc_target->CheckEx())) {
-			cerr << "ERROR: There was unexpected behaviour in Ex" << endl;
+			std::cerr << "ERROR: There was unexpected behaviour in Ex" << std::endl;
 			return 0;
 		}
 
 		// Init array
-		for(int p=0;p<num_particle;p++){
+		for(int p=0;p<NucDeEx::num_particle;p++){
 			Ex_bin[p]=0;
-			for(int b=0;b<bins;b++){
+			for(int b=0;b<NucDeEx::bins;b++){
 				Ex[p][b]=Br[p][b]=0;
 				REx_bin[p][b]=0;
-				for(int b1=0;b1<bins;b1++){
+				for(int b1=0;b1<NucDeEx::bins;b1++){
 					REx[p][b][b1]=RBr[p][b][b1]=0;
 				}
 			}
 		}
 
 		// for ttree
-		name = (string)nuc_target->name;
+		name = (std::string)nuc_target->name;
 		Z = nuc_target->Z;
 		N = nuc_target->N;
 		int bin_target = nuc_target->Ex_bin[0];
 
-		int index[parity]={0};
-		int	index_br[num_particle]={0};
-		int index_br_ex[num_particle][bins]={0};
-		float max_total_pop[parity]={0};
-		for(int par=0;par<parity;par++){
+		int index[NucDeEx::parity]={0};
+		int	index_br[NucDeEx::num_particle]={0};
+		int index_br_ex[NucDeEx::num_particle][NucDeEx::bins]={0};
+		float max_total_pop[NucDeEx::parity]={0};
+		for(int par=0;par<NucDeEx::parity;par++){
 			index[par]=0;
 			max_total_pop[par]=0;
 		}
-		for(int p=0;p<num_particle;p++){
+		for(int p=0;p<NucDeEx::num_particle;p++){
 			index_br[p] = 0;
-			for(int i=0;i<bins;i++){ // target bin loop
+			for(int i=0;i<NucDeEx::bins;i++){ // target bin loop
 				index_br_ex[p][i]=0;
 			}
 		}
@@ -176,7 +175,7 @@ int main(int argc, char* argv[]){
 			float Ex_target = nuc_target->Ex[0][i];
 			float pop_target_sum = nuc_target->GetPopParitySum(i);
 
-			for(int par=0;par<parity;par++){
+			for(int par=0;par<NucDeEx::parity;par++){
 				float pop_target_norm = nuc_target->pop[par][i]/nuc_target->total_pop[par];
 				// fill normalized population
 				//g_target_pop[par]->SetPoint(index[par],Ex_target,pop_target_norm);
@@ -186,7 +185,7 @@ int main(int argc, char* argv[]){
 			}
 
 			// calculate br
-			for(int p=0;p<num_particle;p++){ // particle loop
+			for(int p=0;p<NucDeEx::num_particle;p++){ // particle loop
 				if(!nuc_target->flag_decay_data[i] && i<=20){ // no decay data
 					if(p==0){
 						//g_target_br[p]->SetPoint(index_br[p],Ex_target,1);
@@ -228,16 +227,16 @@ int main(int argc, char* argv[]){
 					}
 					index_br[p]++;
 				}else{
-					cerr << "Warning: No decay data, but have population " << endl;
-					cerr << "pop_targe_sum = " << pop_target_sum << endl;
-					cerr << "decay_data = " << nuc_target->flag_decay_data[i] << endl;
-					cerr << "bin = " << i << endl;
-					cerr << "particle = " << p << endl;
+					std::cerr << "Warning: No decay data, but have population " << std::endl;
+					std::cerr << "pop_targe_sum = " << pop_target_sum << std::endl;
+					std::cerr << "decay_data = " << nuc_target->flag_decay_data[i] << std::endl;
+					std::cerr << "bin = " << i << std::endl;
+					std::cerr << "particle = " << p << std::endl;
 				}
 			} // end of p (particle) loop
 		}// end of i (target bin) loop
 
-		for(int p=0;p<num_particle;p++){ // particle loop
+		for(int p=0;p<NucDeEx::num_particle;p++){ // particle loop
 			Ex_bin[p]       = index_br[p];
 			for(int i=0;i<index_br[p];i++){ // target bin loop
 				REx_bin[p][i]  = index_br_ex[p][i];
@@ -248,35 +247,35 @@ int main(int argc, char* argv[]){
 		tree->Fill();
 
 		// --- Prepare TGraph --- //
-		TGraph* g_target_pop[parity];
-		TGraph* g_target_br[num_particle];
-		TGraph* g_target_br_ex[num_particle][bin_target];
-		for(int par=0;par<parity;par++){
+		TGraph* g_target_pop[NucDeEx::parity];
+		TGraph* g_target_br[NucDeEx::num_particle];
+		TGraph* g_target_br_ex[NucDeEx::num_particle][bin_target];
+		for(int par=0;par<NucDeEx::parity;par++){
 			g_target_pop[par] = new TGraph(index[par],Ex[0],Pop[par]);
 			os.str("");
 			os << "g_" << name.c_str() << "_pop_" << par;
 			g_target_pop[par]->SetName(os.str().c_str());
 		}
-		for(int p=0;p<num_particle;p++){
+		for(int p=0;p<NucDeEx::num_particle;p++){
 			g_target_br[p] = new TGraph(Ex_bin[p],Ex[p],Br[p]);
 			os.str("");
 			os << "g_" << name.c_str() << "_br_" << p;
 			g_target_br[p]->SetName(os.str().c_str());
 			g_target_br[p]->SetMarkerStyle(7);
-			g_target_br[p]->SetMarkerColor(color_root[p]);
+			g_target_br[p]->SetMarkerColor(NucDeEx::color_root[p]);
 			g_target_br[p]->SetLineWidth(2);
-			g_target_br[p]->SetLineColor(color_root[p]);
+			g_target_br[p]->SetLineColor(NucDeEx::color_root[p]);
 		}
-		for(int p=0;p<num_particle;p++){
+		for(int p=0;p<NucDeEx::num_particle;p++){
 			for(int i=0;i<bin_target;i++){ // target bin loop
 				g_target_br_ex[p][i] = new TGraph(REx_bin[p][i],REx[p][i],RBr[p][i]);
 				os.str("");
 				os << "g_" << name << "_br_ex_" << p << "_" << i;
 				g_target_br_ex[p][i]->SetName(os.str().c_str());
 				g_target_br_ex[p][i]->SetMarkerStyle(7);
-				g_target_br_ex[p][i]->SetMarkerColor(color_root[p]);
+				g_target_br_ex[p][i]->SetMarkerColor(NucDeEx::color_root[p]);
 				g_target_br_ex[p][i]->SetLineWidth(2);
-				g_target_br_ex[p][i]->SetLineColor(color_root[p]);
+				g_target_br_ex[p][i]->SetLineColor(NucDeEx::color_root[p]);
 			}
 		}
 
@@ -291,7 +290,7 @@ int main(int argc, char* argv[]){
 		// --- Canvas --- //
 		TCanvas* c_target_pop = new TCanvas("c_target_pop","",0,0,1200,600);
 		c_target_pop->Divide(2);
-		for(int par=0;par<parity;par++){
+		for(int par=0;par<NucDeEx::parity;par++){
 			c_target_pop->cd(par+1);
 			TH1F* waku_target_pop = gPad->DrawFrame(0,0,max_Ex_plot,max_total_pop[par]*1.1);
 			os.str("");
@@ -330,13 +329,13 @@ int main(int argc, char* argv[]){
 		waku_target_br->GetXaxis()->SetTitle("Excitation energy [MeV]");
 		waku_target_br->GetYaxis()->SetTitle("Branching ratio");
 		gPad->SetGrid();
-		for(int p=0;p<num_particle;p++){
+		for(int p=0;p<NucDeEx::num_particle;p++){
 			g_target_br[p]->Draw("PLsame");
 		}
 		TLegend* leg_target_br = new TLegend(0.4,0.7,0.9,0.9);
 		leg_target_br->SetNColumns(3);
-		for(int p=0;p<num_particle;p++){
-			leg_target_br->AddEntry(g_target_br[p],particle_name[p].c_str(),"PL");
+		for(int p=0;p<NucDeEx::num_particle;p++){
+			leg_target_br->AddEntry(g_target_br[p],NucDeEx::particle_name[p].c_str(),"PL");
 		}
 		leg_target_br->Draw("same");
 		gPad->RedrawAxis();
@@ -368,8 +367,8 @@ int main(int argc, char* argv[]){
 		os << argv[1] << "_ldmodel" << ldmodel;
 		if(parity_optmodall) os << "_parity_optmodall";
 		os << "/fig_" << name.c_str() << "_br_Ex.pdf";
-		string pdfname= os.str();
-		c_target_br_ex->Print( (pdfname+(string)"[").c_str() );
+		std::string pdfname= os.str();
+		c_target_br_ex->Print( (pdfname+(std::string)"[").c_str() );
 		c_target_br_ex->Update();
 		c_target_br_ex->Clear();
 		for(int i=0;i<bin_target;i++){ // target bin loop
@@ -377,12 +376,12 @@ int main(int argc, char* argv[]){
 			float Ex_target = nuc_target->Ex[0][i];
 			if(Ex_target==0) continue;
 			c_target_br_ex->Divide(4,2);
-			for(int p=0;p<num_particle;p++){ // particle loop
+			for(int p=0;p<NucDeEx::num_particle;p++){ // particle loop
 				c_target_br_ex->cd(p+1);
 				gPad->SetGrid();
 				TH1F* waku = gPad->DrawFrame(0,0,max_Ex_plot,1.05);
 				os.str("");
-				os << particle_name[p];
+				os << NucDeEx::particle_name[p];
 				waku->SetTitle(os.str().c_str());
 				waku->GetXaxis()->SetTitle("Excitation energy of daughter nucleus");
 				waku->GetYaxis()->SetTitle("Relative branching ratio");
@@ -396,11 +395,11 @@ int main(int argc, char* argv[]){
 					//if((Ex_target<nuc_target->min_S() 
 					//		|| (!nuc_target->flag_decay_data[i] && i<=1)) && p==0){ 
 					if((!nuc_target->flag_decay_data[i] && i<=20)){ 
-						os << "BR: " << scientific << setprecision(2) << 1;
+						os << "BR: " << std::scientific << std::setprecision(2) << 1;
 					}else{
 						double br,ex;
 						g_target_br[p]->GetPoint(i,ex,br);
-						os << "BR: " << scientific << setprecision(2) << br;
+						os << "BR: " << std::scientific << std::setprecision(2) << br;
 							 //<< nuc_target->GetPopDaughterBinSum(p,i)/nuc_target->GetPopParitySum(i);
 					}
 					TText* text = new TText(max_Ex_plot*0.25,0.8,os.str().c_str());
@@ -409,13 +408,13 @@ int main(int argc, char* argv[]){
 			}
 			c_target_br_ex->cd(8);
 			os.str("");
-			os << name.c_str() << ", Ex[" << i << "] = " << fixed << setprecision(2) << nuc_target->Ex[0][i] << " (MeV)";
+			os << name.c_str() << ", Ex[" << i << "] = " << std::fixed << std::setprecision(2) << nuc_target->Ex[0][i] << " (MeV)";
 			TText* text_Ex = new TText(0.1,0.9,os.str().c_str());
 			text_Ex->Draw("same");
-			TText* text_S[num_particle];
-			for(int p=1;p<num_particle;p++){ // particle loop
+			TText* text_S[NucDeEx::num_particle];
+			for(int p=1;p<NucDeEx::num_particle;p++){ // particle loop
 				os.str("");
-				os << "S_" << particle_name[p].substr(0,1) << " = " << fixed << setprecision(2) << nuc_target->S[p] << " (MeV)";
+				os << "S_" << NucDeEx::particle_name[p].substr(0,1) << " = " << std::fixed << std::setprecision(2) << nuc_target->S[p] << " (MeV)";
 				text_S[p] = new TText(0.1,0.9-0.1*p,os.str().c_str());
 				if(nuc_target->S[p]>Ex_target) text_S[p]->SetTextColor(kGray+1);
 				text_S[p]->Draw("same");
@@ -433,7 +432,7 @@ int main(int argc, char* argv[]){
 			c_target_br_ex->Clear();
 		}
 		os.str("");
-		os << (pdfname+(string)"]").c_str();
+		os << (pdfname+(std::string)"]").c_str();
 		c_target_br_ex->Print(os.str().c_str());
 		c_target_br_ex->Clear();
 		delete c_target_br_ex;
@@ -441,10 +440,10 @@ int main(int argc, char* argv[]){
 
 		// --- Save TGraph in TFile --- //
 		rootf->cd();
-		for(int par=0;par<parity;par++){
+		for(int par=0;par<NucDeEx::parity;par++){
 			g_target_pop[par]->Write();
 		}
-		for(int p=0;p<num_particle;p++){
+		for(int p=0;p<NucDeEx::num_particle;p++){
 			g_target_br[p]->Write();
 			for(int i=0;i<bin_target;i++){ // target bin loop
 				g_target_br_ex[p][i]->Write();
