@@ -536,6 +536,10 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 			break; 
 		} 
 	}
+	if(decay_mode<0){
+    std::cerr << "Unexpected decay_mode = " << decay_mode << std::endl;
+    exit(1);
+  }
 
 	// --- Set Z and N for daughter 
 	Z_daughter = Z_target;
@@ -556,9 +560,6 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 	}else if(decay_mode==6){
 		Z_daughter-=2;
 		N_daughter-=2;
-	}else{
-    std::cerr << "Unexpected decay_mode = " << decay_mode << std::endl;
-    exit(1);
   }
 	nuc_daughter = _nucleus_table->GetNucleusPtr(Z_daughter,N_daughter);
 	if(nuc_daughter!=NULL) name_daughter = nuc_daughter->name;
