@@ -13,7 +13,6 @@
 #ifdef INCL_DEEXCITATION_NUCDEEX
 #include "G4INCLConfig.hh"
 #endif
-using namespace std;
 
 ///////////////
 NucleusTable::NucleusTable()
@@ -25,7 +24,7 @@ NucleusTable::NucleusTable()
   if(env!=NULL){
     PATH_NucDeEx_table = env;
   }else{
-    cerr << "PATH to nucleus table is not specified" << endl;
+    std::cerr << "PATH to nucleus table is not specified" << std::endl;
     exit(1);
   }
 }
@@ -38,7 +37,7 @@ NucleusTable::NucleusTable(G4INCL::Config *config)
   verbose=1;
   num_of_nuc=-1;
   PATH_NucDeEx_table = config->getNucDeExDataFilePath() + "/tables";
-  //cout << PATH_NucDeEx_table.c_str() << endl;
+  //std::cout << PATH_NucDeEx_table.c_str() << std::endl;
 }
 #endif
 
@@ -47,13 +46,13 @@ bool NucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
 	// --- Read nucleus / separation energy tables ---//
-	string filename1= PATH_NucDeEx_table+(string)"/nucleus/nucleus.txt";
-  ifstream ifs(filename1);
+	std::string filename1= PATH_NucDeEx_table+(std::string)"/nucleus/nucleus.txt";
+  std::ifstream ifs(filename1);
   if(!ifs.is_open()){
-    cerr << "ERROR : Cannot open " << filename1 << endl;
+    std::cerr << "ERROR : Cannot open " << filename1 << std::endl;
 		return 0;
   }else{
-		if(verbose>0) cout << "Read: " << filename1 << endl;
+		if(verbose>0) std::cout << "Read: " << filename1 << std::endl;
 	}
 
 	// at first get num of nucleus in the table
@@ -80,8 +79,8 @@ bool NucleusTable::ReadTables(const bool init_flag)
   ifs.seekg(0);
   while(ifs.getline(buf,sizeof(buf))){
     if(buf[0]=='#') continue;
-    istringstream(buf) >> Name >> z >> n >> maxlevelsbin;
-		_nucleus_id.insert(make_pair(Name,index));
+    std::istringstream(buf) >> Name >> z >> n >> maxlevelsbin;
+		_nucleus_id.insert(std::make_pair(Name,index));
 		//_nucleus[index].name = Name;
 		strcpy(_nucleus[index].name,Name);
 		_nucleus[index].Z = z;
@@ -91,21 +90,21 @@ bool NucleusTable::ReadTables(const bool init_flag)
 		_nucleus[index].maxlevelsbin = maxlevelsbin;
 
 		// read separation energy table
-		string filename2= PATH_NucDeEx_table
-                      + (string)"/separation_energy/separation_energy_"
-                      + (string)Name
-                      + (string)".txt";
-		ifstream ifs2(filename2);
+		std::string filename2= PATH_NucDeEx_table
+                      + (std::string)"/separation_energy/separation_energy_"
+                      + (std::string)Name
+                      + (std::string)".txt";
+		std::ifstream ifs2(filename2);
 		if(!ifs2.is_open()){
-			cerr << "Warning: We do not have separation energy file for " << Name << endl;
+			std::cerr << "Warning: We do not have separation energy file for " << Name << std::endl;
 		}else{
-			if(verbose>0) cout << "Read: " << filename2 << endl;
+			if(verbose>0) std::cout << "Read: " << filename2 << std::endl;
 			_nucleus[index].flag_s = 1;
 			int particle_index=0;
 			while(ifs2.getline(buf,sizeof(buf))){
 				if(buf[0]=='#') continue;
-				istringstream(buf) >> _nucleus[index].S[particle_index];
-				if(verbose>0) cout << "SE: " << particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << endl;
+				std::istringstream(buf) >> _nucleus[index].S[particle_index];
+				if(verbose>0) std::cout << "SE: " << NucDeEx::particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << std::endl;
 				particle_index++;
 			}
 			ifs2.close();
@@ -137,9 +136,9 @@ Nucleus* NucleusTable::GetNucleusPtr(const char* name)
 Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
 ///////////////
 {
-	if(Z>=sizeof(nuc_name)/sizeof(char*) || Z<0) return NULL;
-	//cout << "SIZE " << sizeof(nuc_name)/sizeof(char*) << endl;
-	ostringstream os;
+	if((unsigned)Z>=sizeof(nuc_name)/sizeof(char*) || Z<0) return NULL;
+	//std::cout << "SIZE " << sizeof(nuc_name)/sizeof(char*) << std::endl;
+	std::ostringstream os;
 	os << Z+N << nuc_name[Z];
 	return GetNucleusPtr(os.str().c_str());
 }
@@ -161,7 +160,7 @@ int NucleusTable::getID(const char* name)
   if(_p_id!=_nucleus_id.end()){
     return (int) ((_p_id->second));
   }else{
-    if(verbose>0) cerr << "Warning @ NucleusTable: Cannot find such nucleus " << name << endl;
+    if(verbose>0) std::cerr << "Warning @ NucleusTable: Cannot find such nucleus " << name << std::endl;
 		return -1;
   }
 }

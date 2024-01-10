@@ -3,8 +3,6 @@
 
 #include "consts.hh"
 
-using namespace std;
-
 class Nucleus{
   public :
 	Nucleus(){;};

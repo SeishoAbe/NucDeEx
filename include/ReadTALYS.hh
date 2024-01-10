@@ -6,8 +6,6 @@
 #include "NucleusTable.hh"
 #include "consts.hh"
 
-using namespace std;
-
 class ReadTALYS{
 	public: 
 	//ReadTALYS(){;};
@@ -18,28 +16,28 @@ class ReadTALYS{
 	void SetVerboseLevel(int v){ _verbose = v;};
 
 	private:
-	string _filename;
+	std::string _filename;
 	NucleusTable* _nucleus_table;
-	ifstream* _ifs;
+	std::ifstream* _ifs;
 	int _verbose;
 
 	const float check_criteria=0.05;
 
 	void SetKeywords();
 
-	string* keyword_population;
-	string* keyword_N;
-	string* keyword_parity;
-	string* keyword_before_decay;
-	string* keyword_decay;
-	string* keyword_total;
-	string* keyword_bin_mother;
-	string* keyword_parity_mother;
-	string* keyword_parity_daughter;
-	string* keyword_discrete;
-	string* keyword_discrete_br;
+	std::string* keyword_population;
+	std::string* keyword_N;
+	std::string* keyword_parity;
+	std::string* keyword_before_decay;
+	std::string* keyword_decay;
+	std::string* keyword_total;
+	std::string* keyword_bin_mother;
+	std::string* keyword_parity_mother;
+	std::string* keyword_parity_daughter;
+	std::string* keyword_discrete;
+	std::string* keyword_discrete_br;
 
-	ostringstream* os;
+	std::ostringstream* os;
 };
 
 #endif
