@@ -31,7 +31,7 @@
 
 #ifdef NUCDEEX_IN_GEANT4_MODE
 
-#include "G4AblaInterface.hh"
+#include "G4NucDeExInterface.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ReactionProductVector.hh"
 #include "G4ReactionProduct.hh"
@@ -42,7 +42,7 @@
 #include <iostream>
 #include <cmath>
 
-G4AblaInterface::G4AblaInterface() :
+G4NucDeExInterface::G4NucDeExInterface() :
   G4VPreCompoundModel(NULL, "NucDeEx"),
   theNucDeEx(new Deexcitation(2,1)), // FIXME
   eventNumber(0)
@@ -51,11 +51,11 @@ G4AblaInterface::G4AblaInterface() :
   theNucDeEx->SetVerbose(0);
 }
 
-G4AblaInterface::~G4AblaInterface() {
+G4NucDeExInterface::~G4NucDeExInterface() {
   delete theNucDeEx;
 }
 
-G4ReactionProductVector *G4AblaInterface::DeExcite(G4Fragment &aFragment) {
+G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   const G4int ARem = aFragment.GetA_asInt();
   const G4int ZRem = aFragment.GetZ_asInt();
   const G4double eStarRem = aFragment.GetExcitationEnergy() / MeV;
