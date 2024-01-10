@@ -40,7 +40,8 @@
 #include "G4HadProjectile.hh"
 #include "G4Nucleus.hh"
 
-#include "Deexcitation.hh"
+#include "NucDeExDeexcitation.hh"
+#include "NucDeExParticle.hh"
 
 #include "TVector3.h"
 #include <vector>
@@ -60,11 +61,11 @@ public:
   virtual void DeExciteModelDescription(std::ostream& outFile) const;
 
 private:
-  Deexcitation *theNucDeEx;
+  NucDeExDeexcitation *theNucDeEx;
   int Zt,Nt,At;
   TVector3 Pinit;
 
-  std::vector<Particle> *theNucDeExResult;
+  std::vector<NucDeExParticle> *theNucDeExResult;
   G4long eventNumber;
 
   /// \brief Convert an NucDeEx particle to a G4DynamicParticle
