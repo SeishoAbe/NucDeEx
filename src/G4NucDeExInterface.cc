@@ -59,7 +59,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   const G4int ARem = aFragment.GetA_asInt();
   const G4int ZRem = aFragment.GetZ_asInt();
   const G4double eStarRem = aFragment.GetExcitationEnergy() / MeV;
-  const G4double jRem = aFragment.GetAngularMomentum().mag() / hbar_Planck;
+  //const G4double jRem = aFragment.GetAngularMomentum().mag() / hbar_Planck; // unused
   const G4LorentzVector &pRem = aFragment.GetMomentum();
   const G4double pxRem = pRem.x() / MeV;
   const G4double pyRem = pRem.y() / MeV;
@@ -70,7 +70,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
 
   theNucDeEx->DoDeex(Zt,Nt,
                      ZRem,ARem-ZRem, 
-                     0,EStarRem,Pinit);
+                     0,eStarRem,Pinit);
 
   G4ReactionProductVector *result = new G4ReactionProductVector;
 
@@ -97,7 +97,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
     }
 
     G4ReactionProduct *product = toG4Particle(A,Z,0, // S
-                                              particle.kE();
+                                              particle.kE(),
                                               particle._momentum.X(),
                                               particle._momentum.Y(),
                                               particle._momentum.Z());
