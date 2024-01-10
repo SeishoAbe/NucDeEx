@@ -1,13 +1,14 @@
-#ifndef __DEEXCITATION__HH__
-#define __DEEXCITATION__HH__
+#ifndef __NUCDEEXDEEXCITATION__HH__
+#define __NUCDEEXDEEXCITATION__HH__
 
 #include <string>
 #include <ostream>
 #include <sstream>
 #include <vector>
-#include "consts.hh"
-#include "NucleusTable.hh"
-#include "Particle.hh"
+
+#include "NucDeExConsts.hh"
+#include "NucDeExNucleusTable.hh"
+#include "NucDeExParticle.hh"
 
 #include <TFile.h>
 #include <TTree.h>
@@ -22,14 +23,14 @@
 #include "G4INCLConfig.hh"
 #endif
 
-class Deexcitation{
+class NucDeExDeexcitation{
 	public:
-	Deexcitation(const int ldmodel=1, const bool parity_optmodall=1);
+	NucDeExDeexcitation(const int ldmodel=1, const bool parity_optmodall=1);
 #ifdef INCL_DEEXCITATION_NUCDEEX
-	Deexcitation(const int ldmodel=1, const bool parity_optmodall=1, G4INCL::Config *config=0);
+	NucDeExDeexcitation(const int ldmodel=1, const bool parity_optmodall=1, G4INCL::Config *config=0);
 #endif
 
-	virtual ~Deexcitation();
+	virtual ~NucDeExDeexcitation();
 
 	// --- Main function ---//
 	int DoDeex(const int Zt, const int Nt,
@@ -74,8 +75,8 @@ class Deexcitation{
 	void SetVerbose(const int v);
 	void SetEventID(int id){ eventID=id;};
 	int  GetEventID(){ return eventID; };
-	vector<Particle>* GetParticleVector(){return _particle;};
-	NucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
+	vector<NucDeExParticle>* GetParticleVector(){return _particle;};
+	NucDeExNucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
 	int GetShell(){return _shell;};
 
 	private:
@@ -126,7 +127,7 @@ class Deexcitation{
 	double Ex_target;
 	double mass_target;
 	TVector3 mom_target;
-	Nucleus* nuc_target;
+	NucDeExNucleus* nuc_target;
 	std::string name_target;
 
 	// daughter nucleus info
@@ -134,7 +135,7 @@ class Deexcitation{
 	double Ex_daughter;
 	double mass_daughter;
 	TVector3 mom_daughter;
-	Nucleus* nuc_daughter;
+	NucDeExNucleus* nuc_daughter;
 	std::string name_daughter;
 
 	// decay particle info
@@ -143,11 +144,11 @@ class Deexcitation{
 
 	// for output
 	void InitParticleVector();
-	vector<Particle> *_particle;
+	vector<NucDeExParticle> *_particle;
 	int PDGion(int Z,int N);
 
 	// others
-	NucleusTable* _nucleus_table;
+	NucDeExNucleusTable* _nucleus_table;
 	int ldmodel;
 	bool parity_optmodall;
 	int verbose;

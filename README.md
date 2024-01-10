@@ -5,10 +5,10 @@ Note that this simulator reads files containing branching ratios calculated with
 Therefore, the simulator codes themselves are independent of the TALYS code.
 
 ## Contact 
-Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
+Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
-**If you use NucDeEx, please always cite this paper [URL](https://arxiv.org/abs/2310.10394).**
+**If you use NucDeEx, please always cite [this paper](https://arxiv.org/abs/2310.10394) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3).**
 ```
 @misc{abe2023nuclear,
       title={Nuclear deexcitation simulator for neutrino interactions and nucleon decays of $^{12}\text{C}$ and $^{16}\text{O}$ based on TALYS}, 
@@ -19,42 +19,24 @@ Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
       primaryClass={hep-ph}
 }
 ```
-It would be better to also cite [TALYS' paper](https://doi.org/10.1016/j.nds.2012.11.002).  
-In addition, please consider citing the following references, explaining the predecessor deexcitation simulator to NucDeEx.
 ```
-@article{Abe_2021,
-doi = {10.1088/1742-6596/2156/1/012189},
-url = {https://dx.doi.org/10.1088/1742-6596/2156/1/012189},
-year = {2021},
-month = {dec},
-publisher = {IOP Publishing},
-volume = {2156},
-number = {1},
-pages = {012189},
-author = {Seisho Abe and the KamLAND Collaboration},
-title = {Nuclear de-excitation associated with neutrino-carbon interactions},
-journal = {Journal of Physics: Conference Series},
+@Article{Koning2023,
+  author={Koning, Arjan and Hilaire, Stephane and Goriely, Stephane},
+  title={TALYS: modeling of nuclear reactions},
+  journal={The European Physical Journal A},
+  year={2023},
+  month={Jun},
+  day={14},
+  volume={59},
+  number={6},
+  pages={131},
+  issn={1434-601X},
+  doi={10.1140/epja/s10050-023-01034-3},
+  url={https://doi.org/10.1140/epja/s10050-023-01034-3}
 }
 ```
-```
-@article{PhysRevD.107.072006,
-  title = {First measurement of the strange axial coupling constant using neutral-current quasielastic interactions of atmospheric neutrinos at KamLAND},
-  author = {Abe, S. and others},
-  collaboration = {KamLAND Collaboration},
-  journal = {Phys. Rev. D},
-  volume = {107},
-  issue = {7},
-  pages = {072006},
-  numpages = {17},
-  year = {2023},
-  month = {Apr},
-  publisher = {American Physical Society},
-  doi = {10.1103/PhysRevD.107.072006},
-  url = {https://link.aps.org/doi/10.1103/PhysRevD.107.072006}
-}
-
-```
-
+In addition, please consider citing the following references, explaining [the predecessor deexcitation simulator to NucDeEx](https://dx.doi.org/10.1088/1742-6596/2156/1/012189) 
+and [application to atmospheric neutrino analysis at KamLAND](https://link.aps.org/doi/10.1103/PhysRevD.107.072006).
 
 ## Compile
 
@@ -69,10 +51,10 @@ source setup.sh
 make
 ```
 
-## Deexcitation Simulation
-You need to declare "Deexcitation" object and call a function:
+## Run Simulation
+You need to declare `NucDeExDeexcitation` object and call a function:
 ```
-Deexcitation::DoDeex(Zt,Nt,Z,N,shell,Ex,Pinit)
+NucDeExDeexcitation::DoDeex(Zt,Nt,Z,N,shell,Ex,Pinit)
 ```
 - Zt(Nt): Z(N) number of the target nucleus
 - Z(N): Z(N) number of the residual nucleus

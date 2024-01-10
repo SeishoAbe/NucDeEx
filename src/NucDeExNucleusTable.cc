@@ -7,15 +7,15 @@
 #include <string.h>
 #include <cstdlib>
 
-#include "NucleusTable.hh"
-#include "consts.hh"
+#include "NucDeExConsts.hh"
+#include "NucDeExNucleusTable.hh"
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 #include "G4INCLConfig.hh"
 #endif
 
 ///////////////
-NucleusTable::NucleusTable()
+NucDeExNucleusTable::NucDeExNucleusTable()
 ///////////////
 {
   verbose=1;
@@ -31,7 +31,7 @@ NucleusTable::NucleusTable()
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 ///////////////
-NucleusTable::NucleusTable(G4INCL::Config *config)
+NucDeExNucleusTable::NucDeExNucleusTable(G4INCL::Config *config)
 ///////////////
 {
   verbose=1;
@@ -42,7 +42,7 @@ NucleusTable::NucleusTable(G4INCL::Config *config)
 #endif
 
 ///////////////
-bool NucleusTable::ReadTables(const bool init_flag)
+bool NucDeExNucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
 	// --- Read nucleus / separation energy tables ---//
@@ -65,7 +65,7 @@ bool NucleusTable::ReadTables(const bool init_flag)
 	num_of_nuc = index;
 
 	// create array for nucleus
-	_nucleus = new Nucleus[num_of_nuc];
+	_nucleus = new NucDeExNucleus[num_of_nuc];
 	for(int i=0;i<num_of_nuc;i++){
 		_nucleus[i].Init(init_flag);
 	}
@@ -117,23 +117,23 @@ bool NucleusTable::ReadTables(const bool init_flag)
 }
 
 ///////////////
-Nucleus* NucleusTable::GetNucleusPtr(int id)
+NucDeExNucleus* NucDeExNucleusTable::GetNucleusPtr(int id)
 ///////////////
 {
 	if(id<0) return NULL;
-	Nucleus* ptr = _nucleus;
+	NucDeExNucleus* ptr = _nucleus;
 	return ptr+id;
 }
 
 ///////////////
-Nucleus* NucleusTable::GetNucleusPtr(const char* name)
+NucDeExNucleus* NucDeExNucleusTable::GetNucleusPtr(const char* name)
 ///////////////
 {
 	return GetNucleusPtr(getID(name));
 }
 
 ///////////////
-Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
+NucDeExNucleus* NucDeExNucleusTable::GetNucleusPtr(int Z, int N)
 ///////////////
 {
 	if((unsigned)Z>=sizeof(nuc_name)/sizeof(char*) || Z<0) return NULL;
@@ -144,7 +144,7 @@ Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
 }
 
 ///////////////
-Nucleus* NucleusTable::GetNucleusPtrPDG(int PDG)
+NucDeExNucleus* NucDeExNucleusTable::GetNucleusPtrPDG(int PDG)
 ///////////////
 {
 	int A = (PDG%1000)/10;
@@ -153,14 +153,14 @@ Nucleus* NucleusTable::GetNucleusPtrPDG(int PDG)
 }
 
 ///////////////
-int NucleusTable::getID(const char* name)
+int NucDeExNucleusTable::getID(const char* name)
 ///////////////
 {
   _p_id = _nucleus_id.find(name);
   if(_p_id!=_nucleus_id.end()){
     return (int) ((_p_id->second));
   }else{
-    if(verbose>0) std::cerr << "Warning @ NucleusTable: Cannot find such nucleus " << name << std::endl;
+    if(verbose>0) std::cerr << "Warning @ NucDeExNucleusTable: Cannot find such nucleus " << name << std::endl;
 		return -1;
   }
 }
