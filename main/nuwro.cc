@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
 	ostringstream os;
 
 	// --- prepare deex tools
-	int Zt, Nt;
+	int Zt=0, Nt=0;
 	double S;
 	Deexcitation* deex = new Deexcitation(2, 1);
 	deex->SetSeed(seed);
