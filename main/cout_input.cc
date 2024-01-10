@@ -7,11 +7,9 @@
 #include "consts.hh"
 #include "NucleusTable.hh"
 
-using namespace std;
-
 int main(int argc, char* argv[]){
 	if(argc<=2){
-		cerr << argv[0] << " [Target nucleus]" << endl;
+		std::cerr << argv[0] << " [Target nucleus]" << std::endl;
 		return 0;
 	}
 	int ldmodel=1; // default: 1 (constant temperature)
@@ -24,11 +22,11 @@ int main(int argc, char* argv[]){
 	if(argc>=5) optmodall = (bool) atoi(argv[4]);
 	if(argc>=6) flag_jpi=(bool) atoi(argv[5]);
 
-	ostringstream os;
+	std::ostringstream os;
 	
   NucleusTable* nucleus_table = new NucleusTable();
   if(!nucleus_table->ReadTables()){
-		cerr << "something wrong" << endl;
+		std::cerr << "something wrong" << std::endl;
 		return 1;
 	}
 	Nucleus* nuc_target = nucleus_table->GetNucleusPtr(argv[1]);
@@ -46,58 +44,58 @@ int main(int argc, char* argv[]){
 	os << "/input_" << argv[1] << "_ldmodel" << ldmodel;
 	if(parity) os << "_parity";
 	if(optmodall) os << "_optmodall";
-	ofstream ofs(os.str().c_str());
+	std::ofstream ofs(os.str().c_str());
 
-	ofs << "projectile 0" << endl;
-	ofs << "element " << Z << endl;
-	ofs << "mass " << A << endl;
+	ofs << "projectile 0" << std::endl;
+	ofs << "element " << Z << std::endl;
+	ofs << "mass " << A << std::endl;
 	if( flag_jpi && (A==11 || A==15)) {
-		ofs << "energy energy.1.2.p" << endl;
+		ofs << "energy energy.1.2.p" << std::endl;
 	}else{
-		ofs << "energy energy" << endl;
+		ofs << "energy energy" << std::endl;
 	}
-	ofs << endl;
+	ofs << std::endl;
 
-	ofs << "bins 0" << endl;
-	ofs << "ldmodel " << ldmodel << endl;
-	if(parity) ofs << "parity y" << endl;
-	else       ofs << "parity n" << endl;
-	if(optmodall) ofs << "optmodall y" << endl;
-	else          ofs << "optmodall n" << endl;
-	ofs << endl;
+	ofs << "bins 0" << std::endl;
+	ofs << "ldmodel " << ldmodel << std::endl;
+	if(parity) ofs << "parity y" << std::endl;
+	else       ofs << "parity n" << std::endl;
+	if(optmodall) ofs << "optmodall y" << std::endl;
+	else          ofs << "optmodall n" << std::endl;
+	ofs << std::endl;
 
 	// maxlevelsbin
-	ofs << "maxlevelstar " << nuc_target->maxlevelsbin << endl;
-	for(int p=0;p<num_particle;p++){
+	ofs << "maxlevelstar " << nuc_target->maxlevelsbin << std::endl;
+	for(int p=0;p<NucDeEx::num_particle;p++){
 		int Zt=Z, Nt=N;
-		ofs << "maxlevelsbin " << particle_name[p].substr(0,1) << " ";
-		if(particle_name[p].substr(0,1)=="n") Nt--;
-		else if(particle_name[p].substr(0,1)=="p") Zt--;
-		else if(particle_name[p].substr(0,1)=="d") Zt--,Nt--;
-		else if(particle_name[p].substr(0,1)=="t") Zt--,Nt-=2;
-		else if(particle_name[p].substr(0,1)=="h") Zt-=2,Nt--;
-		else if(particle_name[p].substr(0,1)=="a") Zt-=2,Nt-=2;
+		ofs << "maxlevelsbin " << NucDeEx::particle_name[p].substr(0,1) << " ";
+		if(NucDeEx::particle_name[p].substr(0,1)=="n") Nt--;
+		else if(NucDeEx::particle_name[p].substr(0,1)=="p") Zt--;
+		else if(NucDeEx::particle_name[p].substr(0,1)=="d") Zt--,Nt--;
+		else if(NucDeEx::particle_name[p].substr(0,1)=="t") Zt--,Nt-=2;
+		else if(NucDeEx::particle_name[p].substr(0,1)=="h") Zt-=2,Nt--;
+		else if(NucDeEx::particle_name[p].substr(0,1)=="a") Zt-=2,Nt-=2;
 		int At = Zt+Nt;
 		int maxlevelsbin=0;
 		for(int i=0;i<nucleus_table->GetNumofNuc();i++){
 			Nucleus* nuc = nucleus_table->GetNucleusPtr(i);
 			if(nuc->Z==Zt && nuc->N==Nt  && nuc->A==At){
-				cout << nuc->name << endl;
+				std::cout << nuc->name << std::endl;
 				maxlevelsbin=nuc->maxlevelsbin;
 			}
 		}
 		ofs << maxlevelsbin;
-		ofs << endl;
+		ofs << std::endl;
 	}
-	ofs << "maxlevelsres 0" << endl;
-	ofs << "ejectiles g n p a d t h" << endl;
+	ofs << "maxlevelsres 0" << std::endl;
+	ofs << "ejectiles g n p a d t h" << std::endl;
 
 	// output
-	ofs << endl;
-	ofs << "outdiscrete y" << endl;
-	ofs << "outpopulation y" << endl;
-	ofs << "outdecay y" << endl;
-	ofs << "outlevels y" << endl;
+	ofs << std::endl;
+	ofs << "outdiscrete y" << std::endl;
+	ofs << "outpopulation y" << std::endl;
+	ofs << "outdecay y" << std::endl;
+	ofs << "outlevels y" << std::endl;
 
 	ofs.close();
 

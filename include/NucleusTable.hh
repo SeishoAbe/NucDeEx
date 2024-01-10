@@ -8,8 +8,6 @@
 #include "G4INCLConfig.hh"
 #endif
 
-using namespace std;
-
 class NucleusTable{
   public:
   NucleusTable();
@@ -33,9 +31,9 @@ class NucleusTable{
   private:
 	int num_of_nuc;
 	Nucleus* _nucleus;
-	map<string, int> _nucleus_id;
-	map<string, int> :: iterator _p_id;
-  string PATH_NucDeEx_table;
+	std::map<std::string, int> _nucleus_id;
+	std::map<std::string, int> :: iterator _p_id;
+  std::string PATH_NucDeEx_table;
   int verbose;
 };
 #endif
