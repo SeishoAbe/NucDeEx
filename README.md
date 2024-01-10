@@ -5,7 +5,7 @@ Note that this simulator reads files containing branching ratios calculated with
 Therefore, the simulator codes themselves are independent of the TALYS code.
 
 ## Contact 
-Seisho Abe (ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
+Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
 **If you use NucDeEx, please always cite [this paper](https://arxiv.org/abs/2310.10394) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3).**
@@ -52,7 +52,7 @@ make
 ```
 
 ## Run Simulation
-You need to declare "NucDeExDeexcitation" object and call a function:
+You need to declare `NucDeExDeexcitation` object and call a function:
 ```
 NucDeExDeexcitation::DoDeex(Zt,Nt,Z,N,shell,Ex,Pinit)
 ```
