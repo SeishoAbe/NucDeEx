@@ -136,7 +136,7 @@ Nucleus* NucleusTable::GetNucleusPtr(const char* name)
 Nucleus* NucleusTable::GetNucleusPtr(int Z, int N)
 ///////////////
 {
-	if(Z>=sizeof(nuc_name)/sizeof(char*) || Z<0) return NULL;
+	if((unsigned)Z>=sizeof(nuc_name)/sizeof(char*) || Z<0) return NULL;
 	//std::cout << "SIZE " << sizeof(nuc_name)/sizeof(char*) << std::endl;
 	std::ostringstream os;
 	os << Z+N << nuc_name[Z];

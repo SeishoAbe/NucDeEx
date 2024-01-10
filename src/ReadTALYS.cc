@@ -70,7 +70,7 @@ bool ReadTALYS::Read()
 
 		// --- Find discrete level info 
 		int find_discrete = st.find(keyword_discrete->c_str());
-		if(find_discrete != std::string::npos){
+		if((unsigned)find_discrete != std::string::npos){
 			flag_mode=2;
 			if(_verbose>0){
 				std::cout << "### Discrete mode ###" << std::endl;
@@ -79,7 +79,7 @@ bool ReadTALYS::Read()
 			int z,n;
 			std::istringstream(st) >> z;
 			int find_N = st.find(keyword_N->c_str());
-			if(find_N == std::string::npos){
+			if((unsigned)find_N == std::string::npos){
 				std::cerr << "something wrong in finding " << keyword_N << std::endl;
 				return 0;
 			}
@@ -95,7 +95,7 @@ bool ReadTALYS::Read()
 			int d_bin;
 			float d_energy, d_spin;
 			std::string d_parity;
-			if(find_discrete_br == std::string::npos){ // level info
+			if((unsigned)find_discrete_br == std::string::npos){ // level info
 				if(st.find("Number") != std::string::npos) continue;
 				if(std::istringstream(st) >> d_bin >> d_energy >> d_spin >> d_parity){
 					if(nuc->level_Ex_bin<d_bin) nuc->level_Ex_bin = d_bin;
@@ -116,7 +116,7 @@ bool ReadTALYS::Read()
 		// --- Find total population info (starting from 'keyword_population')
 		// ->  get total population
 		int find_population = st.find(keyword_population->c_str());
-		if(find_population != std::string::npos){
+		if((unsigned)find_population != std::string::npos){
 			if(_verbose>0 && flag_mode!=0){
 				std::cout << "### Population mode ###" << std::endl;
 			}
@@ -126,7 +126,7 @@ bool ReadTALYS::Read()
 			float total_pop;
 			std::istringstream(st) >> z; // obtain z
 			int find_N = st.find(keyword_N->c_str());
-			if(find_N == std::string::npos){
+			if((unsigned)find_N == std::string::npos){
 				std::cerr << "something wrong in finding " << keyword_N << std::endl;
 				return 0;
 			}
@@ -140,9 +140,9 @@ bool ReadTALYS::Read()
 				flag_first_population=0;//turn off
 			}
 			int find_parity= st.find(keyword_parity->c_str());
-			if(find_parity == std::string::npos){ // parity plus & minus
+			if((unsigned)find_parity == std::string::npos){ // parity plus & minus
 				int find_before_decay = st.find(keyword_before_decay->c_str());
-				if(find_before_decay == std::string::npos){
+				if((unsigned)find_before_decay == std::string::npos){
 					std::cerr << "something wrong in finding " << keyword_before_decay << std::endl;
 					return 0;
 				}
@@ -163,7 +163,7 @@ bool ReadTALYS::Read()
 				else parity_array=1;
 
 				int find_before_decay = st.find(keyword_before_decay->c_str());
-				if(find_before_decay == std::string::npos){
+				if((unsigned)find_before_decay == std::string::npos){
 					std::cerr << "something wrong in finding " << keyword_before_decay << std::endl;
 					return 0;
 				}
@@ -181,7 +181,7 @@ bool ReadTALYS::Read()
 			int bin_mother, parity_mother, parity_daughter, daughter_id;
 			int find_decay = st.find(keyword_decay->c_str());
 			int find_total = st.find(keyword_total->c_str());
-			if(find_decay == std::string::npos && flag_mode==0){
+			if((unsigned)find_decay == std::string::npos && flag_mode==0){
 				// after total population info (polulation mode), but it is not decay info.
 				// -> excitation energy & pop info.
 				int bin;
@@ -205,13 +205,13 @@ bool ReadTALYS::Read()
 						}
 					}
 				}
-			}else if (find_decay!=std::string::npos){ // decay info was found
+			}else if ((unsigned)find_decay!=std::string::npos){ // decay info was found
 				//if(_verbose>0){
 				//	std::cout << "### Decay mode ###" << std::endl;
 				//}
 				flag_mode=1;
 				int find_bin_mother = st.find(keyword_bin_mother->c_str());
-				if(find_bin_mother == std::string::npos){
+				if((unsigned)find_bin_mother == std::string::npos){
 					std::cerr << "unexpected behavior" << std::endl;
 					return 0;
 				}
@@ -238,7 +238,7 @@ bool ReadTALYS::Read()
 						break;
 					}
 				}
-			}else if(flag_mode==1 && find_total!=std::string::npos){ // find total info just after decay mode
+			}else if(flag_mode==1 && (unsigned)find_total!=std::string::npos){ // find total info just after decay mode
 				st = st.substr(find_total+keyword_total->length());
 				std::istringstream(st) >> pop_total_decay; // obtain pop for the decay
 						// this parameter wil be sum of transition pop for both parity (negative + positive)
