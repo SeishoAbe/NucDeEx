@@ -1,13 +1,11 @@
+!.gitignore
 # Prefix
 old*
-/output*/*/output*
-/output*/output*
-/output_nuwro*
-/output_genie*
-/output_neut*
 bin/*
 obj/*
 lib/*
+sim_out_*
+log*
 fig
 fig_2*
 fig_neut*
@@ -16,9 +14,6 @@ fig_genie*
 fig_comparison*
 fig_sim_*
 fig_paper*
-sim_out_*
-!.gitignore
-log*
 
 # Suffix
 #*.root
@@ -28,6 +23,13 @@ log*
 *.so
 
 #special file
+/output*/*/output*
+/output*/output*
+/output*/*/energy*
+/output*/energy*
+/output_nuwro*
+/output_genie*
+/output_neut*
 cs??????
 tr??????
 ecis.invin
