@@ -17,6 +17,23 @@
 # List external includes needed.
 include_directories(${CLHEP_INCLUDE_DIRS})
 
+# List root includes needed.
+execute_process(
+  COMMAND root-config --incdir
+  OUTPUT_VARIABLE ROOT_INCLUDE_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+#message(${ROOT_INCLUDE_DIR})
+include_directories(${ROOT_INCLUDE_DIR})
+
+execute_process(
+  COMMAND root-config --evelibs
+  OUTPUT_VARIABLE ROOT_LIBRARIES
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+#message(${ROOT_LIBRARIES})
+include_directories(${ROOT_LIBRARIES})
+
 # List internal includes needed.
 include_directories(${CMAKE_SOURCE_DIR}/source/geometry/management/include)
 include_directories(${CMAKE_SOURCE_DIR}/source/geometry/volumes/include)
@@ -38,13 +55,6 @@ include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/de_exci
 include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/de_excitation/evaporation/include)
 include_directories(${CMAKE_SOURCE_DIR}/source/track/include)
 include_directories(${CMAKE_SOURCE_DIR}/source/intercoms/include)
-
-execute_process(
-  COMMAND root-config --incdir
-  OUTPUT_VARIABLE ROOT_INC_DIR
-  )
-#message(${ROOT_INC_DIR})
-include_directories(${ROOT_INC_DIR})
 
 #
 # Define the Geant4 Module.
@@ -102,4 +112,6 @@ GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
         G4track
         G4intercoms
 
-LINK_LIBRARIES)# List any source specific properties here
+    LINK_LIBRARIES
+      ${ROOT_LIBRARIES}
+)# List any source specific properties here
