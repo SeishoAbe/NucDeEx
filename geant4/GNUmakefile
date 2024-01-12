@@ -31,5 +31,8 @@ CPPFLAGS += -I$(G4BASE)/geometry/management/include \
 	    -I$(G4BASE)/processes/hadronic/models/de_excitation/evaporation/include \
 	    -I$(G4BASE)/track/include \
 	    -I$(G4BASE)/intercoms/include
+
+CPPFLAGS += $(shell root-config --cflags)
+LDFLAGS  += $(shell root-config --evelibs)
            
 include $(G4INSTALL)/config/common.gmk
