@@ -10,7 +10,7 @@
 
 ### multi nucleon hole
 #TARGET_TMP="14O 13O 12O 11O 14N 13N 12N 11N 10N 14C 13C 12C 11C 10C 9C 13B 12B 11B 10B 9B 8B 12Be 11Be 10Be 9Be 8Be 7Be 11Li 10Li 9Li 8Li 7Li 6Li"
-TARGET_TMP="16O"
+TARGET_TMP="16O 16N 16F"
 ldmodel_tmp=2
 parity_optmodall_tmp=1
 flag_jpi=0
