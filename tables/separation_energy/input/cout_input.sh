@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-NUCLEUSTABLE=$TALYS_WORK_TABLES/nucleus/nucleus.txt
+NUCLEUSTABLE=$NUCDEEX_TABLES/nucleus/nucleus.txt
 
 cat $NUCLEUSTABLE | while read line
 do 
