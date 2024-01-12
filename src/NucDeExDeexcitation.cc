@@ -107,22 +107,24 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   eventID++;
 
   int status=-1;
+  InitParticleVector();
+
+  if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
+    std::cerr << "This tool does not support the target nucleus" << std::endl;
+    AddGSNucleus(Z,N,mom);
+    status=0;
+    return status;
+  }
 
   if(shell>0) _shell=shell;
   else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
   else abort();
-
-  if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
-    std::cerr << "This tool does not support the target nucleus" << std::endl;
-    status=0;
-  }
 
   // --- Call sub functions according to shell and nucleus conditions- --//
   if(Zt+Nt == Z+N || Ex<=0){
     // --- No change in nucleus (Coherent scattering etc.) or no nucleon emission
     //     Currently not supported. Nothing to do.
     // --- Negative Ex
-    InitParticleVector();
     AddGSNucleus(Z,N,mom);
     status=0;
   }else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
@@ -130,7 +132,6 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
     if(_shell==3){ 
       // p1/2-hole. nothing to do
       if(verbose>0) std::cout << "(p1/2)-hole" <<std::endl;
-      InitParticleVector();
       AddGSNucleus(Z,N,mom);
       status=1;
     }else if(_shell==2){
@@ -488,7 +489,7 @@ int NucDeExDeexcitation::ExtoShell(const int Zt, const int Nt, const double Ex)
   if(Zt==6&&Nt==6){ // 12C
     if(Ex>Ex_12C_s12) return 1; // s1/2-hole
     else return 2; //p3/2-hole
-  }else if(Zt==8&&Nt==8){
+  }else if(Zt==8&&Nt==8){ // 16O
     if(Ex>Ex_16O_s12) return 1;
     else if(Ex>Ex_16O_p32) return 2;
     else return 3;
