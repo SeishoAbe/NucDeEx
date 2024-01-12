@@ -49,6 +49,8 @@ G4NucDeExInterface::G4NucDeExInterface() :
 {
   theNucDeEx->SetSeed(1);
   theNucDeEx->SetVerbose(0);
+  // This is tentavie solution. We cannot get parent nucleus informationi
+  Zt=8, Nt=8, At=16; // FIXME
 }
 
 G4NucDeExInterface::~G4NucDeExInterface() {
@@ -77,6 +79,9 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   theNucDeExResult = theNucDeEx->GetParticleVector();
   int size = theNucDeExResult->size();
 
+  //G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem
+  //       << "   eStarRem = " << eStarRem << G4endl;
+
   for(int j = 0; j < size ; ++j) { // Copy NucDeEx result to the EventInfo
     NucDeExParticle particle = theNucDeExResult->at(j);
     if(!particle._flag) continue; // skip intermediate states
@@ -95,6 +100,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
       A = (PDG%10000)/10;
       Z = (PDG%10000000-A*10)/10000;
     }
+    //G4cout << "NucDeEx: PDG = " << PDG << "  kE = " << particle.kE() << G4endl;
 
     G4ReactionProduct *product = toG4Particle(A,Z,0, // S
                                               particle.kE(),
