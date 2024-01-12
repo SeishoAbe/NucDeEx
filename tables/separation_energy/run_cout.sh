@@ -1,8 +1,8 @@
 #!/bin/bash
 
-EXE=./cout_separation_energy
+EXE=./bin/cout_separation_energy
 OUTDIR=output
-NUCLEUSTABLE=$TALYS_WORK_TABLES/nucleus/nucleus.txt
+NUCLEUSTABLE=$NUCDEEX_TABLES/nucleus/nucleus.txt
 
 cat $NUCLEUSTABLE | while read line
 do

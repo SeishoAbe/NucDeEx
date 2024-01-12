@@ -3,12 +3,7 @@
 FILE=energy
 OUTDIR=output
 INDIR=input
-NUCLEUSTABLE=$TALYS_WORK_TABLES/nucleus/nucleus.txt
-
-cd /home/seisho/talys_1.96
-. setup_talys_1.96.sh
-cd -
-
+NUCLEUSTABLE=$NUCDEEX_TABLES/nucleus/nucleus.txt
 
 if [ ! -e $OUTDIR ] ; then
   echo "not output dir"
@@ -18,7 +13,7 @@ else
 fi
 
 rm -v $FILE
-ln -sv $TALYS_WORK_TABLES/energy_distribution/$FILE ./
+ln -sv $NUCDEEX_TABLES/energy_distribution/$FILE ./
 
 cat $NUCLEUSTABLE | while read line
 do
