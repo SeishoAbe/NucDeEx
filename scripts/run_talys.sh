@@ -19,10 +19,6 @@ FILE_TMP="energy.1.2.p energy"
 INDIR_PREFIX=input
 OUTDIR_PREFIX=output
 
-cd /home/seisho/talys_1.96
-. setup_talys_1.96.sh
-cd -
-
 for TARGET in $TARGET_TMP
 do
 	INDIR=$INDIR_PREFIX
