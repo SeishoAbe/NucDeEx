@@ -757,7 +757,7 @@ bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const
   os.str("");
   os << PATH_NucDeEx_root << "/output/";
   // single nucleon hole
-  if(Zt+Nt==Z+N+1){
+  if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){ 
     if(Zt==6&&Nt==6) os << "12C/";
     else if(Zt==8&&Nt==8) os << "16O/";
     else return 0; // not supported
