@@ -39,6 +39,7 @@
 #include "G4HadFinalState.hh"
 #include "G4HadProjectile.hh"
 #include "G4Nucleus.hh"
+#include "G4PreCompoundModel.hh"
 
 #include "NucDeExDeexcitation.hh"
 #include "NucDeExParticle.hh"
@@ -49,6 +50,7 @@
 class G4NucDeExInterface : public G4VPreCompoundModel {
 public:
   G4NucDeExInterface();
+  G4NucDeExInterface(G4VPreCompoundModel* preco);
   virtual ~G4NucDeExInterface();
 
   virtual G4ReactionProductVector *DeExcite(G4Fragment &aFragment);
@@ -62,6 +64,7 @@ public:
 
 private:
   NucDeExDeexcitation *theNucDeEx;
+  G4VPreCompoundModel *theG4PreCompound;
   int Zt,Nt,At;
   TVector3 Pinit;
 

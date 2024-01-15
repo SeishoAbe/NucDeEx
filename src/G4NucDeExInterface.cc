@@ -45,6 +45,7 @@
 G4NucDeExInterface::G4NucDeExInterface() :
   G4VPreCompoundModel(NULL, "NucDeEx"),
   theNucDeEx(new NucDeExDeexcitation(2,1)),
+  theG4PreCompound(new G4PreCompoundModel),
   eventNumber(0)
 {
   theNucDeEx->SetSeed(1);
@@ -53,8 +54,22 @@ G4NucDeExInterface::G4NucDeExInterface() :
   Zt=8, Nt=8, At=16; // FIXME
 }
 
+G4NucDeExInterface::G4NucDeExInterface(G4VPreCompoundModel* preco) :
+  G4VPreCompoundModel(NULL, "NucDeEx"),
+  theNucDeEx(new NucDeExDeexcitation(2,1)),
+  eventNumber(0)
+{
+  G4cout << "NucDeEx: Get G4PreCompoundModel by using G4HadronicInteractionRegistry" << G4endl;
+  theG4PreCompound = p;
+  theNucDeEx->SetSeed(1);
+  theNucDeEx->SetVerbose(0);
+  // This is tentavie solution. We cannot get parent nucleus informationi
+  Zt=8, Nt=8, At=16; // FIXME
+}
+
 G4NucDeExInterface::~G4NucDeExInterface() {
   //delete theNucDeEx;
+  //delete theG4PreCompound;
 }
 
 G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
@@ -69,47 +84,48 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   Pinit.SetXYZ(pxRem,pyRem,pzRem);
 
   eventNumber++;
+  int status = theNucDeEx->DoDeex(Zt,Nt,
+                                  ZRem,ARem-ZRem,
+                                  0,eStarRem,Pinit);
+  G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem
+         << "   eStarRem = " << eStarRem << G4endl;
+  G4ReactionProductVector *result;
+  if(status!=1){// NucDeEx status is bad -> use G4PreCompoundModel
+    G4cout << "Use G4PreCompoundModel instead of NucDeEx" << G4endl;
+    result = theG4PreCompound->DeExcite(aFragment);
+  }else{ // NucDeEx status is good -> use it!
+    result = new G4ReactionProductVector;
+    theNucDeExResult = theNucDeEx->GetParticleVector();
+    int size = theNucDeExResult->size();
+    for(int j = 0; j < size ; ++j) { // Copy NucDeEx result to the EventInfo
+      NucDeExParticle particle = theNucDeExResult->at(j);
+      if(!particle._flag) continue; // skip intermediate states
+      const int PDG = particle._PDG;
+      int A,Z;
+      if(PDG==22){// gamma
+        A = 0;
+        Z = 0;
+      }else if(PDG==2112){ // neutron
+        A = 1;
+        Z = 0;
+      }else if(PDG==2212){ // proton
+        A = 1;
+        Z = 1;
+      }else{
+        A = (PDG%10000)/10;
+        Z = (PDG%10000000-A*10)/10000;
+      }
+      G4cout << "NucDeEx: PDG = " << PDG << "  kE = " << particle.kE() << G4endl;
 
-  theNucDeEx->DoDeex(Zt,Nt,
-                     ZRem,ARem-ZRem, 
-                     0,eStarRem,Pinit);
+      G4ReactionProduct *product = toG4Particle(A,Z,0, // S
+                                                particle.kE(),
+                                                particle._momentum.X(),
+                                                particle._momentum.Y(),
+                                                particle._momentum.Z());
 
-  G4ReactionProductVector *result = new G4ReactionProductVector;
-
-  theNucDeExResult = theNucDeEx->GetParticleVector();
-  int size = theNucDeExResult->size();
-
-  //G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem
-  //       << "   eStarRem = " << eStarRem << G4endl;
-
-  for(int j = 0; j < size ; ++j) { // Copy NucDeEx result to the EventInfo
-    NucDeExParticle particle = theNucDeExResult->at(j);
-    if(!particle._flag) continue; // skip intermediate states
-    const int PDG = particle._PDG;
-    int A,Z;
-    if(PDG==22){// gamma
-      A = 0;
-      Z = 0;
-    }else if(PDG==2112){ // neutron
-      A = 1;
-      Z = 0;
-    }else if(PDG==2212){ // proton
-      A = 1;
-      Z = 1;
-    }else{
-      A = (PDG%10000)/10;
-      Z = (PDG%10000000-A*10)/10000;
+      if(product)
+        result->push_back(product);
     }
-    //G4cout << "NucDeEx: PDG = " << PDG << "  kE = " << particle.kE() << G4endl;
-
-    G4ReactionProduct *product = toG4Particle(A,Z,0, // S
-                                              particle.kE(),
-                                              particle._momentum.X(),
-                                              particle._momentum.Y(),
-                                              particle._momentum.Z());
-
-    if(product)
-      result->push_back(product);
   }
   return result;
 }
@@ -158,19 +174,7 @@ void G4NucDeExInterface::ModelDescription(std::ostream& outFile) const {
 
 void G4NucDeExInterface::DeExciteModelDescription(std::ostream& outFile) const {
    outFile 
-     << "NUCDEEX++ is a statistical model for nuclear de-excitation. It simulates\n"
-     << "the gamma emission and the evaporation of neutrons, light charged particles\n"
-     << "and IMFs, as well as fission where applicable. The code included in Geant4\n"
-     << "is a C++ translation of the original Fortran code NUCDEEX07. Although the model\n"
-     << "has been recently extended to hypernuclei by including the evaporation of lambda\n"
-     << "particles. More details about the physics are available in the\n"
-     << "Geant4 Physics Reference Manual and in the reference articles.\n\n"
-     << "References:\n"
-     << "(1) A. Kelic, M. V. Ricciardi, and K. H. Schmidt, in Proceedings of Joint\n"
-     << "ICTP-IAEA Advanced Workshop on Model Codes for Spallation Reactions,\n"
-     << "ICTP Trieste, Italy, 4–8 February 2008, edited by D. Filges, S. Leray, Y. Yariv,\n"
-     << "A. Mengoni, A. Stanculescu, and G. Mank (IAEA INDC(NDS)-530, Vienna, 2008), pp. 181–221.\n\n"
-     << "(2) J.L. Rodriguez-Sanchez, J.-C. David et al., Phys. Rev. C 98, 021602 (2018)\n\n"; 
+     << "https://github.com/SeishoAbe/NucDeEx\n";
 }
 
 #endif // NUCDEEX_IN_GEANT4_MODE
