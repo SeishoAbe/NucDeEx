@@ -60,7 +60,7 @@ G4NucDeExInterface::G4NucDeExInterface(G4VPreCompoundModel* preco) :
   eventNumber(0)
 {
   G4cout << "NucDeEx: Get G4PreCompoundModel by using G4HadronicInteractionRegistry" << G4endl;
-  theG4PreCompound = p;
+  theG4PreCompound = preco;
   theNucDeEx->SetSeed(1);
   theNucDeEx->SetVerbose(0);
   // This is tentavie solution. We cannot get parent nucleus informationi
