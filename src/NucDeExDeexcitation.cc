@@ -116,8 +116,7 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
 
   // --- Call sub functions according to shell and nucleus conditions- --//
   if(Ex<=0){ // --- negative Ex
-    AddGSNucleus(Z,N,mom);
-    status=1;
+    status=AddGSNucleus(Z,N,mom);
   }else if(Zt+Nt == Z+N){ // --- No change in Atomic number (Coherent scattering etc.)
     status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
   }else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){ // --- Single nucleon disapperance
@@ -129,8 +128,7 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
     if(_shell==3){ 
       // p1/2-hole. nothing to do
       if(verbose>0) std::cout << "(p1/2)-hole" <<std::endl;
-      AddGSNucleus(Z,N,mom);
-      status=1;
+      status=AddGSNucleus(Z,N,mom);
     }else if(_shell==2){
       // p3/2-hole 
       status=DoDeex_p32(Zt,Nt,Z,N,mom); 
@@ -184,7 +182,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
            << name_target.c_str() << std::endl;
     }
     AddGSNucleus(Z,N,mom);
-    return -1;
+    return 0;
   }
   
   // Loop until zero excitation energy or null nuc_daughter ptr
@@ -459,12 +457,12 @@ int NucDeExDeexcitation::DoDeex_p32(const int Zt, const int Nt,
 }
 
 /////////////////////////////////////////////
-void NucDeExDeexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
+int NucDeExDeexcitation::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 /////////////////////////////////////////////
 {
   mass_target = ElementMassInMeV(element_table->GetElementRN(Z+N, Z));
   nuc_target = _nucleus_table->GetNucleusPtr(Z,N);
-  if(nuc_target==NULL || mass_target<0) return; // do nothing
+  if(nuc_target==NULL || mass_target<0) return -1; // do nothing
   name_target = (string)nuc_target->name;
   NucDeExParticle nucleus(PDGion(Z,N),
                           mass_target, // w/o excitation E
@@ -475,6 +473,7 @@ void NucDeExDeexcitation::AddGSNucleus(const int Z,const int N, const TVector3& 
   if(verbose>0){
     std::cout << "AddGSNucleus(): " << name_target << std::endl;
   }
+  return 1;
 }
 
 

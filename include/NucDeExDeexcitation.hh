@@ -46,8 +46,13 @@ class NucDeExDeexcitation{
   // mom     : 3D momentum of residual nucleus
   // 
   // return  0 : The target or residual nucleus is not supported
+  //           : No root file 
+  //           : The g.s. nucleus is added in this case.
   //         1 : Success
-  //        -1 : Fatal error
+  //        -1 : Fatal error 
+  //           : Strange target & residual nuclei not in nucleus table, no mass profile
+  //           : no particle info is added
+
 
   // ---Sub functions --- //
   // supports multi-nucleon disapperance
@@ -86,9 +91,10 @@ class NucDeExDeexcitation{
   int DecayMode(const double Ex);
   bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
   void Decay(const bool breakflag);
-  void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
+  int  AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
     // Just add g.s. nucleus to the vector.
-    // this function will be used in p1/2-hole, etc.
+    // return 1: sucess
+    //       -1: fatal error
 
 
   // --- ROOT related methods & members --- //
