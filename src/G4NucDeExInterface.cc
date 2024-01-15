@@ -54,7 +54,7 @@ G4NucDeExInterface::G4NucDeExInterface() :
 }
 
 G4NucDeExInterface::~G4NucDeExInterface() {
-  delete theNucDeEx;
+  //delete theNucDeEx;
 }
 
 G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
