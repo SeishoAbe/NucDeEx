@@ -110,25 +110,22 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   InitParticleVector();
 
   if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
-    std::cerr << "This tool does not support the target nucleus" << std::endl;
-    AddGSNucleus(Z,N,mom);
-    status=0;
-    return status;
+    std::cerr << "ERROR: This tool does not support the target nucleus" << std::endl;
+    exit(1);
   }
 
-  if(shell>0) _shell=shell;
-  else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
-  else abort();
-
   // --- Call sub functions according to shell and nucleus conditions- --//
-  if(Zt+Nt == Z+N || Ex<=0){
-    // --- No change in nucleus (Coherent scattering etc.) or no nucleon emission
-    //     Currently not supported. Nothing to do.
-    // --- Negative Ex
+  if(Ex<=0){ // --- negative Ex
     AddGSNucleus(Z,N,mom);
-    status=0;
-  }else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
-    // --- Single nucleon disapperance
+    status=1;
+  }else if(Zt+Nt == Z+N){ // --- No change in Atomic number (Coherent scattering etc.)
+    status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
+  }else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){ // --- Single nucleon disapperance
+    // determine shell level of hole
+    if(shell>0) _shell=shell;
+    else if(shell==0) _shell=ExtoShell(Zt,Nt,Ex);
+    else abort();
+    //
     if(_shell==3){ 
       // p1/2-hole. nothing to do
       if(verbose>0) std::cout << "(p1/2)-hole" <<std::endl;
@@ -140,16 +137,15 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
     }else if(_shell==1){
       // s1/2-hole read TALYS data
       status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
-    }else{
+    }else{ // bug case
       std::cerr << "ERROR: Unexpected shell level: shell = " << _shell << std::endl;
-      status=-1;
+      abort();
     }
-  }else if(Zt+Nt>Z+N){
-    // --- Multi-nucleon disapperance
+  }else if(Zt+Nt>Z+N){ // --- Multi-nucleon disapperance
     status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
-  }else{
-    std::cerr << "ERROR: Unexpected target & residual nuclei" << std::endl;
-    status=-1;
+  }else{ // Zt and Nt are larger than Z and N. This can be happen in the use in Geant4
+    std::cerr << "Waring: Unexpected target & residual nuclei" << std::endl;
+    std::cerr << "Zt = " << Zt << "   Nt = " << Nt << "  Z = " << Z << "   N = " << N << std::endl;
   }
   return status;
 }
@@ -177,7 +173,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
            << name_target.c_str() << std::endl;
     }
     //AddGSNucleus(Z,N,mom); // nothing can be done for this case...(no mass profile)
-    return 0;
+    return -1;
   }
   name_target = (string)nuc_target->name;
 
@@ -188,7 +184,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
            << name_target.c_str() << std::endl;
     }
     AddGSNucleus(Z,N,mom);
-    return 0;
+    return -1;
   }
   
   // Loop until zero excitation energy or null nuc_daughter ptr
@@ -766,9 +762,6 @@ bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const
     if(Zt==6&&Nt==6) os << "12C/";
     else if(Zt==8&&Nt==8) os << "16O/";
     else return 0; // not supported
-  }else{
-    // multi-nucleon hole
-    ;
   }
   os << "Br_" << name_target.c_str() << "_ldmodel" << ldmodel;
   if(parity_optmodall) os << "_parity_optmodall";
