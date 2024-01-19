@@ -26,10 +26,12 @@ execute_process(
 include_directories(${ROOT_INCLUDE_DIR})
 
 execute_process(
-  COMMAND root-config --libs -lEG -lGeom #-lEve # will be broken if it's linked
+  COMMAND root-config --libs
   OUTPUT_VARIABLE ROOT_LIBRARIES
   OUTPUT_STRIP_TRAILING_WHITESPACE
   )
+set(ROOT_LIBRARIES ${ROOT_LIBRARIES} -lEG -lGeom) # -lEve will break G4 if it's linked
+#message(${ROOT_LIBRARIES})
 
 # List internal includes needed.
 include_directories(${CMAKE_SOURCE_DIR}/source/geometry/management/include)
