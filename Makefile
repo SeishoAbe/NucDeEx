@@ -15,7 +15,8 @@ ARFLAGS=
 CXXFLAGS        += $(shell root-config --cflags)
 #LDFLAGS         += $(shell root-config --libs) # <- Print regular ROOT libraries
 #LDFLAGS         += $(shell root-config --glibs) # <- Print regular + GUI ROOT libraries
-LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
+#LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
+LDFLAGS         += $(shell root-config --libs) -lEG -lGeom #-lEve
 ROOTVERSION = $(shell root-config --version)
 ROOT5=$(findstring 5.,$(ROOTVERSION))
 ifneq ($(ROOT5),)
