@@ -23,16 +23,13 @@ execute_process(
   OUTPUT_VARIABLE ROOT_INCLUDE_DIR
   OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-#message(${ROOT_INCLUDE_DIR})
 include_directories(${ROOT_INCLUDE_DIR})
 
 execute_process(
-  COMMAND root-config --evelibs
+  COMMAND root-config --libs -lEG -lGeom #-lEve # will be broken if it's linked
   OUTPUT_VARIABLE ROOT_LIBRARIES
   OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-#message(${ROOT_LIBRARIES})
-include_directories(${ROOT_LIBRARIES})
 
 # List internal includes needed.
 include_directories(${CMAKE_SOURCE_DIR}/source/geometry/management/include)
