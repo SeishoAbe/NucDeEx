@@ -84,11 +84,11 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   Pinit.SetXYZ(pxRem,pyRem,pzRem);
 
   eventNumber++;
+  G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem
+         << "   eStarRem = " << eStarRem << G4endl;
   int status = theNucDeEx->DoDeex(Zt,Nt,
                                   ZRem,ARem-ZRem,
                                   0,eStarRem,Pinit);
-  G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem
-         << "   eStarRem = " << eStarRem << G4endl;
   G4ReactionProductVector *result;
   if(status!=1){// NucDeEx status is bad -> use G4PreCompoundModel
     G4cout << "Use G4PreCompoundModel instead of NucDeEx" << G4endl;
