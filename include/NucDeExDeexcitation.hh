@@ -90,7 +90,7 @@ class NucDeExDeexcitation{
   // --- Simulation method called by DoDeex() --- //
   int DecayMode(const double Ex);
   bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
-  void Decay(const bool breakflag);
+  int Decay(const bool breakflag);
   int  AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
     // Just add g.s. nucleus to the vector.
     // return 1: sucess
