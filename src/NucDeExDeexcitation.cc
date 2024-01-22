@@ -853,7 +853,7 @@ int NucDeExDeexcitation::GetBrExTGraph(const string st, const double ex_t, const
   if(g_br_ex==0) return -1; // no tgraph
 
   if(g_br_ex->GetN()==0){ //no point in the tgraph -> get next point
-    point++
+    point++;
     os.str("");
     os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
     g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
