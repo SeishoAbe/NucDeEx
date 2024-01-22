@@ -582,7 +582,7 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
 bool NucDeExDeexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 /////////////////////////////////////////////
 {
-  double ex, br;
+  double ex=0, br=0;
   double Br_sum=0;
   for(int p=0;p<g_br_ex->GetN();p++){
     g_br_ex->GetPoint(p,ex,br);
@@ -847,14 +847,24 @@ int NucDeExDeexcitation::GetBrExTGraph(const string st, const double ex_t, const
   if(abs(ex-ex_t)>diff_ex) point--;
   if(point==g_br[mode]->GetN()) point--;
   if(point<0) point=0;
-  if(verbose>1){
-    std::cout << "GetBrExTGraph(): nearest_point = " << point << ",  diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << std::endl;
-  }
   os.str("");
   os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
   g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
   if(g_br_ex==0) return -1; // no tgraph
 
+  if(g_br_ex->GetN()==0){ //no point in the tgraph -> get next point
+    point++
+    os.str("");
+    os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
+    g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
+    if(g_br_ex==0) return -1; // no tgraph
+  }
+
+  if(verbose>1){
+    std::cout << "GetBrExTGraph(): nearest_point = " << point << ",  ex at the point = " << ex 
+      << ", diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << std::endl;
+
+  }
   return point;
 }
 
