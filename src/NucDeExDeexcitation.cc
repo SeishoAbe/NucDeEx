@@ -155,6 +155,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
 {
   if(verbose>0) std::cout << "DoDeex_talys()" << std::endl;
   RESET:
+  int status=1; // success
 
   // --- Initialization --- //
   InitParticleVector();
@@ -171,7 +172,8 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
            << name_target.c_str() << std::endl;
     }
     //AddGSNucleus(Z,N,mom); // nothing can be done for this case...(no mass profile)
-    return -1;
+    status=-1;
+    return status;
   }
   name_target = (string)nuc_target->name;
 
@@ -182,7 +184,8 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
            << name_target.c_str() << std::endl;
     }
     AddGSNucleus(Z,N,mom);
-    return 0;
+    status=0;
+    return status;
   }
   
   // Loop until zero excitation energy or null nuc_daughter ptr
@@ -236,6 +239,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
       Ex_daughter=0;
       mass_particle=0;
       mass_daughter=mass_target;
+      status=0;
     }
 
     // --- Get separation E and Qvalue 
@@ -251,7 +255,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
     if(nuc_daughter==NULL || Ex_daughter==0) breakflag=1;
     
     // --- Calculate kinematics --- //
-    Decay(breakflag); // if breakflag==0, it does not save daughter nucleus
+    if(Decay(breakflag)==0) status=0; // if breakflag==0, it does not save daughter nucleus
 
     if(breakflag) break;
 
@@ -274,7 +278,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
   delete rootf;
   tree=0;
 
-  return 1;
+  return status;
 }
 
 /////////////////////////////////////////////
@@ -605,13 +609,14 @@ bool NucDeExDeexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 }
 
 /////////////////////////////////////////////
-void NucDeExDeexcitation::Decay(const bool breakflag)
+int NucDeExDeexcitation::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
   if(verbose>0){
     std::cout << "NucDeExDeexcitation::Decay()" << std::endl;
   }
-  
+  int status=1; // sucess
+
   // ---- CM frame --- //
   // --- Calculate kinematics (CM)
   //    mass used in the following calculation should include excitation energy
@@ -625,8 +630,8 @@ void NucDeExDeexcitation::Decay(const bool breakflag)
   double kE_daughter = sqrt( pow(cmMomentum,2) + pow(mass_ex_daughter,2) ) - mass_ex_daughter;
   double kE_sum = kE_particle + kE_daughter; // just for check
   if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > check_criteria){
-    std::cerr << "Error @ NucDeExDeexcitationD::Decay: Something wroing in kinematics calculation" << std::endl;
-    abort();
+    std::cerr << "Error @ NucDeExDeexcitationD::Decay: Something wrong in kinematics calculation" << std::endl;
+    status=0;
   }
   if(verbose>1){
     std::cout << "mass_target   = " << mass_target << std::endl;
@@ -709,7 +714,7 @@ void NucDeExDeexcitation::Decay(const bool breakflag)
   //            The last two terms are calculated from CM at first, and then boosted.
   if(totalE_ex_target>0 && (totalE_ex_aft-totalE_ex_target)/totalE_ex_target>check_criteria){
     std::cerr << "ERROR: @ NucDeExDeexcitation:Decay(): Energy is not conserved..." << std::endl;
-    abort();
+    status=0;
   }
 
   // Then, push back
@@ -723,6 +728,7 @@ void NucDeExDeexcitation::Decay(const bool breakflag)
     std::cout << "flag_particle = " << p_particle._flag << std::endl;
     std::cout << "flag_daughter = " << p_daughter._flag << std::endl;
   }
+  return status;
 }
 
 /////////////////////////////////////////////
