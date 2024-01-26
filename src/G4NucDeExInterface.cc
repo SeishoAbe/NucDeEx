@@ -48,8 +48,9 @@ G4NucDeExInterface::G4NucDeExInterface() :
   theG4PreCompound(new G4PreCompoundModel),
   eventNumber(0)
 {
+  verbose=0;
   theNucDeEx->SetSeed(1);
-  theNucDeEx->SetVerbose(0);
+  theNucDeEx->SetVerbose(verbose);
   // This is tentavie solution. We cannot get parent nucleus informationi
   Zt=8, Nt=8, At=16; // FIXME
 }
@@ -60,9 +61,10 @@ G4NucDeExInterface::G4NucDeExInterface(G4VPreCompoundModel* preco) :
   eventNumber(0)
 {
   G4cout << "NucDeEx: Get G4PreCompoundModel by using G4HadronicInteractionRegistry" << G4endl;
+  verbose=0;
   theG4PreCompound = preco;
   theNucDeEx->SetSeed(1);
-  theNucDeEx->SetVerbose(0);
+  theNucDeEx->SetVerbose(verbose);
   // This is tentavie solution. We cannot get parent nucleus informationi
   Zt=8, Nt=8, At=16; // FIXME
 }
@@ -84,14 +86,13 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
   Pinit.SetXYZ(pxRem,pyRem,pzRem);
 
   eventNumber++;
-  G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem
-         << "   eStarRem = " << eStarRem << G4endl;
+  if(verbose>1) G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem << "   eStarRem = " << eStarRem << G4endl;
   int status = theNucDeEx->DoDeex(Zt,Nt,
                                   ZRem,ARem-ZRem,
                                   0,eStarRem,Pinit);
   G4ReactionProductVector *result;
   if(status!=1){// NucDeEx status is bad -> use G4PreCompoundModel
-    G4cout << "Use G4PreCompoundModel instead of NucDeEx" << G4endl;
+    if(verbose>0) G4cout << "Use G4PreCompoundModel instead of NucDeEx" << G4endl;
     result = theG4PreCompound->DeExcite(aFragment);
   }else{ // NucDeEx status is good -> use it!
     result = new G4ReactionProductVector;
@@ -115,7 +116,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
         A = (PDG%10000)/10;
         Z = (PDG%10000000-A*10)/10000;
       }
-      G4cout << "NucDeEx: PDG = " << PDG << "  kE = " << particle.kE() << G4endl;
+      if(verbose>1) G4cout << "NucDeEx: PDG = " << PDG << "  kE = " << particle.kE() << G4endl;
 
       G4ReactionProduct *product = toG4Particle(A,Z,0, // S
                                                 particle.kE(),
