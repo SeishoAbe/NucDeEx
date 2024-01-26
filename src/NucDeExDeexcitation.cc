@@ -142,8 +142,11 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   }else if(Zt+Nt>Z+N){ // --- Multi-nucleon disapperance
     status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
   }else{ // Zt and Nt are larger than Z and N. This can be happen in the use in Geant4
-    std::cerr << "Waring: Unexpected target & residual nuclei" << std::endl;
-    std::cerr << "Zt = " << Zt << "   Nt = " << Nt << "  Z = " << Z << "   N = " << N << std::endl;
+    if(verbose>0){
+      std::cerr << "Waring: Unexpected target & residual nuclei: "
+                << "Zt = " << Zt << "   Nt = " << Nt << "  Z = " << Z << "   N = " << N << std::endl;
+    }
+    status=-1;
   }
   return status;
 }

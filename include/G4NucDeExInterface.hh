@@ -65,7 +65,7 @@ public:
 private:
   NucDeExDeexcitation *theNucDeEx;
   G4VPreCompoundModel *theG4PreCompound;
-  int Zt,Nt,At;
+  int Zt,Nt,At,verbose;
   TVector3 Pinit;
 
   std::vector<NucDeExParticle> *theNucDeExResult;
