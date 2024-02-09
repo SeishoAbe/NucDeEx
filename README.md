@@ -8,15 +8,21 @@ Therefore, the simulator codes themselves are independent of the TALYS code.
 Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
-**If you use NucDeEx, please always cite [this paper](https://arxiv.org/abs/2310.10394) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3).**
+**If you use NucDeEx, please always cite [this paper](https://link.aps.org/doi/10.1103/PhysRevD.109.036009) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3).**
 ```
-@misc{abe2023nuclear,
-      title={Nuclear deexcitation simulator for neutrino interactions and nucleon decays of $^{12}\text{C}$ and $^{16}\text{O}$ based on TALYS}, 
-      author={Seisho Abe},
-      year={2023},
-      eprint={2310.10394},
-      archivePrefix={arXiv},
-      primaryClass={hep-ph}
+@article{PhysRevD.109.036009,
+  title = {Nuclear deexcitation simulator for neutrino interactions and nucleon decays of $^{12}\mathrm{C}$ and $^{16}\mathrm{O}$ based on TALYS},
+  author = {Abe, Seisho},
+  journal = {Phys. Rev. D},
+  volume = {109},
+  issue = {3},
+  pages = {036009},
+  numpages = {13},
+  year = {2024},
+  month = {Feb},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevD.109.036009},
+  url = {https://link.aps.org/doi/10.1103/PhysRevD.109.036009}
 }
 ```
 ```
