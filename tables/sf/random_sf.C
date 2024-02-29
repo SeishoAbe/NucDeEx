@@ -1,7 +1,7 @@
-#include "../../include/NucleusTable.hh"
-#include "../../include/Deexcitation.hh"
+#include "../../include/NucDeExNucleusTable.hh"
+#include "../../include/NucDeExDeexcitation.hh"
 
-R__LOAD_LIBRARY(../../lib/libTALYStool);
+R__LOAD_LIBRARY(../../lib/libNucDeEx);
 
 using namespace std;
 
@@ -9,14 +9,14 @@ int random_sf(){
 	// --------------------//
 	const int numofevent=1e6; // to be generated
 	//
-	const double Ex_p32 =4.0;
-	const double Ex_s12 =16;
-	string target="16O";
-	/*
 
 	const double Ex_p32 =-1e9;
 	const double Ex_s12 =16.0;
 	string target="12C";
+	/*
+	const double Ex_p32 =4.0;
+	const double Ex_s12 =16;
+	string target="16O";
 
 	*/
 	double max_mom=500;
@@ -28,11 +28,11 @@ int random_sf(){
 	ostringstream os,os_remove_g;
 
 	// Set deex tool
-	Deexcitation* deex = new Deexcitation(ldmodel, parity_optmodall);
+	NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall);
 	deex->SetSeed(seed); // 0: time
 	deex->SetVerbose(1);
-  NucleusTable* nucleus_table = deex->GetNucleusTablePtr();
-	Nucleus* nuc = nucleus_table->GetNucleusPtr(target.c_str());
+  NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
+	NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(target.c_str());
 	gStyle->SetTextFont(132);
   gStyle->SetTextSize(0.07);
   gStyle->SetTitleSize(0.07,"XYZ");
@@ -58,10 +58,10 @@ int random_sf(){
 	double MissE, Ex, S;
 	os.str("");	
 	if(target=="12C"){
-		os << getenv("TALYS_WORK_TABLES") << "/sf/pke12_tot.root";
+		os << getenv("NUCDEEX_TABLES") << "/sf/pke12_tot.root";
 		S = nucleus_table->GetNucleusPtr("12C")->S[2];
 	}else if(target=="16O"){
-		os << getenv("TALYS_WORK_TABLES") << "/sf/pke16.root";
+		os << getenv("NUCDEEX_TABLES") << "/sf/pke16.root";
 		S = nucleus_table->GetNucleusPtr("16O")->S[2];
 	}
 	cout << "S = " << S << endl;
@@ -238,6 +238,10 @@ int random_sf(){
 	os.str("");
 	os << "figure/fig_sf_random_" << target.c_str() << "_Ex.pdf";
 	c_Ex->Print(os.str().c_str());
+
+
+  TFile* outf = new TFile(("sf_random_" + target +".root").c_str(),"RECREATE");
+  h_sf_Ex_random[0]->Write();
 
 	return 0;
 }
