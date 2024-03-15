@@ -70,7 +70,6 @@ void NucDeExDeexcitation::Init(const int ld, const bool p_o)
   eventID=0;
   ldmodel=ld;
   parity_optmodall=p_o;
-  tree=0;
   for(int p=0;p<NucDeEx::num_particle;p++){
     g_br[p]=0;
   }
@@ -181,7 +180,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
   name_target = (string)nuc_target->name;
 
   // Read ROOT file
-  if( ! OpenROOT(Zt,Nt,Z,N,0) ){
+  if( ! OpenROOT(Zt,Nt,Z,N) ){
     if(verbose>0){
       std::cout << "We don't have deexcitation profile for this nucleus: " 
            << name_target.c_str() << std::endl;
@@ -283,7 +282,6 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
 
   rootf->Close();
   delete rootf;
-  tree=0;
 
   return status;
 }
@@ -800,8 +798,7 @@ int NucDeExDeexcitation::PDGion(int Z, int N)
 
 
 /////////////////////////////////////////////
-bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N, 
-                            const bool flag_tree)
+bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const int N)
 /////////////////////////////////////////////
 {
   os.str("");
@@ -820,45 +817,6 @@ bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const
   if(! rootf->IsOpen()) return 0;
   if(verbose>1){
     std::cout << "OpenRoot: " << os.str().c_str() << std::endl;
-  }
-  if(!flag_tree) return 1;
-  else return GetTTree(Z,N); // not supported now
-}
-
-/////////////////////////////////////////////
-bool NucDeExDeexcitation::GetTTree(const int Z, const int N)
-/////////////////////////////////////////////
-{
-  tree = (TTree*)rootf->Get("tree");
-  if(tree==0) return 0; // not ttree
-  tree->SetBranchAddress("Z",&_Z);
-  tree->SetBranchAddress("N",&_N);
-  tree->SetBranchAddress("Ex_bin",&_Ex_bin);
-  tree->SetBranchAddress("Ex",&_Ex);
-  tree->SetBranchAddress("Br",&_Br);
-  tree->SetBranchAddress("REx_bin",&_REx_bin);
-  tree->SetBranchAddress("REx",&_REx);
-  tree->SetBranchAddress("RBr",&_RBr);
-  return 1;
-}
-
-
-/////////////////////////////////////////////
-bool NucDeExDeexcitation::CreateTGraph(const int Z, const int N)
-/////////////////////////////////////////////
-{
-  bool found=0;
-  for(int i=0;i<tree->GetEntries();i++){
-    tree->GetEntry(i);
-    if(Z==_Z && N==_N){
-      found=1;
-      break;
-    }
-  }
-  if(!found) return 0;
-
-  for(int p=0;p<NucDeEx::num_particle;p++){
-    g_br[p] = new TGraph(_Ex_bin[p],_Ex[p],_Br[p]);
   }
   return 1;
 }

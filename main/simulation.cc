@@ -10,6 +10,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TFile.h>
+#include <TTree.h>
 #include <TH2.h>
 #include <TF2.h>
 #include <TCanvas.h>
