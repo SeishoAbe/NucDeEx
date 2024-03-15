@@ -43,7 +43,7 @@ do
 
 	for FILE in $FILE_TMP
 	do
-		ln -sv $NUCDEEX_TABLES/energy_distribution/$FILE ./
+		ln -sv $NUCDEEX_ROOT/tables/energy_distribution/$FILE ./
 	done
 
 	for ldmodel in $ldmodel_tmp
