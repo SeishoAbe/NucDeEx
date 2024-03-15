@@ -21,8 +21,14 @@ NucDeExNucleusTable::NucDeExNucleusTable()
   verbose=1;
   num_of_nuc=-1;
   const char* env = getenv("NUCDEEX_ROOT");
+#ifdef WITH_NEUT
+  env = getenv("NEUT_ROOT");
+#endif
   if(env!=NULL){
-    PATH_NucDeEx_table = env + "/tables";
+    PATH_NucDeEx_table = env + (std::string)"/tables";
+#ifdef WITH_NEUT
+    PATH_NucDeEx_table = env + (std::string)"/../../src/nucdeex/nucdeex/tables";
+#endif
   }else{
     std::cerr << "PATH to nucleus table is not specified" << std::endl;
     exit(1);
