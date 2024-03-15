@@ -11,7 +11,6 @@
 #include "NucDeExParticle.hh"
 
 #include <TFile.h>
-#include <TTree.h>
 #include <TGraph.h>
 #include <TRandom3.h>
 #include <TDatabasePDG.h>
@@ -98,22 +97,12 @@ class NucDeExDeexcitation{
 
 
   // --- ROOT related methods & members --- //
-  bool OpenROOT(const char* name);
-  bool OpenROOT(const int Zt,const int Nt, const int Z, const int N, const bool flag_tree=1);
-  bool GetTTree(const int Z,const int N);
-  bool CreateTGraph(const int Z, const int N);
+  bool OpenROOT(const int Zt,const int Nt, const int Z, const int N);
   bool GetBrTGraph(const std::string st);
   int  GetBrExTGraph(const std::string st, const double ex_t, const int mode); 
     // The nearest TGraph point will be returned
   void DeleteTGraphs();
   TFile* rootf;
-  TTree* tree;
-  int _Z, _N, _Ex_bin[NucDeEx::num_particle];
-  float _Ex[NucDeEx::num_particle][NucDeEx::bins];
-  float _Br[NucDeEx::num_particle][NucDeEx::bins];
-  int _REx_bin[NucDeEx::num_particle][NucDeEx::bins];
-  float _REx[NucDeEx::num_particle][NucDeEx::bins][NucDeEx::bins];
-  float _RBr[NucDeEx::num_particle][NucDeEx::bins][NucDeEx::bins];
 
   TGraph* g_br[NucDeEx::num_particle];
   TGraph* g_br_ex;
