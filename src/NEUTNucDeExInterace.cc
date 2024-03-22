@@ -3,6 +3,8 @@
 #include "vcworkC.h"
 #include "posinnucC.h"
 #include "vcvrtxC.h"
+
+#include "NucDeExUtils.hh"
 #include "NucDeExDeexcitation.hh"
 
 NucDeExDeexcitation* nucdeex;
@@ -17,7 +19,7 @@ extern "C"{
 
 ///////////////////////////
 int nucdeex_()
-///////////////////////////
+t ///////////////////////////
 {
   //std::cout << vcwork_.ipvc[1] << "   " << posinnuc_.ibound << std::endl;
   if(vcwork_.ipvc[1]!=2112 && vcwork_.ipvc[1]!=2212) return 0;
@@ -108,8 +110,8 @@ void NucDeExInitialize(void)
   if(!nucdeex_initialized){
     std::cout << "NucDeEx initialized" << std::endl;
     nucdeex = new NucDeExDeexcitation(2,1);
-    nucdeex->SetSeed(1); // 0: time
-    nucdeex->SetVerbose(0);  
+    NucDeExUtils::SetSeed(1);
+    NucDeExUtils::SetVerbose(1);
   }
   nucdeex_initialized=true;
   return;

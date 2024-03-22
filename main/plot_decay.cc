@@ -5,6 +5,7 @@
 #include <iomanip> 
 
 #include "NucDeExConsts.hh"
+#include "NucDeExUtils.hh"
 #include "NucDeExNucleusTable.hh"
 #include "ReadTALYS.hh"
 
@@ -56,8 +57,8 @@ int main(int argc, char* argv[]){
   }
   os << "/output_" << argv[1] << "_ldmodel" << ldmodel;
   if(parity_optmodall) os << "_parity_optmodall";
+  NucDeExUtils::SetVerbose(1);
   ReadTALYS* read_talys = new ReadTALYS(os.str().c_str(), nucleus_table);
-  read_talys->SetVerboseLevel(1);
   if(!read_talys->Read()){
     std::cerr << "something wrong happend..." << std::endl;
     return 0;

@@ -3,6 +3,7 @@
 #include "G4INCLParticle.hh"
 #include "G4INCLGlobals.hh"
 #include "G4INCLParticleSpecies.hh"
+#include "NucDeExUtils.hh"
 #include <iostream>
 
 G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
@@ -10,8 +11,8 @@ G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
   theConfig(config),
   theNucDeEx(new NucDeExDeexcitation(2,1,theConfig))
 {
-  theNucDeEx->SetSeed(1);
-  theNucDeEx->SetVerbose(0);
+  NucDeExUtils::SetSeed(1);
+  NucDeExUtils::SetVerbose(1);
   Zt = theConfig->getTargetZ();
   At = theConfig->getTargetA();
   Nt = At-Zt;

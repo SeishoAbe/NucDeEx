@@ -14,13 +14,11 @@ class ReadTALYS{
   virtual ~ReadTALYS(){;};
 
   bool Read();
-  void SetVerboseLevel(int v){ _verbose = v;};
 
   private:
   std::string _filename;
   NucDeExNucleusTable* _nucleus_table;
   std::ifstream* _ifs;
-  int _verbose;
 
   const float check_criteria=0.05;
 

@@ -50,7 +50,6 @@ G4NucDeExInterface::G4NucDeExInterface() :
   theG4PreCompound(new G4PreCompoundModel),
   eventNumber(0)
 {
-  NucDeExUtils::SetPATH();
   NucDeExUtils::SetSeed(1);
   NucDeExUtils::SetVerbose(1);
   // This is tentavie solution. We cannot get parent nucleus informationi
@@ -64,7 +63,6 @@ G4NucDeExInterface::G4NucDeExInterface(G4VPreCompoundModel* preco) :
 {
   G4cout << "NucDeEx: Get G4PreCompoundModel by using G4HadronicInteractionRegistry" << G4endl;
   theG4PreCompound = preco;
-  NucDeExUtils::SetPATH();
   NucDeExUtils::SetSeed(1);
   NucDeExUtils::SetVerbose(1);
   // This is tentavie solution. We cannot get parent nucleus informationi
