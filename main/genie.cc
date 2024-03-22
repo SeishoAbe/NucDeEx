@@ -12,6 +12,7 @@
 #include "TLegend.h"
 #include "THStack.h"
 
+#include "NucDeExUtils.hh"
 #include "NucDeExNucleusTable.hh"
 #include "NucDeExDeexcitation.hh"
 
@@ -39,9 +40,10 @@ int main(int argc, char* argv[]){
   // --- prepare deex tools
   int Zt=0, Nt=0;
   double S;
+  // Set params before declaring NucDeExDeexcitation
+  NucDeExUtils::SetVerbose(2);
+  NucDeExUtils::SetSeed(seed);
   NucDeExDeexcitation* deex = new NucDeExDeexcitation(2, 1);
-  deex->SetSeed(seed);
-  deex->SetVerbose(1);
   NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
   bool flag_O=0;
   if(target.find("C")!=string::npos){

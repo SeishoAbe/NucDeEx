@@ -24,10 +24,11 @@
 
 class NucDeExDeexcitation{
   public:
-  NucDeExDeexcitation(const int ldmodel=1, const bool parity_optmodall=1);
+  NucDeExDeexcitation(const int ld=1, const bool p_o=1);
 #ifdef INCL_DEEXCITATION_NUCDEEX
-  NucDeExDeexcitation(const int ldmodel=1, const bool parity_optmodall=1, G4INCL::Config *config=0);
+  NucDeExDeexcitation(const int ld=1, const bool p_o=1, G4INCL::Config *config=0);
 #endif
+  // ld: ldmodel, p_o: parity_optmodall
 
   virtual ~NucDeExDeexcitation();
 
@@ -73,10 +74,7 @@ class NucDeExDeexcitation{
   
   int ExtoShell(const int Zt, const int Nt, const double Ex);
 
-  void SetSeed(int s){ rndm->SetSeed(s) ;};
-  int  GetSeed(){return rndm->GetSeed();};
   TRandom3* GetTRandom3(){ return rndm; };
-  void SetVerbose(const int v);
   void SetEventID(int id){ eventID=id;};
   int  GetEventID(){ return eventID; };
   vector<NucDeExParticle>* GetParticleVector(){return _particle;};
@@ -84,7 +82,7 @@ class NucDeExDeexcitation{
   int GetShell(){return _shell;};
 
   private:
-  void Init(const int ldmodel, const bool parity_optmodall);
+  void Init();
 
   // --- Simulation method called by DoDeex() --- //
   int DecayMode(const double Ex);
@@ -147,7 +145,6 @@ class NucDeExDeexcitation{
   NucDeExNucleusTable* _nucleus_table;
   int ldmodel;
   bool parity_optmodall;
-  int verbose;
   int eventID;
   std::ostringstream os;
   const double check_criteria=5e-3;
@@ -180,7 +177,5 @@ class NucDeExDeexcitation{
   const double E_p32_15O[Nlevel_p32_15O]={6.18,9.61,10.48};
   const double Br_p32_15O[Nlevel_p32_15O]={0.872,0.064,0.064}; // guess
   //const double Br_p32_15O[Nlevel_p32_15O]={1.,0,0}; // original Ejiri's value
-
-  std::string PATH_NucDeEx_root;
 };
 #endif

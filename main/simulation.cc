@@ -4,6 +4,7 @@
 #include <string>
 #include <iomanip> 
 
+#include "NucDeExUtils.hh"
 #include "NucDeExNucleusTable.hh"
 #include "NucDeExDeexcitation.hh"
 
@@ -21,15 +22,16 @@
 #include <THStack.h>
 
 int main(int argc, char* argv[]){
-  if(argc<5){
-    std::cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi] [Random Seed (optional)]" << std::endl;
+  if(argc<=5){
+    std::cerr << "Input: " << argv[0] << " [Target nucleus] [ldmodel] [parity&optmodall] [flag_jpi] [verbosity] [Random Seed (optional)]" << std::endl;
     return 0;
   }
   const int ldmodel=atoi(argv[2]);
   const bool parity_optmodall=(bool)atoi(argv[3]);
   const bool flag_jpi = (bool) atoi(argv[4]);
+  const int verbose = atoi(argv[5]);
   int seed=1; // default: 1
-  if(argc==6) seed = atoi(argv[5]);
+  if(argc==7) seed = atoi(argv[6]);
   std::cout << "SEED = " << seed << std::endl;
 
   // ---- FIXME --- // 
@@ -45,10 +47,10 @@ int main(int argc, char* argv[]){
 
   std::ostringstream os,os_remove_g;
 
-  // Set deex tool
+  // Set params before declaring NucDeExDeexcitation
+  NucDeExUtils::SetVerbose(verbose);
+  NucDeExUtils::SetSeed(seed);
   NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall);
-  deex->SetSeed(seed); // 0: time
-  deex->SetVerbose(2);
   // Get Z and N
   NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
   NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);

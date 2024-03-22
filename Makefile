@@ -41,7 +41,7 @@ LIBDIR=lib
 LIBNAME=${LIBDIR}/libNucDeEx.a
 
 AOBJS =  NucDeExNucleus.o NucDeExNucleusTable.o ReadTALYS.o 
-AOBJS += NucDeExParticle.o NucDeExDeexcitation.o
+AOBJS += NucDeExParticle.o NucDeExDeexcitation.o NucDeExUtils.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
