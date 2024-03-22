@@ -95,6 +95,8 @@ class NucDeExDeexcitation{
     // return 1: sucess
     //       -1: fatal error
 
+  // --- Z,N to PDG
+  int PDGion(int Z,int N);
 
   // --- ROOT related methods & members --- //
   bool OpenROOT(const int Zt,const int Nt, const int Z, const int N);
@@ -140,7 +142,6 @@ class NucDeExDeexcitation{
   // for output
   void InitParticleVector();
   vector<NucDeExParticle> *_particle;
-  int PDGion(int Z,int N);
 
   // others
   NucDeExNucleusTable* _nucleus_table;

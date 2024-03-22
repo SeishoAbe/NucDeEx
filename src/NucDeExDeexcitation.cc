@@ -30,8 +30,14 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o)
   }
   // Get PATH from ENV
   const char* env = getenv("NUCDEEX_ROOT");
+#ifdef WITH_NEUT
+  env = getenv("NEUT_ROOT");
+#endif
   if(env!=NULL){
     PATH_NucDeEx_root = env;
+#ifdef WITH_NEUT
+    PATH_NucDeEx_root = env + (std::string)"/../../src/nucdeex/nucdeex";
+#endif
   }else{
     std::cerr << "PATH to nucleus table is not specified" << std::endl;
     exit(1);
@@ -52,7 +58,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::C
     std::cerr << "Fatal Error" << std::endl;
     abort();
   }
-  // Get PATH from config istead of NUCDEEX_ROOT
+  // Get PATH from config instead of NUCDEEX_ROOT
   PATH_NucDeEx_root = config->getNucDeExDataFilePath();
   //std::cout << PATH_NucDeEx_root.c_str() << std::endl;
 }
