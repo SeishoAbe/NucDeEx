@@ -38,6 +38,7 @@ int main(int argc, char* argv[]){
   const bool flag_jpi = (bool) atoi(argv[4]);
   
   std::ostringstream os;
+  NucDeExUtils::SetVerbose(1);
   NucDeExNucleusTable* nucleus_table = new NucDeExNucleusTable();
   if(!nucleus_table->ReadTables()){
     std::cerr << "something wrong" << std::endl;
@@ -57,7 +58,6 @@ int main(int argc, char* argv[]){
   }
   os << "/output_" << argv[1] << "_ldmodel" << ldmodel;
   if(parity_optmodall) os << "_parity_optmodall";
-  NucDeExUtils::SetVerbose(1);
   ReadTALYS* read_talys = new ReadTALYS(os.str().c_str(), nucleus_table);
   if(!read_talys->Read()){
     std::cerr << "something wrong happend..." << std::endl;
