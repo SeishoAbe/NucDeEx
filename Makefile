@@ -1,5 +1,5 @@
-PROGRAMS = plot_decay cout_input simulation
-PROGRAMS += genie
+PROGRAMS = plot_decay cout_input #simulation
+#PROGRAMS += genie
 
 ifndef ROOTSYS
 @echo "$(error "Please set ROOT enviromental variables")"
@@ -25,14 +25,14 @@ endif
 
 ## neut libs
 ifdef NEUT_ROOT
-PROGRAMS += neut
+#PROGRAMS += neut
 CXXFLAGS += -I$(NEUT_ROOT)/include
 LDFLAGS += -L$(NEUT_ROOT)/lib -lNEUT -lNEUTClass -lNEUTClassUtils
 endif
 
 ## nuwro libs
 ifdef NUWRO
-PROGRAMS += nuwro
+#PROGRAMS += nuwro
 CXXFLAGS += -I$(NUWRO)/src
 LDFLAGS += $(NUWRO)/bin/event1.so
 endif
@@ -41,7 +41,7 @@ LIBDIR=lib
 LIBNAME=${LIBDIR}/libNucDeEx.a
 
 AOBJS =  NucDeExNucleus.o NucDeExNucleusTable.o ReadTALYS.o 
-AOBJS += NucDeExParticle.o NucDeExDeexcitation.o NucDeExUtils.o
+AOBJS += NucDeExParticle.o NucDeExDeexcitation.o NucDeExUtils.o NucDeExEventInfo.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))

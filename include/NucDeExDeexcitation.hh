@@ -9,6 +9,7 @@
 #include "NucDeExConsts.hh"
 #include "NucDeExNucleusTable.hh"
 #include "NucDeExParticle.hh"
+#include "NucDeExEventInfo.hh"
 
 #include <TFile.h>
 #include <TGraph.h>
@@ -33,9 +34,9 @@ class NucDeExDeexcitation{
   virtual ~NucDeExDeexcitation();
 
   // --- Main function ---//
-  int DoDeex(const int Zt, const int Nt,
-              const int Z, const int N, const int shell, const double Ex,
-             const TVector3& mom=TVector3(0,0,0));
+  const NucDeExEventInfo DoDeex(const int Zt, const int Nt,
+                          const int Z, const int N, const int shell, const double Ex,
+                          const TVector3& mom=TVector3(0,0,0));
   // Zt, Nt  : Target nucleus Z and N (supports 16O or 12C currently)
   // Z, N    : Residual nucleus Z and N (having excitation energy)
   // shell  0 : Shell level will be determined according to Ex (box cut)
@@ -67,22 +68,18 @@ class NucDeExDeexcitation{
   // only for single-nucleon disappearance
   int DoDeex_p32(const int Zt, const int Nt,
                  const int Z, const int N,
-                 const TVector3& mom=TVector3(0,0,0));
-  // Note: Energy level is determined irrelevant to Ex
+                 const TVector3& mom=TVector3(0,0,0)); // Note: Energy level is determined irrelevant to Ex
   // return  1: Sucess
   //        -1 : Fatal error
   
   int ExtoShell(const int Zt, const int Nt, const double Ex);
 
-  TRandom3* GetTRandom3(){ return rndm; };
   void SetEventID(int id){ eventID=id;};
   int  GetEventID(){ return eventID; };
-  vector<NucDeExParticle>* GetParticleVector(){return _particle;};
   NucDeExNucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
   int GetShell(){return _shell;};
 
   private:
-  void Init();
 
   // --- Simulation method called by DoDeex() --- //
   int DecayMode(const double Ex);
@@ -137,9 +134,6 @@ class NucDeExDeexcitation{
   double mass_particle;
   TVector3 mom_particle;
 
-  // for output
-  void InitParticleVector();
-  vector<NucDeExParticle> *_particle;
 
   // others
   NucDeExNucleusTable* _nucleus_table;
@@ -149,6 +143,8 @@ class NucDeExDeexcitation{
   std::ostringstream os;
   const double check_criteria=5e-3;
   int _shell;
+  void Init();
+  NucDeExEventInfo EventInfo;
 
   // Constatnts for Ex to shell
   const double Ex_12C_s12=16.0;

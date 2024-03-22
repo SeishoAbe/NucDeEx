@@ -59,7 +59,6 @@ void NucDeExDeexcitation::Init()
     g_br[p]=0;
   }
   g_br_ex=0;
-  _particle=0;
 }
 
 
@@ -71,32 +70,27 @@ NucDeExDeexcitation::~NucDeExDeexcitation()
   delete rndm;
   delete pdg;
   delete geo;
-  if(_particle!=0){
-    _particle->clear();
-    delete _particle;
-  }
 }
 
 /////////////////////////////////////////////
-int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
+const NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
                           const int Z, const int N, const int shell, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
+  if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
+    std::cerr << "ERROR: This tool does not support the target nucleus" << std::endl;
+    exit(1);
+  }
   if(NucDeExUtils::GetVerbose()>0){
     std::cout << std::endl << "###################################" << std::endl;
     std::cout << "NucDeExDeexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
          << "," << shell << "," << Ex << ")  eventID=" << eventID << std::endl;
     std::cout << "###################################" << std::endl;
   }
-  eventID++;
 
+  // -- init --- //
+  EventInfo.InitParameters();
   int status=-1;
-  InitParticleVector();
-
-  if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
-    std::cerr << "ERROR: This tool does not support the target nucleus" << std::endl;
-    exit(1);
-  }
 
   // --- Call sub functions according to shell and nucleus conditions- --//
   if(Ex<=0){ // --- negative Ex
@@ -132,7 +126,20 @@ int NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
     }
     status=-1;
   }
-  return status;
+
+  // event level info
+  EventInfo.eventID = eventID;
+  EventInfo.fStatus = status;
+  EventInfo.fShell = _shell;
+  EventInfo.Zt     = Zt;
+  EventInfo.Nt     = Nt;
+  EventInfo.Z      = Z;
+  EventInfo.N      = N;
+  EventInfo.Ex     = Ex;
+  EventInfo.Pinit  = mom;
+
+  eventID++;
+  return EventInfo;
 }
 
 /////////////////////////////////////////////
@@ -144,8 +151,6 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
   RESET:
   int status=1; // success
 
-  // --- Initialization --- //
-  InitParticleVector();
 
   // store target info. we don't want to change original value.
   Z_target   = Z;
@@ -276,8 +281,6 @@ int NucDeExDeexcitation::DoDeex_p32(const int Zt, const int Nt,
                              const int Z, const int N, const TVector3& mom)
 /////////////////////////////////////////////
 {
-  // --- Initialization --- //
-  InitParticleVector();
 
   // store target info. we don't want to change original value.
   Z_target   = Z;
@@ -463,7 +466,7 @@ int NucDeExDeexcitation::AddGSNucleus(const int Z,const int N, const TVector3& m
                           mom,
                           name_target, 
                           1,0); // track flag on // zero ex
-  _particle->push_back(nucleus);
+  EventInfo.ParticleVector->push_back(nucleus);
   if(NucDeExUtils::GetVerbose()>0){
     std::cout << "AddGSNucleus(): " << name_target << std::endl;
   }
@@ -738,10 +741,10 @@ int NucDeExDeexcitation::Decay(const bool breakflag)
 
   // Then, push back
 
-  _particle->push_back(p_particle);
+  EventInfo.ParticleVector->push_back(p_particle);
   // DoDeex loop will be end -> turn on track flag, because it is not intermediate state
   if(breakflag) p_daughter._flag=1;
-  _particle->push_back(p_daughter);
+  EventInfo.ParticleVector->push_back(p_daughter);
 
   if(NucDeExUtils::GetVerbose()>1){
     std::cout << "flag_particle = " << p_particle._flag << std::endl;
@@ -821,16 +824,4 @@ void NucDeExDeexcitation::DeleteTGraphs()
   }
   delete g_br_ex;
   g_br_ex=0;
-}
-
-
-/////////////////////////////////////////////
-void NucDeExDeexcitation::InitParticleVector()
-/////////////////////////////////////////////
-{
-  if(_particle!=0){
-    _particle->clear();
-    delete _particle;
-  }
-  _particle = new vector<NucDeExParticle>;
 }
