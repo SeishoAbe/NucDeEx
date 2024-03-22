@@ -8,7 +8,6 @@ namespace NucDeEx{
     int fVerbose=0;
     std::string NUCDEEX_ROOT="";
 
-
     void SetPATH()
     {
       if(NUCDEEX_ROOT.length()>0) return;
