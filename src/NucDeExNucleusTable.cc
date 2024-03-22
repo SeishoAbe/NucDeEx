@@ -17,7 +17,7 @@ NucDeExNucleusTable::NucDeExNucleusTable()
 ///////////////
 {
   num_of_nuc=-1;
-  NucDeExUtils::SetPATH();
+  NucDeEx::Utils::SetPATH();
 }
 
 ///////////////
@@ -25,13 +25,13 @@ bool NucDeExNucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
   // --- Read nucleus / separation energy tables ---//
-  std::string filename1= NucDeExUtils::GetPATH()+(std::string)"/tables/nucleus/nucleus.txt";
+  std::string filename1= NucDeEx::Utils::NUCDEEX_ROOT+(std::string)"/tables/nucleus/nucleus.txt";
   std::ifstream ifs(filename1);
   if(!ifs.is_open()){
     std::cerr << "ERROR : Cannot open " << filename1 << std::endl;
     return 0;
   }else{
-    if(NucDeExUtils::GetVerbose()>0) std::cout << "Read: " << filename1 << std::endl;
+    if(NucDeEx::Utils::fVerbose>0) std::cout << "Read: " << filename1 << std::endl;
   }
 // at first get num of nucleus in the table
   int index=0;
@@ -68,7 +68,7 @@ bool NucDeExNucleusTable::ReadTables(const bool init_flag)
     _nucleus[index].maxlevelsbin = maxlevelsbin;
 
     // read separation energy table
-    std::string filename2= NucDeExUtils::GetPATH()
+    std::string filename2= NucDeEx::Utils::NUCDEEX_ROOT
                       + (std::string)"/tables/separation_energy/separation_energy_"
                       + (std::string)Name
                       + (std::string)".txt";
@@ -76,13 +76,13 @@ bool NucDeExNucleusTable::ReadTables(const bool init_flag)
     if(!ifs2.is_open()){
       std::cerr << "Warning: We do not have separation energy file for " << Name << std::endl;
     }else{
-      if(NucDeExUtils::GetVerbose()>0) std::cout << "Read: " << filename2 << std::endl;
+      if(NucDeEx::Utils::fVerbose>0) std::cout << "Read: " << filename2 << std::endl;
       _nucleus[index].flag_s = 1;
       int particle_index=0;
       while(ifs2.getline(buf,sizeof(buf))){
         if(buf[0]=='#') continue;
         std::istringstream(buf) >> _nucleus[index].S[particle_index];
-        if(NucDeExUtils::GetVerbose()>0) std::cout << "SE: " << NucDeEx::particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << std::endl;
+        if(NucDeEx::Utils::fVerbose>0) std::cout << "SE: " << NucDeEx::particle_name[particle_index].substr(0,1) << " = " << _nucleus[index].S[particle_index] << std::endl;
         particle_index++;
       }
       ifs2.close();
@@ -138,7 +138,7 @@ int NucDeExNucleusTable::getID(const char* name)
   if(_p_id!=_nucleus_id.end()){
     return (int) ((_p_id->second));
   }else{
-    if(NucDeExUtils::GetVerbose()>0) std::cerr << "Warning @ NucDeExNucleusTable: Cannot find such nucleus " << name << std::endl;
+    if(NucDeEx::Utils::fVerbose>0) std::cerr << "Warning @ NucDeExNucleusTable: Cannot find such nucleus " << name << std::endl;
     return -1;
   }
 }

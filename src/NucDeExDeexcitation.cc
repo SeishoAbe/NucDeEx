@@ -13,7 +13,6 @@
 #include "NucDeExDeexcitation.hh"
 
 #include <TGraph.h>
-#include <TRandom3.h>
 #include <TParticlePDG.h>
 #include <TParticle.h>
 
@@ -23,7 +22,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o)
 {
   ldmodel=ld;
   parity_optmodall=p_o;
-  NucDeExUtils::SetPATH();
+  NucDeEx::Utils::SetPATH();
   _nucleus_table = new NucDeExNucleusTable();
   Init();
 }
@@ -35,7 +34,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::C
 { 
   ldmodel=ld;
   parity_optmodall=p_o;
-  NucDeExUtils::SetPATH(config);
+  NucDeEx::Utils::SetPATH(config);
   Init();
 }
 #endif
@@ -49,8 +48,6 @@ void NucDeExDeexcitation::Init()
     std::cerr << "Fatal Error" << std::endl;
     abort();
   }
-
-  rndm = new TRandom3(NucDeExUtils::GetSeed());
   pdg = new TDatabasePDG();
   geo = new TGeoManager("NucDeEx","NucDeEx");
   element_table = geo->GetElementTable();
@@ -67,7 +64,6 @@ NucDeExDeexcitation::~NucDeExDeexcitation()
 ///////////////////////////
 {
   delete _nucleus_table;
-  delete rndm;
   delete pdg;
   delete geo;
 }
@@ -81,7 +77,7 @@ const NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
     std::cerr << "ERROR: This tool does not support the target nucleus" << std::endl;
     exit(1);
   }
-  if(NucDeExUtils::GetVerbose()>0){
+  if(NucDeEx::Utils::fVerbose>0){
     std::cout << std::endl << "###################################" << std::endl;
     std::cout << "NucDeExDeexcitation::DoDeex(" << Zt << "," << Nt<< ","  << Z << "," << N 
          << "," << shell << "," << Ex << ")  eventID=" << eventID << std::endl;
@@ -105,7 +101,7 @@ const NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
     //
     if(_shell==3){ 
       // p1/2-hole. nothing to do
-      if(NucDeExUtils::GetVerbose()>0) std::cout << "(p1/2)-hole" <<std::endl;
+      if(NucDeEx::Utils::fVerbose>0) std::cout << "(p1/2)-hole" <<std::endl;
       status=AddGSNucleus(Z,N,mom);
     }else if(_shell==2){
       // p3/2-hole 
@@ -120,7 +116,7 @@ const NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   }else if(Zt+Nt>Z+N){ // --- Multi-nucleon disapperance
     status=DoDeex_talys(Zt,Nt,Z,N,Ex,mom);
   }else{ // Zt and Nt are larger than Z and N. This can be happen in the use in Geant4
-    if(NucDeExUtils::GetVerbose()>0){
+    if(NucDeEx::Utils::fVerbose>0){
       std::cerr << "Waring: Unexpected target & residual nuclei: "
                 << "Zt = " << Zt << "   Nt = " << Nt << "  Z = " << Z << "   N = " << N << std::endl;
     }
@@ -147,7 +143,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
                                const int Z, const int N, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
-  if(NucDeExUtils::GetVerbose()>0) std::cout << "DoDeex_talys()" << std::endl;
+  if(NucDeEx::Utils::fVerbose>0) std::cout << "DoDeex_talys()" << std::endl;
   RESET:
   int status=1; // success
 
@@ -159,7 +155,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
   mom_target = mom;
   nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
   if(nuc_target==NULL){
-    if(NucDeExUtils::GetVerbose()>0){
+    if(NucDeEx::Utils::fVerbose>0){
       std::cout << "We don't have deexcitation profile for this nucleus: "
            << name_target.c_str() << std::endl;
     }
@@ -171,7 +167,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
 
   // Read ROOT file
   if( ! OpenROOT(Zt,Nt,Z,N) ){
-    if(NucDeExUtils::GetVerbose()>0){
+    if(NucDeEx::Utils::fVerbose>0){
       std::cout << "We don't have deexcitation profile for this nucleus: " 
            << name_target.c_str() << std::endl;
     }
@@ -183,7 +179,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
   // Loop until zero excitation energy or null nuc_daughter ptr
   // Use private members (parameters) named as "_target"
   while(true){// <- infinite loop. There is break point
-    if(NucDeExUtils::GetVerbose()>0){
+    if(NucDeEx::Utils::fVerbose>0){
       std::cout << "### " << name_target << ",   Ex = " << Ex_target;
       std::cout << "     mom_target: "; mom_target.Print();
     }
@@ -213,12 +209,12 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
         int a_particle = (NucDeEx::PDG_particle[decay_mode]%1000)/10;
         int z_particle = ((NucDeEx::PDG_particle[decay_mode]%1000000)-a_particle*10)/10000;
         TGeoElementRN* element_rn =  element_table->GetElementRN(a_particle,z_particle); // (A,Z)
-        if(NucDeExUtils::GetVerbose()>1) std::cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << std::endl;
+        if(NucDeEx::Utils::fVerbose>1) std::cout << "a_particle = " << a_particle << "   z_particle = " << z_particle << std::endl;
         mass_particle = ElementMassInMeV(element_rn);
       }
       // this rarely happens...
       if(element_table->GetElementRN(Z_daughter+N_daughter,Z_daughter) == NULL){
-        if(NucDeExUtils::GetVerbose()>0){
+        if(NucDeEx::Utils::fVerbose>0){
           std::cout << "Cannot find " << name_daughter << " in TGeoElementRN" << std::endl;
           std::cout << "Call DoDeex() again!" << std::endl;
         }
@@ -227,7 +223,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
       mass_target = ElementMassInMeV(element_table->GetElementRN(Z_target+N_target, Z_target));
       mass_daughter = ElementMassInMeV(element_table->GetElementRN(Z_daughter+N_daughter, Z_daughter));
     }else{ // no tgraph found -> gamma emission to g.s.
-      if(NucDeExUtils::GetVerbose()>0){
+      if(NucDeEx::Utils::fVerbose>0){
         std::cout << "Cannot find TGraph" << std::endl;
         std::cout << "Force gamma decay" << std::endl;
       }
@@ -242,7 +238,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
     S = nuc_target->S[decay_mode];
     Qvalue = Ex_target - S - Ex_daughter;
     if(Qvalue<0) Qvalue=0;
-    if(NucDeExUtils::GetVerbose()>1){
+    if(NucDeEx::Utils::fVerbose>1){
       std::cout << "S = " << S << std::endl;
       std::cout << "Qvalue = " << Qvalue << std::endl;
     }
@@ -263,7 +259,7 @@ int NucDeExDeexcitation::DoDeex_talys(const int Zt, const int Nt,
     mom_target  += mom_daughter;
     nuc_target = nuc_daughter;
     name_target = (string)nuc_target->name;
-    if(NucDeExUtils::GetVerbose()>0) std::cout << std::endl;
+    if(NucDeEx::Utils::fVerbose>0) std::cout << std::endl;
 
     // --- Need this to release memory of TGraph
     //    TGraph memory looks not relased only by closing & deleting root file...
@@ -288,13 +284,13 @@ int NucDeExDeexcitation::DoDeex_p32(const int Zt, const int Nt,
   mom_target = mom;
   nuc_target = _nucleus_table->GetNucleusPtr(Z_target,N_target);
   name_target = (string)nuc_target->name;
-  if(NucDeExUtils::GetVerbose()>0){
+  if(NucDeEx::Utils::fVerbose>0){
     std::cout << "DoDeex_p32()" << std::endl;
     std::cout << "### " << name_target;
     std::cout << "     mom_target: "; mom_target.Print();
   }
 
-  double random = rndm->Rndm();
+  double random = NucDeEx::Random::random();
 
   //-----------11B------------//
   if(Z==5 && N==6){
@@ -467,7 +463,7 @@ int NucDeExDeexcitation::AddGSNucleus(const int Z,const int N, const TVector3& m
                           name_target, 
                           1,0); // track flag on // zero ex
   EventInfo.ParticleVector->push_back(nucleus);
-  if(NucDeExUtils::GetVerbose()>0){
+  if(NucDeEx::Utils::fVerbose>0){
     std::cout << "AddGSNucleus(): " << name_target << std::endl;
   }
   return 1;
@@ -502,18 +498,18 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
     Br[p] = g_br[p]->Eval(Ex);
     if(Br[p]<0) Br[p]=0;
     Br_sum += Br[p];
-    if(NucDeExUtils::GetVerbose()>1){
+    if(NucDeEx::Utils::fVerbose>1){
       std::cout << "Br(" << NucDeEx::particle_name[p].substr(0,1) << ") = " << Br[p] << std::endl;
     }
   }
 
   double Br_integ=0;
-  double random = rndm->Rndm();
+  double random = NucDeEx::Random::random();
   int decay_mode_r=-1;
   for(int p=0;p<NucDeEx::num_particle;p++){
     Br[p] /= Br_sum; // Normalize Br just in case.  
     Br_integ += Br[p];
-    if(NucDeExUtils::GetVerbose()>1){
+    if(NucDeEx::Utils::fVerbose>1){
       std::cout << "Br_integ(" << NucDeEx::particle_name[p].substr(0,1) << ") = " << Br_integ << std::endl;
     }
     if(Br_integ>random){
@@ -554,7 +550,7 @@ int NucDeExDeexcitation::DecayMode(const double Ex)
     name_daughter = os.str();
   }
 
-  if(NucDeExUtils::GetVerbose()>1){ 
+  if(NucDeEx::Utils::fVerbose>1){ 
     std::cout << "DecayMode(): Random = " << random << " : " << name_target.c_str() << " --> " << NucDeEx::particle_name[decay_mode_r] << " + ";
     std::cout << name_daughter.c_str() << std::endl;
   }
@@ -591,7 +587,7 @@ int NucDeExDeexcitation::GetBrExTGraph(const string st, const double ex_t, const
   }
   g_br[mode]->GetPoint(point,ex,br);
 
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "GetBrExTGraph(): nearest_point = " << point << ",  ex at the point = " << ex
       << ", diff_Ex = " << abs(ex-ex_t) << ", diff_ex(previous) = " << diff_ex << std::endl;
 
@@ -611,7 +607,7 @@ bool NucDeExDeexcitation::DaughterExPoint(double *d_Ex, int *d_point)
     Br_sum += br;
   }
   double Br_integ=0;
-  double random = rndm->Rndm();
+  double random = NucDeEx::Random::random();
   int point=0;
   for(point=0;point<g_br_ex->GetN();point++){
     g_br_ex->GetPoint(point,ex,br);
@@ -619,7 +615,7 @@ bool NucDeExDeexcitation::DaughterExPoint(double *d_Ex, int *d_point)
     Br_integ += br;
     if(Br_integ>random) break;
   }
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "DaughterExPoint: Random = " << random << " : ex = " << ex
          << ",   point = " << point << std::endl;
   }
@@ -634,7 +630,7 @@ bool NucDeExDeexcitation::DaughterExPoint(double *d_Ex, int *d_point)
 int NucDeExDeexcitation::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
-  if(NucDeExUtils::GetVerbose()>0){
+  if(NucDeEx::Utils::fVerbose>0){
     std::cout << "NucDeExDeexcitation::Decay()" << std::endl;
   }
   int status=1; // sucess
@@ -655,7 +651,7 @@ int NucDeExDeexcitation::Decay(const bool breakflag)
     std::cerr << "Error @ NucDeExDeexcitationD::Decay: Something wrong in kinematics calculation" << std::endl;
     status=0;
   }
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "mass_target   = " << mass_target << std::endl;
     std::cout << "mass_particle = " << mass_particle << std::endl;
     std::cout << "mass_daughter = " << mass_daughter << std::endl;
@@ -667,13 +663,13 @@ int NucDeExDeexcitation::Decay(const bool breakflag)
   
   // --- Detemine momentum direction (uniform) (CM)
   // --- Then set momentum vectors
-  double costheta = 2.*rndm->Rndm()-1.; // [-1, 1]
+  double costheta = 2.*NucDeEx::Random::random()-1.; // [-1, 1]
   double sintheta = sqrt( 1. - pow(costheta,2) );
-  double phi      = 2*TMath::Pi()*rndm->Rndm(); // [0,2pi]
+  double phi      = 2*TMath::Pi()*NucDeEx::Random::random(); // [0,2pi]
   TVector3 dir( sintheta*cos(phi), sintheta*sin(phi), costheta );
   mom_particle = -1*cmMomentum*dir; // -P
   mom_daughter = cmMomentum*dir; // P
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "dir:          "; dir.Print();
     std::cout << "mom_particle: ";mom_particle.Print();
     std::cout << "mom_daughter: ";mom_daughter.Print();
@@ -715,7 +711,7 @@ int NucDeExDeexcitation::Decay(const bool breakflag)
   double totalE_ex_bef = totalE_bef + Ex_daughter; // w/ excitation E
   double totalE_ex_aft = totalE_aft + Ex_daughter;
 
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "totalE_target = " << totalE_target << std::endl;
     std::cout << "kE_target = " << kE_target << std::endl;
     std::cout << "Ex_target = " << Ex_target << std::endl;
@@ -746,7 +742,7 @@ int NucDeExDeexcitation::Decay(const bool breakflag)
   if(breakflag) p_daughter._flag=1;
   EventInfo.ParticleVector->push_back(p_daughter);
 
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "flag_particle = " << p_particle._flag << std::endl;
     std::cout << "flag_daughter = " << p_daughter._flag << std::endl;
   }
@@ -761,7 +757,7 @@ double NucDeExDeexcitation::ElementMassInMeV(TGeoElementRN* ele)
   double mass = ele->MassNo()*NucDeEx::amu_c2
                    + ele->MassEx(); // (MeV)
   double mass_amu = mass/NucDeEx::amu_c2;
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "mass (MeV) = " << mass 
          << "    (amu) = " << mass_amu << std::endl;
   }
@@ -782,7 +778,7 @@ bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const
 /////////////////////////////////////////////
 {
   os.str("");
-  os << NucDeExUtils::GetPATH() << "/output/";
+  os << NucDeEx::Utils::NUCDEEX_ROOT << "/output/";
   // single nucleon hole
   if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){ 
     if(Zt==6&&Nt==6) os << "12C/";
@@ -795,7 +791,7 @@ bool NucDeExDeexcitation::OpenROOT(const int Zt,const int Nt, const int Z, const
   //
   rootf = new TFile(os.str().c_str(),"READ");
   if(! rootf->IsOpen()) return 0;
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     std::cout << "OpenRoot: " << os.str().c_str() << std::endl;
   }
   return 1;

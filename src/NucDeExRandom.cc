@@ -2,6 +2,8 @@
 
 namespace NucDeEx{
   namespace Random{
-    random(){ return rndm->Rndm(); };
+    TRandom3 rndm(1);
+    double random(){ return rndm.Rndm(); };
+    void SetSeed(int s){ rndm.SetSeed(s); };
   }
 }

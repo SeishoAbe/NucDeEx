@@ -4,28 +4,18 @@
 #ifdef INCL_DEEXCITATION_NUCDEEX
 #include "G4INCLConfig.hh"
 #endif
+#include "NucDeExRandom.hh"
 
+namespace NucDeEx{
+  namespace Utils{
+    extern int fVerbose;
+    extern std::string NUCDEEX_ROOT;
+    // needs "extern". These are defined in *.cc
 
-class NucDeExUtils{
-  public:
-  NucDeExUtils(){;}
-  ~NucDeExUtils(){;}
-
-  static void SetVerbose(int v){ fVerbose = v; };
-  static int  GetVerbose(){ return fVerbose; };
-  static void SetSeed(int v){ fSeed = v; };
-  static int  GetSeed(){ return fSeed; };
-
-  static void SetPATH();
+    void SetPATH();
 #ifdef INCL_DEEXCITATION_NUCDEEX
-  static void SetPATH(G4INCL::Config* config);
+    void SetPATH(G4INCL::Config* config);
 #endif
-  static std::string GetPATH(){ return NUCDEEX_ROOT; };
-
-  private:
-  static int fVerbose;
-  static int fSeed;
-  static std::string NUCDEEX_ROOT;
-  // Equivalent to env $NUCDEEX_ROOT for standalone use
-};
+  }
+}
 #endif

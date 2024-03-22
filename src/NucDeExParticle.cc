@@ -68,7 +68,7 @@ void NucDeExParticle::Boost(const double totalE_parent,const TVector3& mom_paren
     cerr << "Inputed Mass = " << _mass << endl;
     abort();
   }
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     cout << "Bef boost: ";
     lv.Print();
   }
@@ -77,7 +77,7 @@ void NucDeExParticle::Boost(const double totalE_parent,const TVector3& mom_paren
   lv.Boost(beta);
 
   _momentum = lv.Vect(); // save new vectors after boost
-  if(NucDeExUtils::GetVerbose()>1){
+  if(NucDeEx::Utils::fVerbose>1){
     cout << "Aft boost: ";
     lv.Print();
     _momentum.Print();

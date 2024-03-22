@@ -5,9 +5,11 @@
 
 namespace NucDeEx{
   namespace Random{
-    TRandom3* rndm = NULL;
+    extern TRandom3 rndm;
+    // needs "extern". These are defined in *.cc
+
     double random();
+    void SetSeed(int s);
   }
 }
-
 #endif

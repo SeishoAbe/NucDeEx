@@ -13,7 +13,6 @@
 
 #include <TFile.h>
 #include <TGraph.h>
-#include <TRandom3.h>
 #include <TDatabasePDG.h>
 #include <TParticle.h>
 #include <TGeoManager.h>
@@ -103,7 +102,6 @@ class NucDeExDeexcitation{
 
   TGraph* g_br[NucDeEx::num_particle];
   TGraph* g_br_ex;
-  TRandom3* rndm;
   TDatabasePDG* pdg;
   TGeoManager* geo;
   TGeoElementTable* element_table;

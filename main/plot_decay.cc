@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
   const bool flag_jpi = (bool) atoi(argv[4]);
   
   std::ostringstream os;
-  NucDeExUtils::SetVerbose(1);
+  NucDeEx::Utils::fVerbose=1;
   NucDeExNucleusTable* nucleus_table = new NucDeExNucleusTable();
   if(!nucleus_table->ReadTables()){
     std::cerr << "something wrong" << std::endl;

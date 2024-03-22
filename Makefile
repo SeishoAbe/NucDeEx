@@ -1,4 +1,4 @@
-PROGRAMS = plot_decay cout_input #simulation
+PROGRAMS = plot_decay cout_input simulation
 #PROGRAMS += genie
 
 ifndef ROOTSYS
@@ -41,7 +41,7 @@ LIBDIR=lib
 LIBNAME=${LIBDIR}/libNucDeEx.a
 
 AOBJS =  NucDeExNucleus.o NucDeExNucleusTable.o ReadTALYS.o 
-AOBJS += NucDeExParticle.o NucDeExDeexcitation.o NucDeExUtils.o NucDeExEventInfo.o
+AOBJS += NucDeExParticle.o NucDeExDeexcitation.o NucDeExUtils.o NucDeExEventInfo.o NucDeExRandom.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))
