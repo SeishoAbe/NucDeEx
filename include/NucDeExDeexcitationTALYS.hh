@@ -28,15 +28,10 @@ class NucDeExDeexcitationTALYS: public NucDeExDeexcitationBase{
 
   NucDeExEventInfo DoDeex(const int Zt, const int Nt,
                           const int Z, const int N, const double Ex,
-                          //const int Z, const int N, const int shell, const double Ex,
                           const TVector3& mom=TVector3(0,0,0));
   // Zt, Nt  : Target nucleus Z and N (supports 16O or 12C currently)
   // Z, N    : Residual nucleus Z and N (having excitation energy)
-  // shell  0 : Shell level will be determined according to Ex (box cut)
-  //        1 : s1/2-hole
-  //        2 : p3/2-hole
-  //        3 : p1/2-hole (only for 16O target)
-  // Ex      : Only used if shell==1
+  // Ex      : Excitation energy
   // mom     : 3D momentum of residual nucleus
 
   private:

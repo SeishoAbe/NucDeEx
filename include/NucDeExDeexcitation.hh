@@ -6,14 +6,9 @@
 #include <sstream>
 #include <vector>
 
-#include "NucDeExConsts.hh"
 #include "NucDeExDeexcitationBase.hh"
 #include "NucDeExDeexcitationTALYS.hh"
 #include "NucDeExDeexcitationPhole.hh"
-
-#include <TFile.h>
-#include <TGraph.h>
-#include <TParticle.h>
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 #include "G4INCLConfig.hh"

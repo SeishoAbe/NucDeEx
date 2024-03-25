@@ -30,7 +30,7 @@ class NucDeExDeexcitationBase{
                           const TVector3& mom);
 
   bool Decay(const bool breakflag);
-    // Calculate two-body decay considering lorentz boost
+    // Calculate two-body decay considering Lorentz boost
     // return: 1->OK. 0->suspicious
   
   void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
@@ -56,23 +56,20 @@ class NucDeExDeexcitationBase{
   // decay particle info
   double mass_particle;
   TVector3 mom_particle;
-  
-  // basic decay inofo
+  // decay info
   int decay_mode;
   double S;
   double Qvalue;
 
-
-  // scoring 
+  // --- scoring --- //
   NucDeExEventInfo EventInfo;
   int EventID;
   
-  // utils
+  // --- utils --- //
   TDatabasePDG* fTDatabasePDG;
   TGeoManager* fTGeoManager;
   TGeoElementTable* fTGeoElementTable;
   std::ostringstream os;
-
   const double check_criteria=5e-3;
 };
 #endif

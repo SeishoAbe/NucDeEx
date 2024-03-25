@@ -197,5 +197,7 @@ NucDeExEventInfo NucDeExDeexcitationPhole::DoDeex(const int Zt, const int Nt,
   }else{ 
     exit(1);
   }
+
+  EventInfo.fShell=2; // overwrite
   return EventInfo;
 }

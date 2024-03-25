@@ -10,12 +10,7 @@
 #include <vector>
 
 #include "NucDeExUtils.hh"
-#include "NucDeExRandom.hh"
 #include "NucDeExDeexcitation.hh"
-
-#include <TGraph.h>
-#include <TParticlePDG.h>
-#include <TParticle.h>
 
 ///////////////////////////
 NucDeExDeexcitation::NucDeExDeexcitation():ldmodel(2),parity_optmodall(1){};
@@ -75,12 +70,14 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   
 
   // --- Save event level info (except for shell & status) --- //
+  fShell=-1;
   EventInfo.InitParameters();
   SaveEventLevelInfo(Zt,Nt,Z,N,Ex,mom);
 
   // --- Call sub functions according to shell and nucleus conditions- --//
   if(Ex<=0){
     AddGSNucleus(Z,N,mom);
+    fShell=3;
   }else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
     // --- Single nucleon disapperance
     // determine shell level of hole
@@ -95,19 +92,23 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
       EventInfo = deex_phole->DoDeex(Zt,Nt,Z,N,Ex,mom); 
     }else if(fShell==1){// s1/2-hole read TALYS data
       EventInfo = deex_talys->DoDeex(Zt,Nt,Z,N,Ex,mom);
-    }else{
-      std::cerr << "ERROR: Unexpected shell level: shell = " << fShell << std::endl;
-      exit(1);
     }
   }else if( (Zt+Nt>Z+N) || (Zt+Nt == Z+N) ){
     // multi nucleon disapperanace or no change in Atomic number (Coherent scattering etc.)
+    fShell=1;
     EventInfo = deex_talys->DoDeex(Zt,Nt,Z,N,Ex,mom);
   }else{ // Zt and Nt are larger than Z and N. This can be happen in the use in Geant4. Do nothing.
     if(NucDeEx::Utils::fVerbose>0){
       std::cerr << "Waring: Unexpected target & residual nuclei: "
                 << "Zt = " << Zt << "   Nt = " << Nt << "  Z = " << Z << "   N = " << N << std::endl;
     }
+    fShell=1;
     EventInfo.fStatus=0;
+  }
+
+  if(fShell<0 || fShell>3){
+    std::cerr << "ERROR: Unexpected shell level: shell = " << fShell << std::endl;
+    exit(1);
   }
 
   // event level info

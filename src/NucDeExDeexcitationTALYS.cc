@@ -52,6 +52,7 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
   // --- Save event level info (except for shell & status) --- //
   EventInfo.InitParameters();
   SaveEventLevelInfo(Zt,Nt,Z,N,Ex,mom);
+  EventInfo.fShell=1;
 
   // --- store target info --- //
   Z_target   = Z;

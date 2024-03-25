@@ -25,13 +25,11 @@ class NucDeExDeexcitationPhole: public NucDeExDeexcitationBase{
                           const TVector3& mom=TVector3(0,0,0));
     // Note: Energy level is determined irrelevant to Ex
 
-
   void SetPtrTALYS(NucDeExDeexcitationTALYS* t){deex_talys = t;};
 
   private:
   int flag_model;
   NucDeExDeexcitationTALYS* deex_talys;
-  
 
   // Constants for (p3/2)-1 Br
   // 11B* (Panin et al., Phys. Lett. B 753 204-210. Experimental data)
