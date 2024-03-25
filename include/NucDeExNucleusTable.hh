@@ -11,6 +11,7 @@ class NucDeExNucleusTable{
   virtual ~NucDeExNucleusTable(){;};
 
   bool ReadTables(const bool init_flag=1);
+    // 1 -> new arraies
   int getID(const char* name);
   int GetNumofNuc(){return num_of_nuc;};
   

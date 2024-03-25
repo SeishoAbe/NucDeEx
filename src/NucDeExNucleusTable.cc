@@ -29,7 +29,8 @@ bool NucDeExNucleusTable::ReadTables(const bool init_flag)
   std::ifstream ifs(filename1);
   if(!ifs.is_open()){
     std::cerr << "ERROR : Cannot open " << filename1 << std::endl;
-    return 0;
+    //return 0;
+    exit(1);
   }else{
     if(NucDeEx::Utils::fVerbose>0) std::cout << "Read: " << filename1 << std::endl;
   }
