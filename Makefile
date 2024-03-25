@@ -40,8 +40,10 @@ endif
 LIBDIR=lib
 LIBNAME=${LIBDIR}/libNucDeEx.a
 
-AOBJS =  NucDeExNucleus.o NucDeExNucleusTable.o ReadTALYS.o 
-AOBJS += NucDeExParticle.o NucDeExDeexcitation.o NucDeExUtils.o NucDeExEventInfo.o NucDeExRandom.o
+AOBJS = ReadTALYS.o
+AOBJS += NucDeExNucleus.o NucDeExNucleusTable.o
+AOBJS += NucDeExParticle.o NucDeExUtils.o NucDeExEventInfo.o NucDeExRandom.o
+AOBJS += NucDeExDeexcitationBase.o NucDeExDeexcitationTALYS.o NucDeExDeexcitationPhole.o NucDeExDeexcitation.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))

@@ -16,6 +16,7 @@
 NucDeExNucleusTable::NucDeExNucleusTable()
 ///////////////
 {
+  flag_read=0;
   num_of_nuc=-1;
   NucDeEx::Utils::SetPATH();
 }
@@ -24,6 +25,8 @@ NucDeExNucleusTable::NucDeExNucleusTable()
 bool NucDeExNucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
+  if(flag_read) return 0;
+
   // --- Read nucleus / separation energy tables ---//
   std::string filename1= NucDeEx::Utils::NUCDEEX_ROOT+(std::string)"/tables/nucleus/nucleus.txt";
   std::ifstream ifs(filename1);
@@ -91,6 +94,7 @@ bool NucDeExNucleusTable::ReadTables(const bool init_flag)
     index++;
   }
   ifs.close();
+  flag_read=1;
 
   return true;
 }

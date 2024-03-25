@@ -24,6 +24,7 @@ class NucDeExNucleusTable{
 
   private:
   int num_of_nuc;
+  bool flag_read;
   NucDeExNucleus* _nucleus;
   std::map<std::string, int> _nucleus_id;
   std::map<std::string, int> :: iterator _p_id;

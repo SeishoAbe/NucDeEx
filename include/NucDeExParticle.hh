@@ -32,6 +32,6 @@ class NucDeExParticle{
   // This shoud be zero if _flag==1.
 
   private:
-  const double check_criteria=1e-3;
+  double check_criteria=1e-3; // Should not be "const"
 };
 #endif

@@ -16,6 +16,9 @@ NucDeExParticle::NucDeExParticle()
   _PDG=0;
   _mass=0;
   _momentum.SetXYZ(0,0,0);
+  _name="";
+  _flag=0;
+  _Ex=0;
 }
 
 ///////////////

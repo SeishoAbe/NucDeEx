@@ -13,10 +13,15 @@ class NucDeExEventInfo{
   void InitParameters();
 
   // event level info
-  int eventID, fStatus, fShell;
+  int EventID, fStatus, fShell;
+  // fStatus:
+  //     1: OK
+  //     0: The nucleus is not supported
+  //    -1: Fatal
   int Zt, Nt, Z, N;
-  double Ex, S, MissE;
+  double Ex;
   TVector3 Pinit; // Initial momentum of nucleus
+
   // particle level info
   std::vector<NucDeExParticle> ParticleVector;
 };

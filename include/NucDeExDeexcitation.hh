@@ -7,23 +7,21 @@
 #include <vector>
 
 #include "NucDeExConsts.hh"
-#include "NucDeExNucleusTable.hh"
-#include "NucDeExParticle.hh"
-#include "NucDeExEventInfo.hh"
+#include "NucDeExDeexcitationBase.hh"
+#include "NucDeExDeexcitationTALYS.hh"
+#include "NucDeExDeexcitationPhole.hh"
 
 #include <TFile.h>
 #include <TGraph.h>
-#include <TDatabasePDG.h>
 #include <TParticle.h>
-#include <TGeoManager.h>
-#include <TGeoElement.h>
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 #include "G4INCLConfig.hh"
 #endif
 
-class NucDeExDeexcitation{
+class NucDeExDeexcitation: public NucDeExDeexcitationBase{
   public:
+  NucDeExDeexcitation();
   NucDeExDeexcitation(const int ld=1, const bool p_o=1);
 #ifdef INCL_DEEXCITATION_NUCDEEX
   NucDeExDeexcitation(const int ld=1, const bool p_o=1, G4INCL::Config *config=0);
@@ -33,7 +31,7 @@ class NucDeExDeexcitation{
   virtual ~NucDeExDeexcitation();
 
   // --- Main function ---//
-  const NucDeExEventInfo DoDeex(const int Zt, const int Nt,
+  NucDeExEventInfo DoDeex(const int Zt, const int Nt,
                           const int Z, const int N, const int shell, const double Ex,
                           const TVector3& mom=TVector3(0,0,0));
   // Zt, Nt  : Target nucleus Z and N (supports 16O or 12C currently)
@@ -52,124 +50,22 @@ class NucDeExDeexcitation{
   //        -1 : Fatal error 
   //           : Strange target & residual nuclei not in nucleus table, no mass profile
   //           : no particle info is added
-
-
-  // ---Sub functions --- //
-  // supports multi-nucleon disapperance
-  int DoDeex_talys(const int Zt, const int Nt,
-                   const int Z, const int N, const double Ex,
-                   const TVector3& mom=TVector3(0,0,0));
-  // return 0: No talys tables. Nothing to do.
-  //        1: Sucess
-  //       -1: Very rarely happens due to production of 5H etc. (no mass table)
-  //           If you find this, please execute this again
-
-  // only for single-nucleon disappearance
-  int DoDeex_p32(const int Zt, const int Nt,
-                 const int Z, const int N,
-                 const TVector3& mom=TVector3(0,0,0)); // Note: Energy level is determined irrelevant to Ex
-  // return  1: Sucess
-  //        -1 : Fatal error
   
   int ExtoShell(const int Zt, const int Nt, const double Ex);
-
-  void SetEventID(int id){ eventID=id;};
-  int  GetEventID(){ return eventID; };
-  NucDeExNucleusTable* GetNucleusTablePtr(){ return _nucleus_table;};
-  int GetShell(){return _shell;};
+  int GetShell(){return fShell;};
 
   private:
+  NucDeExDeexcitationTALYS* deex_talys;
+  NucDeExDeexcitationPhole* deex_phole;
 
-  // --- Simulation method called by DoDeex() --- //
-  int DecayMode(const double Ex);
-  bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
-  int Decay(const bool breakflag);
-  int  AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
-    // Just add g.s. nucleus to the vector.
-    // return 1: sucess
-    //       -1: fatal error
-
-  // --- Z,N to PDG
-  int PDGion(int Z,int N);
-
-  // --- ROOT related methods & members --- //
-  bool OpenROOT(const int Zt,const int Nt, const int Z, const int N);
-  bool GetBrTGraph(const std::string st);
-  int  GetBrExTGraph(const std::string st, const double ex_t, const int mode); 
-    // The nearest TGraph point will be returned
-  void DeleteTGraphs();
-  TFile* rootf;
-
-  TGraph* g_br[NucDeEx::num_particle];
-  TGraph* g_br_ex;
-  TDatabasePDG* pdg;
-  TGeoManager* geo;
-  TGeoElementTable* element_table;
-  double ElementMassInMeV(TGeoElementRN* ele);
-
-  // --- Decay information (in MeV) --- //
-  int decay_mode;
-  double S;
-  double Qvalue;
-
-  // target nucleus info
-  int Z_target, N_target;
-  double Ex_target;
-  double mass_target;
-  TVector3 mom_target;
-  NucDeExNucleus* nuc_target;
-  std::string name_target;
-
-  // daughter nucleus info
-  int Z_daughter, N_daughter;
-  double Ex_daughter;
-  double mass_daughter;
-  TVector3 mom_daughter;
-  NucDeExNucleus* nuc_daughter;
-  std::string name_daughter;
-
-  // decay particle info
-  double mass_particle;
-  TVector3 mom_particle;
-
-
-  // others
-  NucDeExNucleusTable* _nucleus_table;
+  // --- model parameters --- //
   int ldmodel;
   bool parity_optmodall;
-  int eventID;
-  std::ostringstream os;
-  const double check_criteria=5e-3;
-  int _shell;
-  void Init();
-  NucDeExEventInfo EventInfo;
 
-  // Constatnts for Ex to shell
+  // --- for Ex to shell --- //
+  int fShell;
   const double Ex_12C_s12=16.0;
   const double Ex_16O_s12=16.0;
   const double Ex_16O_p32=4.0;
-
-  // Constants for (p3/2)-1 Br
-  // 11B* (Panin et al., Phys. Lett. B 753 204-210. Experimental data)
-  static const int Nlevel_p32_11B = 3; 
-  const double E_p32_11B[Nlevel_p32_11B]={0.,2.125,5.020};
-  const double Br_p32_11B[Nlevel_p32_11B]={0.82,0.10,0.08};
-  // 11C* (assume analogy of 11B*)
-  //      the same Br, but energy is different
-  static const int Nlevel_p32_11C = 3;
-  const double E_p32_11C[Nlevel_p32_11C]={0.,2.000,4.804};
-  const double Br_p32_11C[Nlevel_p32_11C]={0.82,0.10,0.08};
-
-  // 15N* (Ejili, Phys. Rev. C 58, 3)
-  //     Deexcitation from 9.93 MeV will be described from TALYS data
-  //     Deexcitation from 10.70 is taken from Ejiri (100% proton)
-  static const int Nlevel_p32_15N = 3;
-  const double E_p32_15N[Nlevel_p32_15N]={6.32,9.93,10.70};
-  const double Br_p32_15N[Nlevel_p32_15N]={0.872,0.064,0.064};
-  // 15O* (Ejiri , Phys. Rev. C 58, 3)
-  static const int Nlevel_p32_15O=3;
-  const double E_p32_15O[Nlevel_p32_15O]={6.18,9.61,10.48};
-  const double Br_p32_15O[Nlevel_p32_15O]={0.872,0.064,0.064}; // guess
-  //const double Br_p32_15O[Nlevel_p32_15O]={1.,0,0}; // original Ejiri's value
 };
 #endif
