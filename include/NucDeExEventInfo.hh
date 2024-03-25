@@ -18,6 +18,6 @@ class NucDeExEventInfo{
   double Ex, S, MissE;
   TVector3 Pinit; // Initial momentum of nucleus
   // particle level info
-  std::vector<NucDeExParticle>* ParticleVector;
+  std::vector<NucDeExParticle> ParticleVector;
 };
 #endif

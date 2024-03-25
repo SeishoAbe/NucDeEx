@@ -14,20 +14,18 @@
 
 /////////////////////////////////////////////
 NucDeExEventInfo::NucDeExEventInfo(): eventID(0), fStatus(0), fShell(0), Zt(0), Nt(0), Z(0), N(0),
-                                      Ex(0), ParticleVector(0)
+                                      Ex(0)
 /////////////////////////////////////////////
 {
   Pinit.SetXYZ(0,0,0);
+  ParticleVector.clear();
 }
 
 /////////////////////////////////////////////
 NucDeExEventInfo::~NucDeExEventInfo()
 /////////////////////////////////////////////
 {
-  if(ParticleVector!=0){
-    ParticleVector->clear();
-    delete ParticleVector;
-  }
+  ;
 }
 /////////////////////////////////////////////
 void NucDeExEventInfo::InitParameters()
@@ -36,9 +34,6 @@ void NucDeExEventInfo::InitParameters()
   eventID = fStatus = fShell =0;
   Zt = Nt = Z = N = 0;
   Ex = 0.;
-  if(ParticleVector!=0){
-    ParticleVector->clear();
-    delete ParticleVector;
-  }
-  ParticleVector = new std::vector<NucDeExParticle>;
+  ParticleVector.clear();
+  std::vector<NucDeExParticle>().swap(ParticleVector);
 }
