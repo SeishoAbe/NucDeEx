@@ -5,8 +5,9 @@
 #include <iomanip> 
 
 #include "NucDeExUtils.hh"
-#include "NucDeExNucleusTable.hh"
+#include "NucDeExRandom.hh"
 #include "NucDeExDeexcitation.hh"
+#include "NucDeExEventInfo.hh"
 
 #include <TROOT.h>
 #include <TStyle.h>
@@ -47,13 +48,14 @@ int main(int argc, char* argv[]){
 
   std::ostringstream os,os_remove_g;
 
-  // Set params before declaring NucDeExDeexcitation
-  NucDeExUtils::SetVerbose(verbose);
-  NucDeExUtils::SetSeed(seed);
-  NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall);
+  // --- Setup routine --- //
+  NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
+  NucDeEx::Random::SetSeed(seed); // optinal (default: 1)
+  NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall); // should be after seting verbosity
+  // --- End of rootine --- //
+
   // Get Z and N
-  NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
-  NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(argv[1]);
+  NucDeExNucleus* nuc = NucDeEx::Utils::NucleusTable->GetNucleusPtr(argv[1]);
   const int Z = nuc->Z;
   const int N = nuc->N;
   const int A = Z+N;
@@ -131,10 +133,10 @@ int main(int argc, char* argv[]){
   if(flag_jpi){
     if(Z+N==11){ // 12C
       os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke12_tot.root";
-      S = nucleus_table->GetNucleusPtr("12C")->S[2];
+      S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("12C")->S[2];
     }else if(Z+N==15){
       os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke16.root";
-      S = nucleus_table->GetNucleusPtr("16O")->S[2];
+      S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("16O")->S[2];
     }
   }else{
     std::cerr << "flag_jpi = " << flag_jpi << std::endl;
@@ -193,19 +195,21 @@ int main(int argc, char* argv[]){
     if(Ex_min>0 && Ex<Ex_min) continue;
     if(Ex_max>0 && Ex>Ex_max) continue;
 
-    // DOIT 
-    //deex->DoDeex(Zt,Nt,Z,N,1,Ex,Pinit); // s1/2-hole 
-    //deex->DoDeex(Zt,Nt,Z,N,2,Ex,Pinit); // p3/2-hole
-    //deex->DoDeex(Zt,Nt,Z,N,3,Ex,Pinit); // p1/2-hole (nothing to do)
-    deex->DoDeex(Zt,Nt,Z,N,0,Ex,Pinit); // shell level is determined from Ex (box cut)
+    // --- DO SIMULATION --- //
+    NucDeExEventInfo result = deex->DoDeex(Zt,Nt,Z,N,0,Ex,Pinit); // shell level is determined from Ex (box cut)
+      // 5th index
+      //    1: s1/2-hole
+      //    2: p3/2-hole
+      //    3: p1/2-hole (nothing to do. g.s.)
 
-    // scoling
-    shell = deex->GetShell();
-    vector<NucDeExParticle>* particle = deex->GetParticleVector();
+
+    // --- Scoling --- //
+    shell = result.fShell;
+    vector<NucDeExParticle> particle = result.ParticleVector;
     PinitX   = Pinit.X();
     PinitY   = Pinit.Y();
     PinitZ   = Pinit.Z();
-    size=particle->size();
+    size=particle.size();
 
     h_sf_Ex_random[shell]->Fill(Ex);
     
@@ -213,7 +217,7 @@ int main(int argc, char* argv[]){
     os_remove_g.str("");
     string pname[size];
     for(int i=0;i<size;i++){
-      NucDeExParticle p = particle->at(i);
+      NucDeExParticle p = particle.at(i);
       PDG[i]=p._PDG;
       mass[i]=p._mass;
       totalE[i]=p.totalE();
