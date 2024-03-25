@@ -7,6 +7,7 @@ namespace NucDeEx{
   namespace Utils{
     int fVerbose=0;
     std::string NUCDEEX_ROOT="";
+    NucDeExNucleusTable* NucleusTable=NULL;
 
     void SetPATH()
     {
@@ -32,5 +33,5 @@ namespace NucDeEx{
       std::cout << "NUCDEEX_ROOT: " << NUCDEEX_ROOT.c_str() << std::endl;
     }
 #endif
-    }
+  }
 }

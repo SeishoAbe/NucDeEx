@@ -4,11 +4,12 @@
 #ifdef INCL_DEEXCITATION_NUCDEEX
 #include "G4INCLConfig.hh"
 #endif
-#include "NucDeExRandom.hh"
+#include "NucDeExNucleusTable.hh"
 
 namespace NucDeEx{
   namespace Utils{
     extern int fVerbose;
+    extern NucDeExNucleusTable* NucleusTable;
     extern std::string NUCDEEX_ROOT;
     // needs "extern". These are defined in *.cc
 
