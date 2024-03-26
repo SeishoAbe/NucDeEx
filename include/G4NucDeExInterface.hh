@@ -42,7 +42,6 @@
 #include "G4PreCompoundModel.hh"
 
 #include "NucDeExDeexcitation.hh"
-#include "NucDeExParticle.hh"
 
 #include "TVector3.h"
 #include <vector>
@@ -67,8 +66,8 @@ private:
   G4VPreCompoundModel *theG4PreCompound;
   int Zt,Nt,At;
   TVector3 Pinit;
+  NucDeExEventInfo theNucDeExResult;
 
-  std::vector<NucDeExParticle> *theNucDeExResult;
   G4long eventNumber;
 
   /// \brief Convert an NucDeEx particle to a G4DynamicParticle

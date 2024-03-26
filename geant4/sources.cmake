@@ -61,19 +61,31 @@ include_directories(${CMAKE_SOURCE_DIR}/source/intercoms/include)
 include(Geant4MacroDefineModule)
 GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
     HEADERS
+        G4NucDeExInterface.hh
+        NucDeExConsts.hh
         NucDeExDeexcitation.hh
+        NucDeExDeexcitationBase.hh
+        NucDeExDeexcitationPhole.hh
+        NucDeExDeexcitationTALYS.hh
+        NucDeExEventInfo.hh
         NucDeExNucleus.hh
         NucDeExNucleusTable.hh
         NucDeExParticle.hh
-        NucDeExConsts.hh
-        G4NucDeExInterface.hh
+        NucDeExRandom.hh
+        NucDeExUtils.hh
 
     SOURCES
+        G4NucDeExInterface.cc
         NucDeExDeexcitation.cc
+        NucDeExDeexcitationBase.cc
+        NucDeExDeexcitationPhole.cc
+        NucDeExDeexcitationTALYS.cc
+        NucDeExEventInfo.cc
         NucDeExNucleus.cc
         NucDeExNucleusTable.cc
         NucDeExParticle.cc
-        G4NucDeExInterface.cc
+        NucDeExRandom.cc
+        NucDeExUtils.cc
 
     GRANULAR_DEPENDENCIES
         G4baryons
