@@ -5,9 +5,27 @@
 
 namespace NucDeEx{
   namespace Utils{
+    // --- Define & initialize --- //
     int fVerbose=0;
     std::string NUCDEEX_ROOT="";
     NucDeExNucleusTable* NucleusTable=NULL;
+    TDatabasePDG* fTDatabasePDG=NULL;
+    TGeoManager* fTGeoManager=NULL;
+    TGeoElementTable* fTGeoElementTable=NULL;
+
+    void Init()
+    {
+      if(NucleusTable==NULL){
+         NucleusTable = new NucDeExNucleusTable();
+      }
+      if(fTDatabasePDG==NULL){
+        fTDatabasePDG = new TDatabasePDG();
+      }
+      if(fTGeoManager==NULL){
+        fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
+        fTGeoElementTable = fTGeoManager->GetElementTable();
+      }
+    }
 
     void SetPATH()
     {

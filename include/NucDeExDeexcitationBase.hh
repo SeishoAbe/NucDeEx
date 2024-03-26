@@ -9,10 +9,6 @@
 #include "NucDeExEventInfo.hh"
 #include "NucDeExNucleus.hh"
 
-#include <TDatabasePDG.h>
-#include <TGeoManager.h>
-#include <TGeoElement.h>
-
 #ifdef INCL_DEEXCITATIONBASE_NUCDEEX
 #include "G4INCLConfig.hh"
 #endif
@@ -66,9 +62,6 @@ class NucDeExDeexcitationBase{
   int EventID;
   
   // --- utils --- //
-  TDatabasePDG* fTDatabasePDG;
-  TGeoManager* fTGeoManager;
-  TGeoElementTable* fTGeoElementTable;
   std::ostringstream os;
   const double check_criteria=5e-3;
 };

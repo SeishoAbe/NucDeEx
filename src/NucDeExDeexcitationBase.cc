@@ -17,28 +17,18 @@
 ///////////////////////////
 NucDeExDeexcitationBase::NucDeExDeexcitationBase(): EventID(0)
 ///////////////////////////
-{
-  if(NucDeEx::Utils::NucleusTable==NULL){
-    NucDeEx::Utils::NucleusTable = new NucDeExNucleusTable();
-  }
-  fTDatabasePDG = new TDatabasePDG();
-  fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
-  fTGeoElementTable = fTGeoManager->GetElementTable();
-}
+{}
 
 ///////////////////////////
 NucDeExDeexcitationBase::~NucDeExDeexcitationBase()
 ///////////////////////////
-{
-  delete fTDatabasePDG;
-  delete fTGeoManager;
-  //delete fTGeoElementTable;
-}
+{}
 
 ///////////////////////////
 void NucDeExDeexcitationBase::Init()
 ///////////////////////////
 {
+  NucDeEx::Utils::Init();
   NucDeEx::Utils::NucleusTable->ReadTables(0);
 }
 
@@ -207,7 +197,7 @@ void NucDeExDeexcitationBase::AddGSNucleus(const int Z,const int N, const TVecto
 const double NucDeExDeexcitationBase::ElementMassInMeV(const int A, const int Z)
 /////////////////////////////////////////////
 {
-  return ElementMassInMeV( fTGeoElementTable->GetElementRN(A,Z) );
+  return ElementMassInMeV( NucDeEx::Utils::fTGeoElementTable->GetElementRN(A,Z) );
 }
 
 /////////////////////////////////////////////

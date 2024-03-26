@@ -17,11 +17,15 @@
 ///////////////////////////
 NucDeExDeexcitationPhole::NucDeExDeexcitationPhole(): flag_model(0)
 ///////////////////////////
-{}
+{
+  Init();
+}
 ///////////////////////////
 NucDeExDeexcitationPhole::NucDeExDeexcitationPhole(int f): flag_model(f)
 ///////////////////////////
-{}
+{
+  Init();
+}
 
 
 /////////////////////////////////////////////
@@ -139,7 +143,7 @@ NucDeExEventInfo NucDeExDeexcitationPhole::DoDeex(const int Zt, const int Nt,
       decay_mode=2; // proton
       Ex_target  = E_p32_15N[index];
       Ex_daughter=0;
-      mass_particle = fTDatabasePDG->GetParticle(NucDeEx::PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
+      mass_particle = NucDeEx::Utils::fTDatabasePDG->GetParticle(NucDeEx::PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
       mass_target = ElementMassInMeV(Z_target+N_target, Z_target);
       Z_daughter = Z_target-1;
       N_daughter = N_target;
@@ -183,7 +187,7 @@ NucDeExEventInfo NucDeExDeexcitationPhole::DoDeex(const int Zt, const int Nt,
       decay_mode=2; // proton
       Ex_target  = E_p32_15O[index];
       Ex_daughter=0;
-      mass_particle = fTDatabasePDG->GetParticle(NucDeEx::PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
+      mass_particle = NucDeEx::Utils::fTDatabasePDG->GetParticle(NucDeEx::PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
       mass_target = ElementMassInMeV(Z_target+N_target, Z_target);
       Z_daughter = Z_target-1;
       N_daughter = N_target;
