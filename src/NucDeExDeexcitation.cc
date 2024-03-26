@@ -75,10 +75,7 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   SaveEventLevelInfo(Zt,Nt,Z,N,Ex,mom);
 
   // --- Call sub functions according to shell and nucleus conditions- --//
-  if(Ex<=0){
-    AddGSNucleus(Z,N,mom);
-    fShell=3;
-  }else if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
+  if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
     // --- Single nucleon disapperance
     // determine shell level of hole
     if(shell>0) fShell=shell;
