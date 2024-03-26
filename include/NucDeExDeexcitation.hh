@@ -17,9 +17,9 @@
 class NucDeExDeexcitation: public NucDeExDeexcitationBase{
   public:
   NucDeExDeexcitation();
-  NucDeExDeexcitation(const int ld=1, const bool p_o=1);
+  NucDeExDeexcitation(const int ld, const bool p_o);
 #ifdef INCL_DEEXCITATION_NUCDEEX
-  NucDeExDeexcitation(const int ld=1, const bool p_o=1, G4INCL::Config *config=0);
+  NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::Config *config);
 #endif
   // ld: ldmodel, p_o: parity_optmodall
 

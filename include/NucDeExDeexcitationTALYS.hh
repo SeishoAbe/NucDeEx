@@ -20,9 +20,9 @@
 class NucDeExDeexcitationTALYS: public NucDeExDeexcitationBase{
   public:
   NucDeExDeexcitationTALYS();
-  NucDeExDeexcitationTALYS(const int ld=1, const bool p_o=1);
+  NucDeExDeexcitationTALYS(const int ld, const bool p_o);
 #ifdef INCL_DEEXCITATION_NUCDEEX
-  NucDeExDeexcitationTALYS(const int ld=1, const bool p_o=1, G4INCL::Config *config=0);
+  NucDeExDeexcitationTALYS(const int ld, const bool p_o, G4INCL::Config *config);
 #endif
   virtual ~NucDeExDeexcitationTALYS(){};
 
