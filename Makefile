@@ -1,5 +1,5 @@
 PROGRAMS = plot_decay cout_input simulation
-#PROGRAMS += genie
+PROGRAMS += genie
 
 ifndef ROOTSYS
 @echo "$(error "Please set ROOT enviromental variables")"
@@ -13,10 +13,8 @@ ARFLAGS=
 
 ## for cern root
 CXXFLAGS        += $(shell root-config --cflags)
-#LDFLAGS         += $(shell root-config --libs) # <- Print regular ROOT libraries
-#LDFLAGS         += $(shell root-config --glibs) # <- Print regular + GUI ROOT libraries
-#LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
-LDFLAGS         += $(shell root-config --libs) -lEG -lGeom #-lEve
+LDFLAGS         += $(shell root-config --libs) -lEG -lGeom #-lEve 
+# DO NOT link lEve. -lEG and -lGeom are necessary.
 ROOTVERSION = $(shell root-config --version)
 ROOT5=$(findstring 5.,$(ROOTVERSION))
 ifneq ($(ROOT5),)
@@ -25,14 +23,14 @@ endif
 
 ## neut libs
 ifdef NEUT_ROOT
-#PROGRAMS += neut
+PROGRAMS += neut
 CXXFLAGS += -I$(NEUT_ROOT)/include
 LDFLAGS += -L$(NEUT_ROOT)/lib -lNEUT -lNEUTClass -lNEUTClassUtils
 endif
 
 ## nuwro libs
 ifdef NUWRO
-#PROGRAMS += nuwro
+PROGRAMS += nuwro
 CXXFLAGS += -I$(NUWRO)/src
 LDFLAGS += $(NUWRO)/bin/event1.so
 endif

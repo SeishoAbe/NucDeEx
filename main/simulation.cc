@@ -4,11 +4,6 @@
 #include <string>
 #include <iomanip> 
 
-#include "NucDeExUtils.hh"
-#include "NucDeExRandom.hh"
-#include "NucDeExDeexcitation.hh"
-#include "NucDeExEventInfo.hh"
-
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TFile.h>
@@ -21,6 +16,11 @@
 #include <TText.h>
 #include <TPaveText.h>
 #include <THStack.h>
+
+#include "NucDeExUtils.hh"
+#include "NucDeExRandom.hh"
+#include "NucDeExDeexcitation.hh"
+#include "NucDeExEventInfo.hh"
 
 int main(int argc, char* argv[]){
   if(argc<=5){
