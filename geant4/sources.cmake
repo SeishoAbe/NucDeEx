@@ -62,6 +62,7 @@ include(Geant4MacroDefineModule)
 GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
     HEADERS
         G4NucDeExInterface.hh
+        G4NucDeExInterfaceMessenger.hh
         NucDeExConsts.hh
         NucDeExDeexcitation.hh
         NucDeExDeexcitationBase.hh
@@ -76,6 +77,7 @@ GEANT4_DEFINE_MODULE(NAME G4hadronic_nucdeex
 
     SOURCES
         G4NucDeExInterface.cc
+        G4NucDeExInterfaceMessenger.cc
         NucDeExDeexcitation.cc
         NucDeExDeexcitationBase.cc
         NucDeExDeexcitationPhole.cc
