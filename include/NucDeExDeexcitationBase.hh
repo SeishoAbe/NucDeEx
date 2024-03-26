@@ -19,8 +19,6 @@ class NucDeExDeexcitationBase{
   virtual ~NucDeExDeexcitationBase();
 
   protected:
-  void Init();
-
   void SaveEventLevelInfo(const int Zt, const int Nt,
                           const int Z, const int N,const double Ex, 
                           const TVector3& mom);

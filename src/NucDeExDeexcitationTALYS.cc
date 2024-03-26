@@ -24,7 +24,7 @@ NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o)
   ldmodel=ld;
   parity_optmodall=p_o;
   NucDeEx::Utils::SetPATH();
-  Init();
+  NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
 }
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
@@ -34,8 +34,7 @@ NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o,
 { 
   ldmodel=ld;
   parity_optmodall=p_o;
-  NucDeEx::Utils::SetPATH(config);
-  Init();
+  NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
 }
 #endif
 

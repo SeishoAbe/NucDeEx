@@ -23,10 +23,10 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o)
   ldmodel=ld;
   parity_optmodall=p_o;
   NucDeEx::Utils::SetPATH();
+  NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
   deex_talys = new NucDeExDeexcitationTALYS(ldmodel,parity_optmodall);
   deex_phole = new NucDeExDeexcitationPhole();
   deex_phole->SetPtrTALYS(deex_talys);
-  Init();
 }
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
@@ -37,10 +37,10 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::C
   ldmodel=ld;
   parity_optmodall=p_o;
   NucDeEx::Utils::SetPATH(config);
+  NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
   deex_talys = new NucDeExDeexcitationTALYS(ldmodel,parity_optmodall);
   deex_phole = new NucDeExDeexcitationPhole();
   deex_phole->SetPtrTALYS(deex_talys);
-  Init();
 }
 #endif
 

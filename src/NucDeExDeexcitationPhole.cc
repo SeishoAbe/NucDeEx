@@ -17,15 +17,11 @@
 ///////////////////////////
 NucDeExDeexcitationPhole::NucDeExDeexcitationPhole(): flag_model(0)
 ///////////////////////////
-{
-  Init();
-}
+{}
 ///////////////////////////
 NucDeExDeexcitationPhole::NucDeExDeexcitationPhole(int f): flag_model(f)
 ///////////////////////////
-{
-  Init();
-}
+{}
 
 
 /////////////////////////////////////////////

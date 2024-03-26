@@ -17,20 +17,14 @@
 ///////////////////////////
 NucDeExDeexcitationBase::NucDeExDeexcitationBase(): EventID(0)
 ///////////////////////////
-{}
+{
+  NucDeEx::Utils::Init();
+}
 
 ///////////////////////////
 NucDeExDeexcitationBase::~NucDeExDeexcitationBase()
 ///////////////////////////
 {}
-
-///////////////////////////
-void NucDeExDeexcitationBase::Init()
-///////////////////////////
-{
-  NucDeEx::Utils::Init();
-  NucDeEx::Utils::NucleusTable->ReadTables(0);
-}
 
 /////////////////////////////////////////////
 void NucDeExDeexcitationBase::SaveEventLevelInfo(const int Zt, const int Nt,

@@ -33,6 +33,8 @@ int main(int argc, char* argv[]){
   const int verbose = atoi(argv[5]);
   int seed=1; // default: 1
   if(argc==7) seed = atoi(argv[6]);
+
+  std::cout << "VERBOSE = " << verbose << std::endl;
   std::cout << "SEED = " << seed << std::endl;
 
   // ---- FIXME --- // 
@@ -50,9 +52,9 @@ int main(int argc, char* argv[]){
 
   // --- Setup routine --- //
   NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
-  NucDeEx::Random::SetSeed(seed); // optinal (default: 1)
+  NucDeEx::Random::SetSeed(seed); // optional (default: 1)
   NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall); // should be after seting verbosity
-  // --- End of rootine --- //
+  // --------------------- //
 
   // Get Z and N
   NucDeExNucleus* nuc = NucDeEx::Utils::NucleusTable->GetNucleusPtr(argv[1]);
@@ -63,7 +65,6 @@ int main(int argc, char* argv[]){
   if(Z+N==11) Zt=6,Nt=6;
   if(Z+N==15) Zt=8,Nt=8;
   
-
   // prepare output root file
   os.str("");  
   os << "sim_out/";

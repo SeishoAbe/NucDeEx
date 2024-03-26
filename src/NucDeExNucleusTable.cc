@@ -18,14 +18,14 @@ NucDeExNucleusTable::NucDeExNucleusTable()
 {
   flag_read=0;
   num_of_nuc=-1;
-  NucDeEx::Utils::SetPATH();
+  //NucDeEx::Utils::SetPATH();
 }
 
 ///////////////
 bool NucDeExNucleusTable::ReadTables(const bool init_flag)
 ///////////////
 {
-  if(flag_read) return 0;
+  if(flag_read) return 0; // already read -> END
 
   // --- Read nucleus / separation energy tables ---//
   std::string filename1= NucDeEx::Utils::NUCDEEX_ROOT+(std::string)"/tables/nucleus/nucleus.txt";
