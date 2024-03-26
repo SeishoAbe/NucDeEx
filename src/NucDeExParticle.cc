@@ -1,4 +1,5 @@
 #include "NucDeExParticle.hh"
+#include "NucDeExUtils.hh"
 
 #include <fstream>
 #include <sstream>
@@ -15,12 +16,14 @@ NucDeExParticle::NucDeExParticle()
   _PDG=0;
   _mass=0;
   _momentum.SetXYZ(0,0,0);
-  verbose=0;
+  _name="";
+  _flag=0;
+  _Ex=0;
 }
 
 ///////////////
 NucDeExParticle::NucDeExParticle(const int PDG, const double mass, const TVector3& mom, 
-                   const string name, const bool flag, const double Ex, const int v)
+                   const string name, const bool flag, const double Ex)
 ///////////////
 {
   _PDG=PDG;
@@ -29,7 +32,6 @@ NucDeExParticle::NucDeExParticle(const int PDG, const double mass, const TVector
   _name=name;
   _flag=flag;
   _Ex=Ex;
-  verbose=v;
 }
 
 
@@ -69,7 +71,7 @@ void NucDeExParticle::Boost(const double totalE_parent,const TVector3& mom_paren
     cerr << "Inputed Mass = " << _mass << endl;
     abort();
   }
-  if(verbose>1){
+  if(NucDeEx::Utils::fVerbose>1){
     cout << "Bef boost: ";
     lv.Print();
   }
@@ -78,7 +80,7 @@ void NucDeExParticle::Boost(const double totalE_parent,const TVector3& mom_paren
   lv.Boost(beta);
 
   _momentum = lv.Vect(); // save new vectors after boost
-  if(verbose>1){
+  if(NucDeEx::Utils::fVerbose>1){
     cout << "Aft boost: ";
     lv.Print();
     _momentum.Print();

@@ -7,3 +7,6 @@
 [submodule "data"]
 	path = data
 	url = git@github.com:SeishoAbe/NucDeEx_ext_data.git
+[submodule "scripts"]
+	path = scripts
+	url = git@github.com:SeishoAbe/NucDeEx_scripts.git

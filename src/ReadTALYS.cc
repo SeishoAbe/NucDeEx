@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <algorithm>
 
+#include "NucDeExUtils.hh"
 #include "NucDeExNucleus.hh"
 #include "ReadTALYS.hh"
 
@@ -18,7 +19,6 @@ ReadTALYS::ReadTALYS(const char* filename, NucDeExNucleusTable* nuc)
   _filename = filename;
   _nucleus_table = nuc;
   os = new std::ostringstream;
-  _verbose=0;
 }
 
 ///////////////////////////
@@ -70,7 +70,7 @@ bool ReadTALYS::Read()
     int find_discrete = st.find(keyword_discrete->c_str());
     if(find_discrete != std::string::npos){
       flag_mode=2;
-      if(_verbose>0){
+      if(NucDeEx::Utils::fVerbose>0){
         std::cout << "### Discrete mode ###" << std::endl;
       }
       st = st.substr(find_discrete+keyword_discrete->length());
@@ -84,7 +84,7 @@ bool ReadTALYS::Read()
       st = st.substr(find_N+keyword_N->length());
       std::istringstream(st) >> n; // obtain n
       nuc = _nucleus_table->GetNucleusPtr(z, n);
-      if(_verbose>0){
+      if(NucDeEx::Utils::fVerbose>0){
         std::cout << nuc->name << " " << z << " " << n << std::endl;
       }
     }else if(flag_mode==2){// discrete mode
@@ -105,7 +105,7 @@ bool ReadTALYS::Read()
         float tmp_br; // br (%)
         std::istringstream(st) >> d_bin_daughter >> tmp_br;
         nuc->level_br[d_bin][d_bin_daughter] = tmp_br;
-        if(_verbose>0){
+        if(NucDeEx::Utils::fVerbose>0){
           std::cout << d_bin << " ---> " << d_bin_daughter  << " : " << nuc->level_br[d_bin][d_bin_daughter] << std::endl;
         }
       }
@@ -115,7 +115,7 @@ bool ReadTALYS::Read()
     // ->  get total population
     int find_population = st.find(keyword_population->c_str());
     if(find_population != std::string::npos){
-      if(_verbose>0 && flag_mode!=0){
+      if(NucDeEx::Utils::fVerbose>0 && flag_mode!=0){
         std::cout << "### Population mode ###" << std::endl;
       }
       flag_mode=0;
@@ -149,7 +149,7 @@ bool ReadTALYS::Read()
 
         // Fill params
         nuc->sum_pop = total_pop;
-        if(_verbose>0){
+        if(NucDeEx::Utils::fVerbose>0){
           std::cout <<  "total population: " << nuc->name << " " << nuc->Z << " " << nuc->N << " " 
                << nuc->A << " " << nuc->sum_pop << std::endl;
         }
@@ -169,7 +169,7 @@ bool ReadTALYS::Read()
         st = st.substr(find_before_decay+keyword_before_decay->length());
         std::istringstream(st) >> pop;
         nuc->total_pop[parity_array] = pop;
-        if(_verbose>0){
+        if(NucDeEx::Utils::fVerbose>0){
           std::cout <<  "parity dependent population: " << nuc->name << " (" << nuc->Z << "," << nuc->N 
                << "," << nuc->A << ") " << nuc->total_pop[parity_array] << std::endl;
         }
@@ -197,14 +197,14 @@ bool ReadTALYS::Read()
             nuc->Ex_bin[parity_array] = bin+1;
             nuc->Ex[parity_array][bin]=Ex;
             nuc->pop[parity_array][bin]=pop_p;
-            if(_verbose>1){
+            if(NucDeEx::Utils::fVerbose>1){
               std::cout << "Parity(" << parity_array << ")" << ": excitation & pop: " << nuc->name << " " << nuc->Ex_bin[parity_array] 
                    << " " << std::setw(9) << nuc->Ex[parity_array][bin] << " " << std::setw(9) << nuc->pop[parity_array][bin]  << std::endl;
             }
           }
         }
       }else if (find_decay!=std::string::npos){ // decay info was found
-        //if(_verbose>0){
+        //if(NucDeEx::Utils::fVerbose>0){
         //  std::cout << "### Decay mode ###" << std::endl;
         //}
         flag_mode=1;
@@ -240,7 +240,7 @@ bool ReadTALYS::Read()
         st = st.substr(find_total+keyword_total->length());
         std::istringstream(st) >> pop_total_decay; // obtain pop for the decay
             // this parameter wil be sum of transition pop for both parity (negative + positive)
-        if(_verbose>1){
+        if(NucDeEx::Utils::fVerbose>1){
           std::cout << "Total pop (decay): " << pop_total_decay << std::endl;
         }
       }else if(flag_mode==1){ // not decay info, but decay mode -> decay pop info

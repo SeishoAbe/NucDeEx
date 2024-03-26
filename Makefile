@@ -13,10 +13,8 @@ ARFLAGS=
 
 ## for cern root
 CXXFLAGS        += $(shell root-config --cflags)
-#LDFLAGS         += $(shell root-config --libs) # <- Print regular ROOT libraries
-#LDFLAGS         += $(shell root-config --glibs) # <- Print regular + GUI ROOT libraries
-#LDFLAGS         += $(shell root-config --evelibs) # <- Print regular + GUI + Eve libraries. SHOULD BE THIS!
-LDFLAGS         += $(shell root-config --libs) -lEG -lGeom #-lEve
+LDFLAGS         += $(shell root-config --libs) -lEG -lGeom #-lEve 
+# DO NOT link lEve. -lEG and -lGeom are necessary.
 ROOTVERSION = $(shell root-config --version)
 ROOT5=$(findstring 5.,$(ROOTVERSION))
 ifneq ($(ROOT5),)
@@ -40,8 +38,10 @@ endif
 LIBDIR=lib
 LIBNAME=${LIBDIR}/libNucDeEx.a
 
-AOBJS =  NucDeExNucleus.o NucDeExNucleusTable.o ReadTALYS.o 
-AOBJS += NucDeExParticle.o NucDeExDeexcitation.o
+AOBJS = ReadTALYS.o
+AOBJS += NucDeExNucleus.o NucDeExNucleusTable.o
+AOBJS += NucDeExParticle.o NucDeExUtils.o NucDeExEventInfo.o NucDeExRandom.o
+AOBJS += NucDeExDeexcitationBase.o NucDeExDeexcitationTALYS.o NucDeExDeexcitationPhole.o NucDeExDeexcitation.o
 
 OBJDIR=obj
 OBJS = $(addprefix $(OBJDIR)/,$(AOBJS))

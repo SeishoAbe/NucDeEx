@@ -16,8 +16,10 @@
 #include "neutvect.h"
 #include "neutpart.h"
 
-#include "NucDeExNucleusTable.hh"
+#include "NucDeExUtils.hh"
+#include "NucDeExRandom.hh"
 #include "NucDeExDeexcitation.hh"
+#include "NucDeExEventInfo.hh"
 
 using namespace std;
 int main(int argc, char* argv[]){
@@ -29,28 +31,30 @@ int main(int argc, char* argv[]){
   string prefix = "neut_1GeV_numu_NCQE_O_MDLQE422_NUCDEXITE0";
   if(argc==2) prefix = argv[1];
   int seed=1;
+  int verbose=2;
   //-----------------.//
 
   ostringstream os;
 
-  // --- prepare deex tools
+  // --- Setup routine --- //
+  NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
+  NucDeEx::Random::SetSeed(seed); // optional (default: 1)
+  NucDeExDeexcitation* deex = new NucDeExDeexcitation(2,1); // should be after seting verbosity
+  // --------------------- //
+
   int Zt=0, Nt=0;
   double S;
-  NucDeExDeexcitation* deex = new NucDeExDeexcitation(2, 1);
-  deex->SetSeed(seed);
-  deex->SetVerbose(1);
-  NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
   bool flag_O=0;
   if(prefix.find("_C_")!=string::npos){
     Zt=6;
     Nt=6;
     os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke12_tot.root";
-    S = nucleus_table->GetNucleusPtr("12C")->S[2];
+    S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("12C")->S[2];
   }else if(prefix.find("_O_")!=string::npos){
     Zt=8;
     Nt=8;
     os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke16.root";
-    S = nucleus_table->GetNucleusPtr("16O")->S[2];
+    S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("16O")->S[2];
     flag_O=1;
   }
   cout << "Separation E = " << S << endl;
@@ -197,18 +201,18 @@ int main(int argc, char* argv[]){
     //cout << MissE << "   "  << S <<  "  " << Ex << endl;
     h_Ex[0]->Fill(Ex);
 
-    // --- DOIT --- //
-    deex->DoDeex(Zt,Nt,Z,N,0,Ex,TVector3(0,0,0));
+    // --- DO SIMULATION --- //
+    NucDeExEventInfo result = deex->DoDeex(Zt,Nt,Z,N,0,Ex,TVector3(0,0,0));
 
     // --- Scoring --- //
-    int shell = deex->GetShell();
-    h_Ex[shell]->Fill(Ex);
-    vector<NucDeExParticle>* particle = deex->GetParticleVector();
-    int size=particle->size();
+    int shell = result.fShell;
+    vector<NucDeExParticle> particle = result.ParticleVector;
+    int size=particle.size();
     for(int i=0;i<size;i++){
-      NucDeExParticle p = particle->at(i);
+      NucDeExParticle p = particle.at(i);
       if(p._PDG==2112) nmulti++;
     }
+    h_Ex[shell]->Fill(Ex);
     h_nmulti_postdeex->Fill(nmulti);
   }
 

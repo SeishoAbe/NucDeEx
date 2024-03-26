@@ -1,5 +1,5 @@
 # Nuclear Deexcitation Simulator (NucDeEx)
-NUcDeEx is a nuclear deexcitation simulator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).  
+NucDeEx is a nuclear deexcitation simulator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).  
 It is composed of two parts: [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html) and a kinematics simulator based on [ROOT](https://root.cern/).  
 Note that this simulator reads files containing branching ratios calculated with TALYS.  
 Therefore, the simulator codes themselves are independent of the TALYS code.
@@ -84,14 +84,7 @@ An example code for simulation is provided:
 
 ## TALYS information & calculation
 - The branching ratios are calculated using [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html).
-- If you want to use TALYS, please follow the documents in tar and install it. 
-- Then, you can use the following scripts and codes 
-```
- run_talys.sh
- ./bin/plot_decay
-```
-- `./bin/plot_decay` is an analyzer on TALYS output.
-- The files created by this executable are used in the simulator (`./bin/simulation`).
+- `main/plot_decay.cc` is the tool to analyze TALYS's output. This is very messy script...
 
 ## Interfaces and build scripts for INCLXX and Geant4
 NucDeEx also provides intefaces and build scripts for use in [INCL++](https://irfu.cea.fr/dphn/Spallation/incl.html) and [Geant4](https://geant4.web.cern.ch/).
@@ -110,7 +103,8 @@ NucDeEx also provides intefaces and build scripts for use in [INCL++](https://ir
 - `./bin`: Executables
 - `./lib`: Library directory
 - `./obj`: Object file directory
-- `./macro`: ROOT macro files to check the output. This is a private submodule.
+- `./macro`: ROOT macro files to check the output (private)
+- `./scripts`: Contains shell scripts for execution (private)
 
 ### Tables, output, etc.
 - `./output`
@@ -128,7 +122,7 @@ NucDeEx also provides intefaces and build scripts for use in [INCL++](https://ir
   - `./sf`
 	- Benhar SF used in event simulation
 - `./data`
-  - Reference data (other predictions, experimental data) are stored. A private submodule.
+  - Reference external data, both experimental and predictive) are stored (private)
 - `./inclxx`
   - Build scripts for use in INCLXX.
 - `./geant4`
