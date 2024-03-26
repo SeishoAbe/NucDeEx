@@ -49,7 +49,7 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
 
   RESET:
 
-  // --- Save event level info (except for shell & status) --- //
+  // --- Save event level info --- //
   EventInfo.InitParameters();
   SaveEventLevelInfo(Zt,Nt,Z,N,Ex,mom);
   EventInfo.fShell=1;
@@ -81,8 +81,6 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
     return EventInfo;
   }
 
-  int status=1;
-  
   // Loop until zero excitation energy or null nuc_daughter ptr
   // Use private members (parameters) named as "_target"
   while(true){// <- infinite loop. There is break point
@@ -148,9 +146,7 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
     if(nuc_daughter==NULL || Ex_daughter==0) breakflag=1;
     
     // --- Calculate kinematics --- //
-    if(Decay(breakflag)==0) status=-1; 
-      // if breakflag==0, it does not save daughter nucleus
-      // return 0: Something suspicious thing happens in energy conservation
+    Decay(breakflag);
 
     if(breakflag) break;
 
@@ -169,11 +165,9 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
     DeleteTGraphs();
   }
 
-
-
   rootf->Close();
   delete rootf;
-  EventInfo.fStatus = status;
+
   return EventInfo;
 }
 

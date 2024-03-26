@@ -24,11 +24,13 @@ class NucDeExDeexcitationBase{
                           const int Z, const int N,const double Ex, 
                           const TVector3& mom);
 
-  bool Decay(const bool breakflag);
+  void Decay(const bool breakflag);
     // Calculate two-body decay considering Lorentz boost
-    // return: 1->OK. 0->suspicious
+    // If something wrong happens in energy conservation, set `EventInfo.fStatus=-1`.
   
   void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
+    // Add g.s. nucleus to EventInfo
+    // If it is not listed in nucleustable, set `EventInfo.fStatus=0`.
   const double ElementMassInMeV(const int A, const int Z);
   const double ElementMassInMeV(const TGeoElementRN* ele);
   const int PDGion(const int Z, const int N); // Z, N to PDG

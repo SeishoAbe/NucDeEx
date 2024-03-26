@@ -42,13 +42,12 @@ void NucDeExDeexcitationBase::SaveEventLevelInfo(const int Zt, const int Nt,
 }
 
 /////////////////////////////////////////////
-bool NucDeExDeexcitationBase::Decay(const bool breakflag)
+void NucDeExDeexcitationBase::Decay(const bool breakflag)
 /////////////////////////////////////////////
 {
   if(NucDeEx::Utils::fVerbose>0){
     std::cout << "NucDeExDeexcitationBase::Decay()" << std::endl;
   }
-  bool status=1; // sucess
 
   // ---- CM frame --- //
   // --- Calculate kinematics (CM)
@@ -64,7 +63,7 @@ bool NucDeExDeexcitationBase::Decay(const bool breakflag)
   double kE_sum = kE_particle + kE_daughter; // just for check
   if( Qvalue>0 && (kE_sum - Qvalue)/Qvalue > check_criteria){
     std::cerr << "WARNING @ NucDeExDeexcitationBase::Decay: Something wrong in kinematics calculation" << std::endl;
-    status=0;
+    EventInfo.fStatus=-1; // error flag
   }
   if(NucDeEx::Utils::fVerbose>1){
     std::cout << "mass_target   = " << mass_target << std::endl;
@@ -147,7 +146,7 @@ bool NucDeExDeexcitationBase::Decay(const bool breakflag)
   //            The last two terms are calculated from CM at first, and then boosted.
   if(totalE_ex_target>0 && (totalE_ex_aft-totalE_ex_target)/totalE_ex_target>check_criteria){
     std::cerr << "WARNING: @ NucDeExDeexcitation:Decay(): Energy is not conserved..." << std::endl;
-    status=0;
+    EventInfo.fStatus=-1; // error flag
   }
 
   // Then, push back
@@ -160,7 +159,6 @@ bool NucDeExDeexcitationBase::Decay(const bool breakflag)
     std::cout << "flag_particle = " << p_particle._flag << std::endl;
     std::cout << "flag_daughter = " << p_daughter._flag << std::endl;
   }
-  return status;
 }
 
 /////////////////////////////////////////////
@@ -170,7 +168,7 @@ void NucDeExDeexcitationBase::AddGSNucleus(const int Z,const int N, const TVecto
   double mass_target = ElementMassInMeV(Z+N, Z);
   NucDeExNucleus* nuc_target = NucDeEx::Utils::NucleusTable->GetNucleusPtr(Z,N);
   if(nuc_target==NULL || mass_target<0){
-    EventInfo.fStatus=0;
+    EventInfo.fStatus=0; // 0 -> not supported
     return; // no particle is added to the vector
   }
   string name_target = (string)nuc_target->name;
@@ -182,7 +180,6 @@ void NucDeExDeexcitationBase::AddGSNucleus(const int Z,const int N, const TVecto
   if(NucDeEx::Utils::fVerbose>0){
     std::cout << "AddGSNucleus(): " << name_target << std::endl;
   }
-  EventInfo.fStatus=1;
   EventInfo.ParticleVector.push_back(nucleus);
   return;
 }

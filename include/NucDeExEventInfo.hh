@@ -17,7 +17,7 @@ class NucDeExEventInfo{
   // fStatus:
   //     1: OK
   //     0: The nucleus is not supported
-  //    -1: Something wrong happens in energy conservation (looking at Decay())
+  //    -1: Error. Something wrong happens in energy conservation.
   int Zt, Nt, Z, N;
   double Ex;
   TVector3 Pinit; // Initial momentum of nucleus

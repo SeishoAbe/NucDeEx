@@ -32,7 +32,7 @@ NucDeExEventInfo NucDeExDeexcitationPhole::DoDeex(const int Zt, const int Nt,
   if(NucDeEx::Utils::fVerbose>0) std::cout << "NucDeExDeexcitationPholeDoDeex()  Z=" << Z << "   N=" << N << endl;
   EventID++;
 
-  // --- Save event level info (except for shell & status) --- //
+  // --- Save event level info --- //
   EventInfo.InitParameters();
   SaveEventLevelInfo(Zt,Nt,Z,N,Ex,mom);
 

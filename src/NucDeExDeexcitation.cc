@@ -73,10 +73,10 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
   }
   
 
-  // --- Save event level info (except for shell & status) --- //
-  fShell=-1;
+  // --- Save event level info --- //
   EventInfo.InitParameters();
   SaveEventLevelInfo(Zt,Nt,Z,N,Ex,mom);
+  fShell=-1;
 
   // --- Call sub functions according to shell and nucleus conditions- --//
   if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){
@@ -104,7 +104,7 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
                 << "Zt = " << Zt << "   Nt = " << Nt << "  Z = " << Z << "   N = " << N << std::endl;
     }
     fShell=1;
-    EventInfo.fStatus=0;
+    EventInfo.fStatus=0; // 0 -> not supported
   }
 
   if(fShell<0 || fShell>3){
