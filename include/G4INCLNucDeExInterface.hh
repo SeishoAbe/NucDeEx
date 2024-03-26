@@ -22,8 +22,7 @@ private:
   NucDeExDeexcitation *theNucDeEx;
   int Zt,Nt,At;
   TVector3 Pinit;
-
-  std::vector<NucDeExParticle> *theNucDeExResult;
+  NucDeExEventInfo theNucDeExResult;
 };
 
 #endif

@@ -1,18 +1,20 @@
+#include <iostream>
+
 #include "G4INCLNucDeExInterface.hh"
 #include "G4INCLParticleTable.hh"
 #include "G4INCLParticle.hh"
 #include "G4INCLGlobals.hh"
 #include "G4INCLParticleSpecies.hh"
 #include "NucDeExUtils.hh"
-#include <iostream>
+#include "NucDeExRandom.hh"
 
 G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
   IDeExcitation(config),
   theConfig(config),
   theNucDeEx(new NucDeExDeexcitation(2,1,theConfig))
 {
-  NucDeExUtils::SetSeed(1);
-  NucDeExUtils::SetVerbose(1);
+  NucDeEx::Utils::fVerbose=2;
+  NucDeEx::Random::SetSeed(seed);
   Zt = theConfig->getTargetZ();
   At = theConfig->getTargetA();
   Nt = At-Zt;
@@ -27,15 +29,14 @@ void G4INCLNucDeExInterface::deExciteRemnant(G4INCL::EventInfo *eventInfo, const
 
   Pinit.SetXYZ(eventInfo->pxRem[i],eventInfo->pyRem[i],eventInfo->pzRem[i]);
 
-  theNucDeEx->DoDeex(Zt,Nt,
+  theNucDeExResult = theNucDeEx->DoDeex(Zt,Nt,
                      eventInfo->ZRem[i],eventInfo->ARem[i]-eventInfo->ZRem[i],
                      0,eventInfo->EStarRem[i],Pinit);
-
-  theNucDeExResult = theNucDeEx->GetParticleVector();
-  int size = theNucDeExResult->size();
+  std::vector<NucDeExParticle> ParticleVector = theNucDeExResult.ParticleVector;
+  int size=ParticleVector.size();
 
   for(int j = 0; j < size ; ++j) { // Copy NucDeEx result to the EventInfo
-    NucDeExParticle particle = theNucDeExResult->at(j);
+    NucDeExParticle particle = ParticleVector.at(j);
     if(!particle._flag) continue; // skip intermediate states
     const int PDG = particle._PDG;
     if(PDG==22){// gamma
