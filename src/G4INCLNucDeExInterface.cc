@@ -14,7 +14,7 @@ G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
   theNucDeEx(new NucDeExDeexcitation(2,1,theConfig))
 {
   NucDeEx::Utils::fVerbose=2;
-  NucDeEx::Random::SetSeed(seed);
+  NucDeEx::Random::SetSeed(1);
   Zt = theConfig->getTargetZ();
   At = theConfig->getTargetA();
   Nt = At-Zt;
