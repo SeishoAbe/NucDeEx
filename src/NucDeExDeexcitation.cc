@@ -30,7 +30,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o): ldmodel(
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 ///////////////////////////
-NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::Config *config): ldmodel(ld), parity_optmodall(p_o);
+NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, G4INCL::Config *config): ldmodel(ld), parity_optmodall(p_o)
 ///////////////////////////
 { 
   NucDeEx::Utils::SetPATH(config);
