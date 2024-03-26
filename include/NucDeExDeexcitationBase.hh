@@ -8,6 +8,7 @@
 
 #include "NucDeExEventInfo.hh"
 #include "NucDeExNucleus.hh"
+#include <TGeoElement.h>
 
 #ifdef INCL_DEEXCITATIONBASE_NUCDEEX
 #include "G4INCLConfig.hh"

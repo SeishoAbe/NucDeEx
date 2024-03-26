@@ -14,26 +14,27 @@
 #include "NucDeExDeexcitationTALYS.hh"
 
 ///////////////////////////
-NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(): ldmodel(2), parity_optmodall(1){};
-///////////////////////////
-
-///////////////////////////
-NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o)
+NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(): ldmodel(2), parity_optmodall(1)
 ///////////////////////////
 {
-  ldmodel=ld;
-  parity_optmodall=p_o;
+  NucDeEx::Utils::SetPATH();
+  NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
+}
+
+///////////////////////////
+NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o): ldmodel(ld), parity_optmodall(p_o)
+///////////////////////////
+{
   NucDeEx::Utils::SetPATH();
   NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
 }
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
 ///////////////////////////
-NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o, G4INCL::Config *config)
+NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o, G4INCL::Config *config): ldmodel(ld), parity_optmodall(p_o)
 ///////////////////////////
 { 
-  ldmodel=ld;
-  parity_optmodall=p_o;
+  NucDeEx::Utils::SetPATH(config);
   NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
 }
 #endif

@@ -25,6 +25,8 @@ class NucDeExDeexcitation: public NucDeExDeexcitationBase{
 
   virtual ~NucDeExDeexcitation();
 
+  void Init();
+
   // --- Main function ---//
   NucDeExEventInfo DoDeex(const int Zt, const int Nt,
                           const int Z, const int N, const int shell, const double Ex,
