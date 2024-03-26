@@ -33,8 +33,9 @@
 
 #include "NucDeExUtils.hh"
 #include "NucDeExRandom.hh"
-
 #include "G4NucDeExInterface.hh"
+#include "G4NucDeExInterfaceMessenger.hh"
+
 #include "G4ParticleDefinition.hh"
 #include "G4ReactionProductVector.hh"
 #include "G4ReactionProduct.hh"
@@ -55,23 +56,26 @@ G4NucDeExInterface::G4NucDeExInterface() :
   NucDeEx::Random::SetSeed(1);
   // This is tentavie solution. We cannot get parent nucleus informationi
   Zt=8, Nt=8, At=16; // FIXME
+  theNucDeExInterfaceMessenger = new G4NucDeExInterfaceMessenger(this);
 }
 
 G4NucDeExInterface::G4NucDeExInterface(G4VPreCompoundModel* preco) :
   G4VPreCompoundModel(NULL, "NucDeEx"),
   theNucDeEx(new NucDeExDeexcitation(2,1)),
+  theG4PreCompound(preco),
   eventNumber(0)
 {
   G4cout << "NucDeEx: Get G4PreCompoundModel by using G4HadronicInteractionRegistry" << G4endl;
-  theG4PreCompound = preco;
   NucDeEx::Utils::fVerbose=0;
   NucDeEx::Random::SetSeed(1);
   // This is tentavie solution. We cannot get parent nucleus informationi
   Zt=8, Nt=8, At=16; // FIXME
+  theNucDeExInterfaceMessenger = new G4NucDeExInterfaceMessenger(this);
 }
 
 G4NucDeExInterface::~G4NucDeExInterface() {
-  //delete theNucDeEx;
+  delete theNucDeExInterfaceMessenger;
+  delete theNucDeEx;
   //delete theG4PreCompound;
 }
 
@@ -92,7 +96,10 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
 
   G4ReactionProductVector *result;
   if(theNucDeExResult.fStatus!=1){// NucDeEx status is not good -> use G4PreCompoundModel
-    if(NucDeEx::Utils::fVerbose>0) G4cout << "Use G4PreCompoundModel instead of NucDeEx" << G4endl;
+    if(NucDeEx::Utils::fVerbose>0){
+      G4cout << "NucDeEx status = " << theNucDeExResult.fStatus << G4endl;
+      G4cout << "Use G4PreCompoundModel instead of NucDeEx" << G4endl;
+    }
     result = theG4PreCompound->DeExcite(aFragment);
   }else{ // NucDeEx status is good -> use it!
     result = new G4ReactionProductVector;

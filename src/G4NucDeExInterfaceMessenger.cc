@@ -10,7 +10,8 @@
 
 const G4String G4NucDeExInterfaceMessenger::theUIDirectory = "/process/had/nucdeex/";
 
-G4NucDeExInterfaceMessenger::G4NucDeExInterfaceMessenger()
+G4NucDeExInterfaceMessenger::G4NucDeExInterfaceMessenger(G4NucDeExInterface* anInterface):
+  theNucDeExInterface(anInterface)
 {
   // Create a directory for the INCL++ commands
   theNucDeExDirectory = new G4UIdirectory(theUIDirectory);

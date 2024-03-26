@@ -46,6 +46,8 @@
 #include "TVector3.h"
 #include <vector>
 
+class G4NucDeExInterfaceMessenger;
+
 class G4NucDeExInterface : public G4VPreCompoundModel {
 public:
   G4NucDeExInterface();
@@ -62,6 +64,8 @@ public:
   virtual void DeExciteModelDescription(std::ostream& outFile) const;
 
 private:
+  G4NucDeExInterfaceMessenger* theNucDeExInterfaceMessenger;
+
   NucDeExDeexcitation *theNucDeEx;
   G4VPreCompoundModel *theG4PreCompound;
   int Zt,Nt,At;
