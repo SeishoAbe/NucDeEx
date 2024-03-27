@@ -187,14 +187,14 @@ void NucDeExDeexcitationBase::AddGSNucleus(const int Z,const int N, const TVecto
 }
 
 /////////////////////////////////////////////
-const double NucDeExDeexcitationBase::ElementMassInMeV(const int A, const int Z)
+double NucDeExDeexcitationBase::ElementMassInMeV(const int A, const int Z)
 /////////////////////////////////////////////
 {
   return ElementMassInMeV( NucDeEx::Utils::fTGeoElementTable->GetElementRN(A,Z) );
 }
 
 /////////////////////////////////////////////
-const double NucDeExDeexcitationBase::ElementMassInMeV(const TGeoElementRN* ele)
+double NucDeExDeexcitationBase::ElementMassInMeV(const TGeoElementRN* ele)
 /////////////////////////////////////////////
 {
   if(ele==0) return -1; // no profile can be found.
@@ -209,7 +209,7 @@ const double NucDeExDeexcitationBase::ElementMassInMeV(const TGeoElementRN* ele)
 }
 
 /////////////////////////////////////////////
-const int NucDeExDeexcitationBase::PDGion(const int Z, const int N)
+int NucDeExDeexcitationBase::PDGion(const int Z, const int N)
 /////////////////////////////////////////////
 {
   int pdg_int= 1e9 + Z*1e4 + (Z+N)*1e1;
