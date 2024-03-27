@@ -14,6 +14,8 @@
 #include "NucDeExParticle.hh"
 #include "NucDeExDeexcitationBase.hh"
 
+#include <TMath.h>
+
 ///////////////////////////
 NucDeExDeexcitationBase::NucDeExDeexcitationBase(): EventID(0)
 ///////////////////////////
@@ -165,20 +167,20 @@ void NucDeExDeexcitationBase::Decay(const bool breakflag)
 void NucDeExDeexcitationBase::AddGSNucleus(const int Z,const int N, const TVector3& mom)
 /////////////////////////////////////////////
 {
-  double mass_target = ElementMassInMeV(Z+N, Z);
-  NucDeExNucleus* nuc_target = NucDeEx::Utils::NucleusTable->GetNucleusPtr(Z,N);
-  if(nuc_target==NULL || mass_target<0){
+  double mass = ElementMassInMeV(Z+N, Z);
+  NucDeExNucleus* nuc = NucDeEx::Utils::NucleusTable->GetNucleusPtr(Z,N);
+  if(nuc==NULL || mass<0){
     EventInfo.fStatus=0; // 0 -> not supported
     return; // no particle is added to the vector
   }
-  string name_target = (string)nuc_target->name;
+  string name = (string)nuc->name;
   NucDeExParticle nucleus(PDGion(Z,N),
-                          mass_target, // w/o excitation E
+                          mass, // w/o excitation E
                           mom,
-                          name_target, 
+                          name, 
                           1,0); // track flag on // zero ex
   if(NucDeEx::Utils::fVerbose>0){
-    std::cout << "AddGSNucleus(): " << name_target << std::endl;
+    std::cout << "AddGSNucleus(): " << name << std::endl;
   }
   EventInfo.ParticleVector.push_back(nucleus);
   return;

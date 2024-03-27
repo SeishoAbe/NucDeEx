@@ -31,9 +31,9 @@ class NucDeExDeexcitationBase{
   void AddGSNucleus(const int Z, const int N, const TVector3& mom=TVector3(0,0,0));
     // Add g.s. nucleus to EventInfo
     // If it is not listed in nucleustable, set `EventInfo.fStatus=0`.
-  const double ElementMassInMeV(const int A, const int Z);
-  const double ElementMassInMeV(const TGeoElementRN* ele);
-  const int PDGion(const int Z, const int N); // Z, N to PDG
+  double ElementMassInMeV(const int A, const int Z);
+  double ElementMassInMeV(const TGeoElementRN* ele);
+  int PDGion(const int Z, const int N); // Z, N to PDG
 
   //--- params --- //
   // target nucleus info
