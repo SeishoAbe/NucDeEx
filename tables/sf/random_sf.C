@@ -1,4 +1,4 @@
-#include "../../include/NucDeExNucleusTable.hh"
+#include "../../include/NucDeExUtils.hh"
 #include "../../include/NucDeExDeexcitation.hh"
 
 R__LOAD_LIBRARY(../../lib/libNucDeEx);
@@ -9,14 +9,14 @@ int random_sf(){
 	// --------------------//
 	const int numofevent=1e6; // to be generated
 	//
-
-	const double Ex_p32 =-1e9;
-	const double Ex_s12 =16.0;
-	string target="12C";
-	/*
 	const double Ex_p32 =4.0;
 	const double Ex_s12 =16;
 	string target="16O";
+
+	/*
+	const double Ex_p32 =-1e9;
+	const double Ex_s12 =16.0;
+	string target="12C";
 
 	*/
 	double max_mom=500;
@@ -29,10 +29,6 @@ int random_sf(){
 
 	// Set deex tool
 	NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall);
-	deex->SetSeed(seed); // 0: time
-	deex->SetVerbose(1);
-  NucDeExNucleusTable* nucleus_table = deex->GetNucleusTablePtr();
-	NucDeExNucleus* nuc = nucleus_table->GetNucleusPtr(target.c_str());
 	gStyle->SetTextFont(132);
   gStyle->SetTextSize(0.07);
   gStyle->SetTitleSize(0.07,"XYZ");
@@ -58,11 +54,11 @@ int random_sf(){
 	double MissE, Ex, S;
 	os.str("");	
 	if(target=="12C"){
-		os << getenv("NUCDEEX_TABLES") << "/sf/pke12_tot.root";
-		S = nucleus_table->GetNucleusPtr("12C")->S[2];
+		os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke12_tot.root";
+		S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("12C")->S[2];
 	}else if(target=="16O"){
-		os << getenv("NUCDEEX_TABLES") << "/sf/pke16.root";
-		S = nucleus_table->GetNucleusPtr("16O")->S[2];
+		os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke16.root";
+		S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("16O")->S[2];
 	}
 	cout << "S = " << S << endl;
 	TFile* rootf = new TFile(os.str().c_str(),"READ");
