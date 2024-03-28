@@ -37,9 +37,10 @@ int main(int argc, char* argv[]){
   ostringstream os;
 
   // --- Setup routine --- //
+  // Set parameters prior to the instantiation
   NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
   NucDeEx::Random::SetSeed(seed); // optional (default: 1)
-  NucDeExDeexcitation* deex = new NucDeExDeexcitation(2,1); // should be after seting verbosity
+  NucDeExDeexcitation* deex = new NucDeExDeexcitation();
   // --------------------- //
 
   int Zt=0, Nt=0;
@@ -202,7 +203,7 @@ int main(int argc, char* argv[]){
     h_Ex[0]->Fill(Ex);
 
     // --- DO SIMULATION --- //
-    NucDeExEventInfo result = deex->DoDeex(Zt,Nt,Z,N,0,Ex,TVector3(0,0,0));
+    NucDeExEventInfo result = deex->DoDeex(Zt,Nt,Z,N,Ex,TVector3(0,0,0));
 
     // --- Scoring --- //
     int shell = result.fShell;

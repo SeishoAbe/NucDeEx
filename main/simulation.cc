@@ -3,7 +3,6 @@
 #include <sstream>
 #include <string>
 #include <iomanip> 
-
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TFile.h>
@@ -38,10 +37,10 @@ int main(int argc, char* argv[]){
   std::cout << "SEED = " << seed << std::endl;
 
   // ---- FIXME --- // 
-  const int numofevent=1e6; // to be generated
-  const bool flag_fig=0;
-  //const int numofevent=100; // to be generated
-  //const bool flag_fig=1;
+  //const int numofevent=1e6; // to be generated
+  //const bool flag_fig=0;
+  const int numofevent=1000; // to be generated
+  const bool flag_fig=1;
 
   const double Ex_min =-1;
   const double Ex_max =-1;
@@ -51,9 +50,11 @@ int main(int argc, char* argv[]){
   std::ostringstream os,os_remove_g;
 
   // --- Setup routine --- //
+  // Set parameters prior to the instantiation
   NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
   NucDeEx::Random::SetSeed(seed); // optional (default: 1)
-  NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall); // should be after seting verbosity
+  NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall,2);// new v2.1~
+  //NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall,1); // old ~v1.3
   // --------------------- //
 
   // Get Z and N
@@ -197,11 +198,14 @@ int main(int argc, char* argv[]){
     if(Ex_max>0 && Ex>Ex_max) continue;
 
     // --- DO SIMULATION --- //
+    NucDeExEventInfo result = deex->DoDeex(Zt,Nt,Z,N,Ex,Pinit);
+    /* old style ~v1.3
     NucDeExEventInfo result = deex->DoDeex(Zt,Nt,Z,N,0,Ex,Pinit); // shell level is determined from Ex (box cut)
       // 5th index
       //    1: s1/2-hole
       //    2: p3/2-hole
       //    3: p1/2-hole (nothing to do. g.s.)
+    */
 
 
     // --- Scoling --- //
