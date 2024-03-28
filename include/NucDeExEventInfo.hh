@@ -24,6 +24,10 @@ class NucDeExEventInfo{
   //    1: TALYS (NucDeExDeexcitationTALYS)
   //    2: gamma discrete
   //    3: g.s. (AddGSNucleus)
+  //  ~v1.3
+  //    1 : s1/2-hole
+  //    2 : p3/2-hole
+  //    3 : p1/2-hole (only for 16O target)
   int Zt, Nt, Z, N;
   double Ex;
   TVector3 Pinit; // Initial momentum of nucleus
