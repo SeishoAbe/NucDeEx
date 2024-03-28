@@ -11,7 +11,7 @@
 G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
   IDeExcitation(config),
   theConfig(config),
-  theNucDeEx(new NucDeExDeexcitation(2,1,theConfig))
+  theNucDeEx(new NucDeExDeexcitation(2,1,2,theConfig))
 {
   NucDeEx::Utils::fVerbose=2;
   NucDeEx::Random::SetSeed(1);
@@ -31,7 +31,7 @@ void G4INCLNucDeExInterface::deExciteRemnant(G4INCL::EventInfo *eventInfo, const
 
   theNucDeExResult = theNucDeEx->DoDeex(Zt,Nt,
                      eventInfo->ZRem[i],eventInfo->ARem[i]-eventInfo->ZRem[i],
-                     0,eventInfo->EStarRem[i],Pinit);
+                     eventInfo->EStarRem[i],Pinit);
   std::vector<NucDeExParticle> ParticleVector = theNucDeExResult.ParticleVector;
   int size=ParticleVector.size();
 

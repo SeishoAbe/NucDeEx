@@ -48,7 +48,7 @@
 
 G4NucDeExInterface::G4NucDeExInterface() :
   G4VPreCompoundModel(NULL, "NucDeEx"),
-  theNucDeEx(new NucDeExDeexcitation(2,1)),
+  theNucDeEx(new NucDeExDeexcitation(2,1,2)),
   theG4PreCompound(new G4PreCompoundModel),
   eventNumber(0)
 {
@@ -61,7 +61,7 @@ G4NucDeExInterface::G4NucDeExInterface() :
 
 G4NucDeExInterface::G4NucDeExInterface(G4VPreCompoundModel* preco) :
   G4VPreCompoundModel(NULL, "NucDeEx"),
-  theNucDeEx(new NucDeExDeexcitation(2,1)),
+  theNucDeEx(new NucDeExDeexcitation(2,1,2)),
   theG4PreCompound(preco),
   eventNumber(0)
 {
@@ -92,7 +92,7 @@ G4ReactionProductVector *G4NucDeExInterface::DeExcite(G4Fragment &aFragment) {
 
   eventNumber++;
   if(NucDeEx::Utils::fVerbose>1) G4cout << "NucDeEx: ZRem = " << ZRem << "  ARem = " << ARem << "   eStarRem = " << eStarRem << G4endl;
-  theNucDeExResult = theNucDeEx->DoDeex(Zt,Nt,ZRem,ARem-ZRem,0,eStarRem,Pinit);
+  theNucDeExResult = theNucDeEx->DoDeex(Zt,Nt,ZRem,ARem-ZRem,eStarRem,Pinit);
 
   G4ReactionProductVector *result;
   if(theNucDeExResult.fStatus!=1){// NucDeEx status is not good -> use G4PreCompoundModel
