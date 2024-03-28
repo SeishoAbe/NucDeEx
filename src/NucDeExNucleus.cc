@@ -75,8 +75,7 @@ float NucDeExNucleus::min_S()
 //////////////////
 {
   float min=1e9;
-  for(int i=0;i<NucDeEx::num_particle;i++){
-    if(i==0) continue; // remove gamma
+  for(int i=1;i<NucDeEx::num_particle;i++){
     if(min>S[i]) min=S[i];
   }
   return min;

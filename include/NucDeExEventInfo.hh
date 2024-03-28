@@ -18,6 +18,12 @@ class NucDeExEventInfo{
   //     1: OK
   //     0: The nucleus is not supported
   //    -1: Error. Something wrong happens in energy conservation.
+  // fShell:
+  //  v2.1~
+  //    0: Did nothing
+  //    1: TALYS (NucDeExDeexcitationTALYS)
+  //    2: gamma discrete
+  //    3: g.s. (AddGSNucleus)
   int Zt, Nt, Z, N;
   double Ex;
   TVector3 Pinit; // Initial momentum of nucleus
