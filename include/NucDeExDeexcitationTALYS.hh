@@ -38,16 +38,26 @@ class NucDeExDeexcitationTALYS: public NucDeExDeexcitationBase{
   int DecayMode(const double Ex);
 
   // --- ROOT related methods & members --- //
-  bool OpenROOT(const int Zt,const int Nt, const int Z, const int N);
-  bool GetBrTGraph(const std::string st);
+  void GetAllTGraph();
+  std::map<std::string, int> map_root; 
+    // store nucleus of root file: nucleus name -> [file]
+  std::map<std::string, int> map_nucleus[NucDeEx::bins]; 
+    // store nucleus of tgraph (target nucleus): nucleus name -> [nucleus]
+  std::map<std::string, int> :: iterator it;
+  int getRootID(const char* name);
+  int getNucleusID(int i, const char* name);
+  int fRootID, fNucleusID, fPoint;
+    // [file], [nucleus], [Exbin]
+    // use "decay_mdoe for [particle]
+
   int  GetBrExTGraph(const std::string st, const double ex_t, const int mode); 
   bool DaughterExPoint(double *d_Ex, int *d_point); //call by pointer
-    // The nearest TGraph point will be returned
-  void DeleteTGraphs();
 
-  TFile* rootf;
-  TGraph* g_br[NucDeEx::num_particle];
-  TGraph* g_br_ex;
+  TGraph* g_br_all[NucDeEx::bins][NucDeEx::bins][NucDeEx::num_particle]; 
+    // [file][nucleus][particle]
+  TGraph* g_br_ex_all[NucDeEx::bins][NucDeEx::bins][NucDeEx::num_particle][NucDeEx::bins];
+    // [file][nucleus][particle][Exbin]
+
 
   int ldmodel;
   bool parity_optmodall;

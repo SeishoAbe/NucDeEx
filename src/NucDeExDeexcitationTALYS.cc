@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <vector>
 
+#include <TKey.h>
+
 #include "NucDeExUtils.hh"
 #include "NucDeExRandom.hh"
 #include "NucDeExDeexcitationTALYS.hh"
@@ -19,6 +21,7 @@ NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(): ldmodel(2), parity_optmoda
 {
   NucDeEx::Utils::SetPATH();
   NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
+  GetAllTGraph();
 }
 
 ///////////////////////////
@@ -27,6 +30,7 @@ NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o)
 {
   NucDeEx::Utils::SetPATH();
   NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
+  GetAllTGraph();
 }
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
@@ -36,6 +40,7 @@ NucDeExDeexcitationTALYS::NucDeExDeexcitationTALYS(const int ld, const bool p_o,
 { 
   NucDeEx::Utils::SetPATH(config);
   NucDeEx::Utils::NucleusTable->ReadTables(0); // should be after SetPATH
+  GetAllTGraph();
 }
 #endif
 
@@ -72,7 +77,9 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
   name_target = (string) nuc_target->name;
 
   // --- Read ROOT file --- //
-  if( ! OpenROOT(Zt,Nt,Z,N) ){ // No ROOT file
+  if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ) fRootID = getRootID((name_target+"_1h").c_str());
+  else                                           fRootID = getRootID(name_target.c_str());
+  if(fRootID<0){ // No 
     if(NucDeEx::Utils::fVerbose>0){
       std::cout << "We don't have deexcitation profile for this nucleus: " << name_target.c_str() << std::endl;
     }
@@ -80,7 +87,7 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
     EventInfo.fStatus=0;
     return EventInfo;
   }
-
+    
   // Loop until zero excitation energy or null nuc_daughter ptr
   // Use private members (parameters) named as "_target"
   while(true){// <- infinite loop. There is break point
@@ -89,13 +96,15 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
     }
 
     // --- Get (TGraph*) br based on name_target
-    if(GetBrTGraph(name_target)){ // TGraph found
+    fNucleusID = getNucleusID(fRootID,name_target.c_str());
+    if(fNucleusID>=0){ // TGraph found
       // --- Determine decay mode 
       //     Return: The same as array in NucDeExConsts.hh
       decay_mode = DecayMode(Ex_target); 
 
       // --- Get nearest Ex bin (TGraph point) and then get (TGraph*) br_ex
-      if(GetBrExTGraph(name_target, Ex_target, decay_mode)==0){ // g.s.
+      fPoint = GetBrExTGraph(name_target, Ex_target, decay_mode);
+      if(fPoint==0){ // g.s.
         AddGSNucleus(Z,N,mom);
         return EventInfo;
       }
@@ -162,11 +171,7 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
 
     // --- Need this to release memory of TGraph
     //    TGraph memory looks not relased only by closing & deleting root file...
-    DeleteTGraphs();
   }
-
-  rootf->Close();
-  delete rootf;
 
   return EventInfo;
 }
@@ -182,7 +187,7 @@ int NucDeExDeexcitationTALYS::DecayMode(const double Ex)
   double Br[NucDeEx::num_particle]={0};
   double Br_sum=0;
   for(int p=0;p<NucDeEx::num_particle;p++){
-    Br[p] = g_br[p]->Eval(Ex);
+    Br[p] = g_br_all[fRootID][fNucleusID][p]->Eval(Ex);
     if(Br[p]<0) Br[p]=0;
     Br_sum += Br[p];
     if(NucDeEx::Utils::fVerbose>1){
@@ -245,42 +250,6 @@ int NucDeExDeexcitationTALYS::DecayMode(const double Ex)
   return decay_mode_r;
 }
 
-/////////////////////////////////////////////
-bool NucDeExDeexcitationTALYS::OpenROOT(const int Zt,const int Nt, const int Z, const int N)
-/////////////////////////////////////////////
-{
-  os.str("");
-  os << NucDeEx::Utils::NUCDEEX_ROOT << "/output/";
-  // single nucleon hole
-  if( (Zt==Z && Nt==N+1) || (Zt==Z+1 && Nt==N) ){ 
-    if(Zt==6&&Nt==6) os << "12C/";
-    else if(Zt==8&&Nt==8) os << "16O/";
-    else return 0; // not supported
-  }
-  os << "Br_" << name_target.c_str() << "_ldmodel" << ldmodel;
-  if(parity_optmodall) os << "_parity_optmodall";
-  os << ".root"; 
-  //
-  rootf = new TFile(os.str().c_str(),"READ");
-  if(! rootf->IsOpen()) return 0;
-  if(NucDeEx::Utils::fVerbose>1){
-    std::cout << "OpenRoot: " << os.str().c_str() << std::endl;
-  }
-  return 1;
-}
-
-/////////////////////////////////////////////
-bool NucDeExDeexcitationTALYS::GetBrTGraph(const string st)
-/////////////////////////////////////////////
-{
-  for(int p=0;p<NucDeEx::num_particle;p++){
-    os.str("");
-    os << "g_" << st.c_str() << "_br_" << p;
-    g_br[p] = (TGraph*) rootf->Get(os.str().c_str());
-    if(g_br[p]==0) return 0; // no tgraph
-  }
-  return 1;
-}
 
 
 /////////////////////////////////////////////
@@ -290,27 +259,18 @@ int NucDeExDeexcitationTALYS::GetBrExTGraph(const string st, const double ex_t, 
   double ex,br;
   double diff_ex=0;
   int point=0;
-  for(point=0;point<g_br[mode]->GetN();point++){
-    g_br[mode]->GetPoint(point,ex,br);
+  for(point=0;point<g_br_all[fRootID][fNucleusID][mode]->GetN();point++){
+    g_br_all[fRootID][fNucleusID][mode]->GetPoint(point,ex,br);
     if(ex>ex_t) break;
     diff_ex = abs(ex-ex_t);
   }
   if(abs(ex-ex_t)>diff_ex) point--;
-  if(point==g_br[mode]->GetN()) point--;
+  if(point==g_br_all[fRootID][fNucleusID][mode]->GetN()) point--;
   if(point<0) point=0;
-  os.str("");
-  os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
-  g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
-  if(g_br_ex==0) return -1; // no tgraph
+  //no point in the tgraph -> get next point
+  if(g_br_ex_all[fRootID][fNucleusID][mode][point]->GetN()==0) point++;
 
-  if(g_br_ex->GetN()==0){ //no point in the tgraph -> get next point
-    point++;
-    os.str("");
-    os << "g_" << st.c_str() << "_br_ex_" << mode << "_" << point;
-    g_br_ex = (TGraph*) rootf->Get(os.str().c_str());
-    if(g_br_ex==0) return -1; // no tgraph
-  }
-  g_br[mode]->GetPoint(point,ex,br);
+  g_br_all[fRootID][fNucleusID][mode]->GetPoint(point,ex,br);
 
   if(NucDeEx::Utils::fVerbose>1){
     std::cout << "GetBrExTGraph(): nearest_point = " << point << ",  ex at the point = " << ex
@@ -318,7 +278,7 @@ int NucDeExDeexcitationTALYS::GetBrExTGraph(const string st, const double ex_t, 
 
   }
   if(ex==0 && point==0) return 0; // g.s.
-  return 1;
+  return point;
 }
 
 
@@ -328,15 +288,15 @@ bool NucDeExDeexcitationTALYS::DaughterExPoint(double *d_Ex, int *d_point)
 {
   double ex=0, br=0;
   double Br_sum=0;
-  for(int p=0;p<g_br_ex->GetN();p++){
-    g_br_ex->GetPoint(p,ex,br);
+  for(int p=0;p<g_br_ex_all[fRootID][fNucleusID][decay_mode][fPoint]->GetN();p++){
+    g_br_ex_all[fRootID][fNucleusID][decay_mode][fPoint]->GetPoint(p,ex,br);
     Br_sum += br;
   }
   double Br_integ=0;
   double random = NucDeEx::Random::random();
   int point=0;
-  for(point=0;point<g_br_ex->GetN();point++){
-    g_br_ex->GetPoint(point,ex,br);
+  for(point=0;point<g_br_ex_all[fRootID][fNucleusID][decay_mode][fPoint]->GetN();point++){
+    g_br_ex_all[fRootID][fNucleusID][decay_mode][fPoint]->GetPoint(point,ex,br);
     br /= Br_sum; // Normalize Br just in case.
     Br_integ += br;
     if(Br_integ>random) break;
@@ -354,13 +314,134 @@ bool NucDeExDeexcitationTALYS::DaughterExPoint(double *d_Ex, int *d_point)
 
 
 /////////////////////////////////////////////
-void NucDeExDeexcitationTALYS::DeleteTGraphs()
+void NucDeExDeexcitationTALYS::GetAllTGraph()
 /////////////////////////////////////////////
 {
-  for(int p=0;p<NucDeEx::num_particle;p++){
-    delete g_br[p];
-    g_br[p]=0;
+  // --- Get list of Root files 
+  char buf[256];
+  int numfile=0;
+  int pos;
+  os.str("");
+  os << "ls " << NucDeEx::Utils::NUCDEEX_ROOT << "/output/*.root";
+  FILE* pipe = popen(os.str().c_str(),"r");
+  std::string file[NucDeEx::bins];
+  bool flag_1hole[NucDeEx::bins]={0};
+  if(!pipe) exit(1);
+  try{
+    while(fgets(buf,sizeof buf,pipe) != NULL){
+      file[numfile] = buf;
+      pos= file[numfile].find("\n");
+      if(pos!=std::string::npos){
+        file[numfile] = file[numfile].substr(0,pos);
+      }
+      numfile++;
+    }
+  } catch (...){
+    pclose(pipe);
+    exit(1);
   }
-  delete g_br_ex;
-  g_br_ex=0;
+  pclose(pipe);
+  // 1hole
+  os.str("");
+  os << "ls " << NucDeEx::Utils::NUCDEEX_ROOT << "/output/*/*ldmodel2_parity*.root";
+  pipe = popen(os.str().c_str(),"r");
+  if(!pipe) exit(1);
+  try{
+    while(fgets(buf,sizeof buf,pipe) != NULL){
+      file[numfile] = buf;
+      pos= file[numfile].find("\n");
+      if(pos!=std::string::npos){
+        file[numfile] = file[numfile].substr(0,pos);
+      }
+      flag_1hole[numfile]=1; // flag on
+      numfile++;
+    }
+  } catch (...){
+    pclose(pipe);
+    exit(1);
+  }
+  pclose(pipe);
+  
+
+  // --- Read Root files
+  for(int i=0;i<numfile;i++){
+    TFile* rootf = new TFile(file[i].c_str(),"READ");
+    if(NucDeEx::Utils::fVerbose>0) std::cout << file[i] << std::endl;
+    if(! rootf->IsOpen() ) exit(1);
+    int pos1 = file[i].find("Br_");
+    int pos2 = file[i].find("_ldmodel");
+    if(pos1!=std::string::npos && pos2!=std::string::npos){
+      std::string nucleus_name = file[i].substr(pos1+3,pos2-pos1-3);
+      if(flag_1hole[i]) nucleus_name += "_1h";
+      if(NucDeEx::Utils::fVerbose>2) std::cout << " -> " << nucleus_name << " (" << i << ")" << std::endl;
+      // --- register nucleus of root file
+      map_root.insert(std::make_pair(nucleus_name.c_str(),i));
+    }else exit(1);
+    TIter next(rootf->GetListOfKeys());
+    TKey* key;
+    int nucleus_id=0, nucleus_id_r=0; // _r is for counter.
+    while( (key = (TKey*) next()) ){
+      if(strstr(key->GetClassName(),"TGraph")){
+        string name_obj = key->GetName();
+        // --- remove pop tgraph
+        pos = name_obj.find("pop");
+        if(pos!=std::string::npos) continue;
+
+        // --- now br or br_ex tgraph are selected. Set/Get index for [target]
+        std::string name_target = name_obj.substr(2,name_obj.find("_br")-2);
+        nucleus_id = getNucleusID(i,name_target.c_str());
+        if(nucleus_id<0){
+          map_nucleus[i].insert(std::make_pair(name_target,nucleus_id_r));
+          nucleus_id = nucleus_id_r;
+          nucleus_id_r++;
+        }
+
+        pos = name_obj.find("ex_");
+        if(pos==std::string::npos){ // br tgraph
+          // --- register if this target nucleus is not registered yet
+          int index_particle = stoi(name_obj.substr(name_obj.length()-1));
+          g_br_all[i][nucleus_id][index_particle] = (TGraph*) rootf->Get(name_obj.c_str());
+          if(NucDeEx::Utils::fVerbose>2){
+            std::cout << name_obj << " -> (" << i << ") " << name_target << " (" << nucleus_id << "), "
+                      << index_particle << std::endl;
+          }
+        }else{ // br_ex tgraph
+          int index_particle = stoi(name_obj.substr(pos+3,1));
+          int index_ex_bin   = stoi(name_obj.substr(pos+5));
+          g_br_ex_all[i][nucleus_id][index_particle][index_ex_bin] = (TGraph*) rootf->Get(name_obj.c_str());
+          if(NucDeEx::Utils::fVerbose>2){
+            std::cout << name_obj << " -> (" << i << ") "<< name_target << " (" << nucleus_id << "), "
+                      << index_particle << ", " << index_ex_bin << std::endl;
+          }
+        }
+      }
+    } // end of key loop
+    rootf->Close();
+    delete rootf;
+  } // end of root file loop
+}
+
+
+/////////////////////////////////////////////
+int NucDeExDeexcitationTALYS::getRootID(const char* name)
+/////////////////////////////////////////////
+{
+  it = map_root.find(name);
+  if(it != map_root.end()){
+    return (int) it->second;
+  }else{
+    return (int) -1;
+  }
+}
+
+/////////////////////////////////////////////
+int NucDeExDeexcitationTALYS::getNucleusID(int i, const char* name)
+/////////////////////////////////////////////
+{
+  it = map_nucleus[i].find(name);
+  if(it != map_nucleus[i].end()){
+    return (int) it->second;
+  }else{
+    return -1;
+  }
 }
