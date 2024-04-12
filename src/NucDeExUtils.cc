@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 #include "NucDeExUtils.hh"
 
@@ -30,16 +31,22 @@ namespace NucDeEx{
     void SetPATH()
     {
       if(NUCDEEX_ROOT.length()>0) return;
-      const char* env = getenv("NUCDEEX_ROOT");
-      NUCDEEX_ROOT = env;
-#ifdef WITH_NEUT
-      env = getenv("NEUT_ROOT");
-      NUCDEEX_ROOT = env + (std::string)"/../../src/nucdeex/nucdeex";
-#endif
+      const char* env;
+#ifndef WITH_NEUT
+      env = std::getenv("NUCDEEX_ROOT");
       if(env==NULL){
-        std::cerr << "PATH to nucleus table is not specified" << std::endl;
+        std::cerr << "The env $NUCDEEX_ROOT is not specified" << std::endl;
         exit(1);
       }
+      NUCDEEX_ROOT = (std::string) env;
+#else
+      env = std::getenv("NEUT_ROOT");
+      if(env==NULL){
+        std::cerr << "The env $NEUT_ROOT is not specified" << std::endl;
+        exit(1);
+      }
+      NUCDEEX_ROOT = (std::string) env + (std::string)"/../../src/nucdeex/nucdeex";
+#endif
       std::cout << "NUCDEEX_ROOT: " << NUCDEEX_ROOT.c_str() << std::endl;
     }
 
