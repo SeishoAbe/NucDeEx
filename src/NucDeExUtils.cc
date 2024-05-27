@@ -45,7 +45,7 @@ namespace NucDeEx{
         std::cerr << "The env $NEUT_ROOT is not specified" << std::endl;
         exit(1);
       }
-      NUCDEEX_ROOT = (std::string) env + (std::string)"/../../src/nucdeex/nucdeex";
+      NUCDEEX_ROOT = (std::string) env + (std::string)"/share/nucdeex";
 #endif
       std::cout << "NUCDEEX_ROOT: " << NUCDEEX_ROOT.c_str() << std::endl;
     }
