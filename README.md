@@ -1,5 +1,5 @@
 # Nuclear Deexcitation Event Generator (NucDeEx)
-NucDeEx is a nuclear deexcitation event generator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).  
+NucDeEx is a nuclear deexcitation event generator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).
 NucDeEx requires  [ROOT](https://root.cern/) to be built, and the main physics part, branching ratios, are calculated with [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html).
 Note that NucDeEx simply refering the pre-tabulated branching ratios calculated by TALYS, i.e., **NucDeEx software itself is independ of the TALYS software**.
 
@@ -7,7 +7,7 @@ Note that NucDeEx simply refering the pre-tabulated branching ratios calculated 
 Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
-**If you use NucDeEx, please always cite [this paper](https://link.aps.org/doi/10.1103/PhysRevD.109.036009) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3).**
+**If you use NucDeEx, please always cite [this paper](https://link.aps.org/doi/10.1103/PhysRevD.109.036009) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3)**:
 ```
 @article{PhysRevD.109.036009,
   title = {Nuclear deexcitation simulator for neutrino interactions and nucleon decays of $^{12}\mathrm{C}$ and $^{16}\mathrm{O}$ based on TALYS},
@@ -45,7 +45,7 @@ and [application to atmospheric neutrino analysis at KamLAND](https://link.aps.o
 
 ## Compile
 
-This simulator depends on **ROOT**.
+NucDeEx requires **ROOT** libraries.
 At least it works with the following gcc versions and ROOT versions.
 - gcc 7.5.0 and ROOT v6.18.04 (ubuntu 18.04)
 - gcc 8.5.0 and ROOT v5.34.38 (redhut 8.5.0-4)
@@ -85,7 +85,7 @@ An example code for simulation is provided:
 - The branching ratios are calculated using [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html).
 - `main/plot_decay.cc` is the tool to analyze TALYS's output. This is very messy script...
 
-## Interfaces and build scripts for INCLXX and Geant4
+## Interfaces and build scripts for INCL++ and Geant4
 NucDeEx also provides intefaces and build scripts for use in [INCL++](https://irfu.cea.fr/dphn/Spallation/incl.html) and [Geant4](https://geant4.web.cern.ch/).
 ### INCL++
 - Interfaces: `include/G4INCLNucDeExInterface.hh`, `src/G4INCLNucDeExInterface.cc`
