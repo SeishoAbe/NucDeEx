@@ -1,5 +1,5 @@
-# Nuclear Deexcitation Simulator (NucDeEx)
-NucDeEx is a nuclear deexcitation simulator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).  
+# Nuclear Deexcitation Event Generator (NucDeEx)
+NucDeEx is a nuclear deexcitation event generator for neutrino interactions and nucleon decays shared in [GitHub](https://github.com/SeishoAbe/NucDeEx).  
 NucDeEx requires  [ROOT](https://root.cern/) to be built, and the main physics part, branching ratios, are calculated with [TALYS v1.96](https://tendl.web.psi.ch/tendl_2019/talys.html).
 Note that NucDeEx simply refering the pre-tabulated branching ratios calculated by TALYS, i.e., **NucDeEx software itself is independ of the TALYS software**.
 
