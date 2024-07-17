@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "vcworkC.h"
 #include "posinnucC.h"
@@ -17,30 +18,70 @@ NucDeExDeexcitation* nucdeex;
 static bool nucdeex_initialized=false;
 
 void NucDeExInitialize(void);
-float ExcitationEnergy();
+float ExcitationEnergy(int Zt, int Nt);
 TVector3 NucleusMomentum();
+TVector3 mom, mom2;
+//ofstream ofs_tmp;
 
 extern "C"{
   int nucdeex_();
+  // 0: Not supported
+  // 1: OK (free p is included here)
+  // -1: Error in NucDeEx
 }
 
 ///////////////////////////
 int nucdeex_()
 ///////////////////////////
 {
-  //std::cout << vcwork_.ipvc[1] << "   ibound=" << posinnuc_.ibound << std::endl;
-  if(posinnuc_.ibound==0) return 0; 
+  // --- 
+  // free proton  -> Nothing to do
+  if(posinnuc_.ibound==0) return 1;
+  // currently QE and 2p2h only
+  if(! ( abs(nework_.modene)<=2 ||
+       (abs(nework_.modene)>=51&&  abs(nework_.modene)<=52) ) ) return 0;
+  // target should be nucleon
   if(vcwork_.ipvc[1]!=2112 && vcwork_.ipvc[1]!=2212) return 0;
+  int Zt = neuttarget_.numbndp;
+  int Nt = neuttarget_.numbndn;
+  // 12C and 16O target nuclei only
+  if(! ( (Zt==6 && Nt==6) || (Zt==8 && Nt==8) ) ) return 0;
 
+  // --- determine Z and N of residual nucleus --- //
+  int Z=Zt, N=Nt;
+  bool flag_CC=0;// 1: CC, 0:NC
+  if(abs(nework_.modene)<30) flag_CC=1;
+  bool flag_nu=0;// 1: neutrino, 0: antineutrino
+  if(vcwork_.ipvc[0]>0) flag_nu=1;
+  //
+  if(flag_CC){
+    if(flag_nu){  // nu + n -> l- + p
+      Z++;
+      N--;
+    }else{ // nubar + p -> l+ + n
+      Z--;
+      N++;
+    }
+  }
+  // FSI 
+  for(int i=3;i<vcwork_.nvc;i++){
+    cout << "### " << i << endl;
+    cout << vcwork_.ipvc[i] << "   icrnvc=" << vcwork_.icrnvc[i] << endl;
+    cout << "iflgvc=" << vcwork_.iflgvc[i] << "   iorgvc=" << vcwork_.iorgvc[i] << endl;
+    if(vcwork_.icrnvc[i]!=1) continue; // remove pre-FSI
+    if(vcwork_.ipvc[i]==2112) N--;
+    else if(vcwork_.ipvc[i]==2212) Z--;
+  }
+  Z = std::max(0,Z);
+  N = std::max(0,N);
+  cout << "Z = " << Z << "   N = " << N << endl;
+
+  // Calculate input variables to NucDeEx
   NucDeExInitialize();
-
-  float Ex = ExcitationEnergy();
+  float Ex = ExcitationEnergy(Zt,Nt);
   TVector3 mom_nucleus = NucleusMomentum(); // mom of residual nucleus
-  
-  int Z = neuttarget_.numbndp;
-  int N = neuttarget_.numbndn;
-
-  NucDeExEventInfo theNucDeExResult = nucdeex->DoDeex(8,8,7,8,Ex,mom_nucleus);
+  //ofs_tmp << nework_.modene << " " << Ex << "  " << mom_nucleus.Mag() << endl;
+  NucDeExEventInfo theNucDeExResult = nucdeex->DoDeex(Zt,Nt,Z,N,Ex,mom_nucleus);
   std::vector<NucDeExParticle> ParticleVector = theNucDeExResult.ParticleVector;
   int size=ParticleVector.size();
   int n_deex=0;
@@ -53,7 +94,7 @@ int nucdeex_()
     vcwork_.iflgvc[vcwork_.nvc+n_deex]  = 10; // flag = deexcitation 
     vcwork_.icrnvc[vcwork_.nvc+n_deex]  = 1;  // flag = chase
     vcwork_.ivtivc[vcwork_.nvc+n_deex]  = 1;  // initial vertex
-    vcwork_.ivtfvc[vcwork_.nvc+n_deex]  = 1; // final vertex
+    vcwork_.ivtfvc[vcwork_.nvc+n_deex]  = 1;  // final vertex
     vcwork_.timvc[vcwork_.nvc+n_deex]   = 0.; // starting time
     vcwork_.amasvc[vcwork_.nvc+n_deex]  = (float) particle._mass;
     vcwork_.pvc[vcwork_.nvc+n_deex][0]  = (float) particle._momentum.X();
@@ -70,41 +111,32 @@ int nucdeex_()
     posinnuc_.posnuc[vcwork_.nvc+n_deex][1] = posinnuc_.posnuc[0][1];
     posinnuc_.posnuc[vcwork_.nvc+n_deex][2] = posinnuc_.posnuc[0][2];
     n_deex++;
-    //std::cout << "vcwork ipvc " << vcwork_.ipvc[vcwork_.nvc+n_deex] << endl;
-    //std::cout << "vcwork posivc("
-    //          << vcwork_.posivc[vcwork_.nvc+n_deex][0] << ","
-    //          << vcwork_.posivc[vcwork_.nvc+n_deex][1] << ","
-    //          << vcwork_.posivc[vcwork_.nvc+n_deex][2] << ")" << endl;
-    //std::cout << "vcwork posfvc("
-    //          << vcwork_.posfvc[vcwork_.nvc+n_deex][0] << ","
-    //          << vcwork_.posfvc[vcwork_.nvc+n_deex][1] << ","
-    //          << vcwork_.posfvc[vcwork_.nvc+n_deex][2] << ")" << endl;
-    //std::cout << "posinnuc posnuc("
-    //          << posinnuc_.posnuc[vcwork_.nvc+n_deex][0] << ","
-    //          << posinnuc_.posnuc[vcwork_.nvc+n_deex][1] << ","
-    //          << posinnuc_.posnuc[vcwork_.nvc+n_deex][2] << ")" << endl;
   }
   vcwork_.nvc += n_deex;
 
-  //std::cout << "################" << std::endl;
-  //std::cout << "vcwork nvc " << vcwork_.nvc << std::endl;
-  //std::cout << "vcwork posvc(" << vcwork_.posvc[0] << "," << vcwork_.posvc[1] << "," << vcwork_.posvc[2] << ")" << std::endl;
-  //std::cout << "################" << std::endl;
-  //for(int i=0;i<vcwork_.nvc;i++){
-  //  std::cout << "vcwork ipvc " << vcwork_.ipvc[i] << "   iflgvc " << vcwork_.iflgvc[i] << endl;
-  //  std::cout << "vcwork posivc("
-  //            << vcwork_.posivc[i][0] << ","
-  //            << vcwork_.posivc[i][1] << ","
-  //            << vcwork_.posivc[i][2] << ")" << endl;
-  //  std::cout << "vcwork posfvc("
-  //            << vcwork_.posfvc[i][0] << ","
-  //            << vcwork_.posfvc[i][1] << ","
-  //            << vcwork_.posfvc[i][2] << ")" << endl;
-  //  std::cout << "posinnuc posnuc("
-  //            << posinnuc_.posnuc[i][0] << ","
-  //            << posinnuc_.posnuc[i][1] << ","
-  //            << posinnuc_.posnuc[i][2] << ")" << endl;
-  //}
+/*
+  std::cout << "Zt=" << Zt << " Nt=" << Nt << "  mom=" << mom_nucleus.Mag() << " Ex=" << Ex << endl;
+  std::cout << "vcwork nvc " << vcwork_.nvc << std::endl;
+  std::cout << "vcwork posvc(" << vcwork_.posvc[0] << "," << vcwork_.posvc[1] << "," << vcwork_.posvc[2] << ")" << std::endl;
+  std::cout << "###" << std::endl;
+  for(int i=0;i<vcwork_.nvc;i++){
+    std::cout << "ipvc=" << vcwork_.ipvc[i] << " icrnvc=" << vcwork_.icrnvc[i] << " iflgvc=" << vcwork_.iflgvc[i] << endl;
+    std::cout << "mass=" << vcwork_.amasvc[i] 
+              << "  " << sqrt( pow(vcwork_.pvc[i][0],2) + pow(vcwork_.pvc[i][1],2) + pow(vcwork_.pvc[i][2],2) ) << endl;
+    //std::cout << "vcwork posivc("
+    //          << vcwork_.posivc[i][0] << ","
+    //          << vcwork_.posivc[i][1] << ","
+    //          << vcwork_.posivc[i][2] << ")" << endl;
+    //std::cout << "vcwork posfvc("
+    //          << vcwork_.posfvc[i][0] << ","
+    //          << vcwork_.posfvc[i][1] << ","
+    //          << vcwork_.posfvc[i][2] << ")" << endl;
+    //std::cout << "posinnuc posnuc("
+    //          << posinnuc_.posnuc[i][0] << ","
+    //          << posinnuc_.posnuc[i][1] << ","
+    //          << posinnuc_.posnuc[i][2] << ")" << endl;
+  }
+*/
   //for(int i=0;i<vcvrtx_.nvtxvc;i++){
   //  std::cout << "vcvrtx pvtxvc("
   //            << vcvrtx_.pvtxvc[i][0] << ","
@@ -117,7 +149,7 @@ int nucdeex_()
 
 
 ///////////////////////////
-float ExcitationEnergy()
+float ExcitationEnergy(int Zt, int Nt)
 ///////////////////////////
 {
   float Ex,MissE;
@@ -148,7 +180,12 @@ float ExcitationEnergy()
 
   MissE = Ev - E_lepton - E_preFSI_nuc + mass_target;
 
-  Ex = MissE; // FIXME
+  float S; // separation E
+  if(Zt==6 && Nt==6) S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("12C")->S[2];
+  else if(Zt==8 && Nt==8) S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("16O")->S[2];
+  else abort();
+
+  Ex = MissE-S;
 
   return Ex;
 }
@@ -157,10 +194,9 @@ float ExcitationEnergy()
 TVector3 NucleusMomentum()
 ///////////////////////////
 {
-  TVector3 mom(0,0,0);
   mom.SetXYZ(vcwork_.pvc[1][0],vcwork_.pvc[1][1],vcwork_.pvc[1][2]);
   if(abs(nework_.modene)==2){ // 2p2h
-    TVector3 mom2(vcwork_.pvc[2][0],vcwork_.pvc[2][1],vcwork_.pvc[2][2]);
+    mom2.SetXYZ(vcwork_.pvc[2][0],vcwork_.pvc[2][1],vcwork_.pvc[2][2]);
     mom += mom2;
   }
   // Assume the residual nucleus momentum is the exact opposite of one of target nucleon 
@@ -176,17 +212,19 @@ void NucDeExInitialize(void)
 {
   if(nucdeex_initialized) return; // already initialized
 
+  //ofs_tmp.open("tmp.txt");
+
   nucdeex = new NucDeExDeexcitation();
-  NucDeEx::Random::SetSeed(1); // tmp
-  
+  // random seed (temporary)
+  NucDeEx::Random::SetSeed(1);
   // verosity
   int neut_quiet = neutcard_.quiet;
   if(neut_quiet==0) NucDeEx::Utils::fVerbose=2;
   else if(neut_quiet==1) NucDeEx::Utils::fVerbose=1;
   else if(neut_quiet==2) NucDeEx::Utils::fVerbose=0;
-  nucdeex_initialized=true;
 
   if(NucDeEx::Utils::fVerbose>0) std::cout << "NucDeEx initialized" << std::endl;
+  nucdeex_initialized=true;
 
   return;
 }
