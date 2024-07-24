@@ -41,7 +41,7 @@ double FUNC_SF_G(double *val,double *par)
 }
 
 int plot_sf(){
-  int flag=1;
+  int flag=0;
   // 0: 12C
   // 1: 16O
   
@@ -197,7 +197,7 @@ int plot_sf(){
 	//TF2* f_sf = new TF2("f_sf",FUNC_SF_G,min_p,max_p,min_E,max_E); // use tgraph2d
 	
 	int bin_p_int = bin_p*4;
-	int bin_E_int = bin_E*5;
+	int bin_E_int = bin_E*10;
   cout << "INT_Energy: (" << bin_E_int << ", " << min_E << ", " << max_E << ")" << endl;
   cout << "INT_Momentum: (" << bin_p_int << ", " << min_p << ", " << max_p << ")" << endl;
   TH2D* h_sf_int = new TH2D("h_sf_int","",bin_p_int,min_p,max_p,bin_E_int,min_E,max_E); 
@@ -308,11 +308,13 @@ int plot_sf(){
 	TCanvas* c_int_1D = new TCanvas("c_int_1D","c_int_1D",0,0,1200,600);
   c_int_1D->Divide(2);
   c_int_1D->cd(1);
+  gPad->SetGrid();
   h_sf_int_p->GetXaxis()->SetTitle("Momentum (MeV)");
   h_sf_int_p->GetYaxis()->SetTitle("A.U.");
   //h_sf_int_p->SetStats(0);
   h_sf_int_p->Draw("HIST");
   c_int_1D->cd(2);
+  gPad->SetGrid();
   h_sf_int_E->GetXaxis()->SetTitle("Removal energy (MeV)");
   h_sf_int_E->GetYaxis()->SetTitle("A.U.");
   //h_sf_int_E->SetStats(0);
