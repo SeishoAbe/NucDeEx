@@ -41,7 +41,7 @@ double FUNC_SF_G(double *val,double *par)
 }
 
 int plot_sf(){
-  int flag=0;
+  int flag=1;
   // 0: 12C
   // 1: 16O
   
@@ -310,12 +310,12 @@ int plot_sf(){
   c_int_1D->cd(1);
   h_sf_int_p->GetXaxis()->SetTitle("Momentum (MeV)");
   h_sf_int_p->GetYaxis()->SetTitle("A.U.");
-  h_sf_int_p->SetStats(0);
+  //h_sf_int_p->SetStats(0);
   h_sf_int_p->Draw("HIST");
   c_int_1D->cd(2);
   h_sf_int_E->GetXaxis()->SetTitle("Removal energy (MeV)");
   h_sf_int_E->GetYaxis()->SetTitle("A.U.");
-  h_sf_int_E->SetStats(0);
+  //h_sf_int_E->SetStats(0);
   h_sf_int_E->GetXaxis()->SetRangeUser(0,100);
   h_sf_int_E->Draw("HIST");
   os.str("");
