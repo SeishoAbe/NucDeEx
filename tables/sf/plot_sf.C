@@ -210,6 +210,24 @@ int plot_sf(){
 		}
 	}
 
+  TH1D* h_sf_int_p = new TH1D("h_sf_int_p","",bin_p_int,min_p,max_p);
+  TH1D* h_sf_int_E = new TH1D("h_sf_int_E","",bin_E_int,min_E,max_E);
+	for(int i=1;i<bin_p_int;i++){
+    double sum=0;
+		for(int j=1;j<bin_E_int;j++){
+      sum += h_sf_int->GetBinContent(i,j);
+    }
+    h_sf_int_p->SetBinContent(i,sum);
+  }
+	for(int j=1;j<bin_E_int;j++){
+    double sum=0;
+	  for(int i=1;i<bin_p_int;i++){
+      sum += h_sf_int->GetBinContent(i,j);
+    }
+    h_sf_int_E->SetBinContent(j,sum);
+  }
+
+
   gStyle->SetTitleXSize(0.05);
   gStyle->SetTitleYSize(0.05);
 
@@ -234,7 +252,7 @@ int plot_sf(){
 	g_sf->SetMarkerColor(kBlack);
 	//g_sf->Draw("PCOL");
 	//g_sf->Draw("surf");
-	f_sf->Draw("same");
+	//f_sf->Draw("same");
   os.str("");
   os << "figure/fig_sf_" << nucleus.c_str() << ".pdf";
   c->Update();
@@ -272,7 +290,7 @@ int plot_sf(){
 	f_sf_E->SetLineColor(kBlue);
 	f_sf_E->Draw("same");
   os.str("");
-  os << "figure/fig_sf_sf_1D_" << nucleus.c_str() << ".pdf";
+  os << "figure/fig_sf_1D_" << nucleus.c_str() << ".pdf";
   c_1D->Update();
   c_1D->Print(os.str().c_str());
 	
@@ -281,8 +299,29 @@ int plot_sf(){
 	gPad->SetLogz();
 	h_sf_int->SetStats(0);
 	h_sf_int->Draw("colz");
+  os.str("");
+  os << "figure/fig_sf_int_" << nucleus.c_str() << ".pdf";
+  c_int->Update();
+  c_int->Print(os.str().c_str());
 	
 
+	TCanvas* c_int_1D = new TCanvas("c_int_1D","c_int_1D",0,0,1200,600);
+  c_int_1D->Divide(2);
+  c_int_1D->cd(1);
+  h_sf_int_p->GetXaxis()->SetTitle("Momentum (MeV)");
+  h_sf_int_p->GetYaxis()->SetTitle("A.U.");
+  h_sf_int_p->SetStats(0);
+  h_sf_int_p->Draw("HIST");
+  c_int_1D->cd(2);
+  h_sf_int_E->GetXaxis()->SetTitle("Removal energy (MeV)");
+  h_sf_int_E->GetYaxis()->SetTitle("A.U.");
+  h_sf_int_E->SetStats(0);
+  h_sf_int_E->GetXaxis()->SetRangeUser(0,100);
+  h_sf_int_E->Draw("HIST");
+  os.str("");
+  os << "figure/fig_sf_int_1D_" << nucleus.c_str() << ".pdf";
+  c_int_1D->Update();
+  c_int_1D->Print(os.str().c_str());
 
   os.str("");
   os << prefix.c_str() << ".root";
@@ -297,6 +336,8 @@ int plot_sf(){
 	f_sf_E->Write();
 	f_sf->Write();
 	h_sf_int->Write();
+	h_sf_int_p->Write();
+	h_sf_int_E->Write();
   outf->Close();
   //delete outf;
 

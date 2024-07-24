@@ -28,7 +28,7 @@ int random_sf(){
 	ostringstream os,os_remove_g;
 
 	// Set deex tool
-	NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall);
+  NucDeExDeexcitation* deex = new NucDeExDeexcitation();
 	gStyle->SetTextFont(132);
   gStyle->SetTextSize(0.07);
   gStyle->SetTitleSize(0.07,"XYZ");
