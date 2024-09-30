@@ -65,16 +65,20 @@ int nucdeex_()
   }
   // FSI 
   for(int i=3;i<vcwork_.nvc;i++){
-    cout << "### " << i << endl;
-    cout << vcwork_.ipvc[i] << "   icrnvc=" << vcwork_.icrnvc[i] << endl;
-    cout << "iflgvc=" << vcwork_.iflgvc[i] << "   iorgvc=" << vcwork_.iorgvc[i] << endl;
+    if(NucDeEx::Utils::fVerbose>=1){
+      cout << "### " << i << endl;
+      cout << vcwork_.ipvc[i] << "   icrnvc=" << vcwork_.icrnvc[i] << endl;
+      cout << "iflgvc=" << vcwork_.iflgvc[i] << "   iorgvc=" << vcwork_.iorgvc[i] << endl;
+    }
     if(vcwork_.icrnvc[i]!=1) continue; // remove pre-FSI
     if(vcwork_.ipvc[i]==2112) N--;
     else if(vcwork_.ipvc[i]==2212) Z--;
   }
   Z = std::max(0,Z);
   N = std::max(0,N);
-  cout << "Z = " << Z << "   N = " << N << endl;
+  if(NucDeEx::Utils::fVerbose>=1){
+    cout << "Z = " << Z << "   N = " << N << endl;
+  }
 
   // Calculate input variables to NucDeEx
   NucDeExInitialize();
@@ -114,29 +118,29 @@ int nucdeex_()
   }
   vcwork_.nvc += n_deex;
 
-/*
-  std::cout << "Zt=" << Zt << " Nt=" << Nt << "  mom=" << mom_nucleus.Mag() << " Ex=" << Ex << endl;
-  std::cout << "vcwork nvc " << vcwork_.nvc << std::endl;
-  std::cout << "vcwork posvc(" << vcwork_.posvc[0] << "," << vcwork_.posvc[1] << "," << vcwork_.posvc[2] << ")" << std::endl;
-  std::cout << "###" << std::endl;
-  for(int i=0;i<vcwork_.nvc;i++){
-    std::cout << "ipvc=" << vcwork_.ipvc[i] << " icrnvc=" << vcwork_.icrnvc[i] << " iflgvc=" << vcwork_.iflgvc[i] << endl;
-    std::cout << "mass=" << vcwork_.amasvc[i] 
-              << "  " << sqrt( pow(vcwork_.pvc[i][0],2) + pow(vcwork_.pvc[i][1],2) + pow(vcwork_.pvc[i][2],2) ) << endl;
-    //std::cout << "vcwork posivc("
-    //          << vcwork_.posivc[i][0] << ","
-    //          << vcwork_.posivc[i][1] << ","
-    //          << vcwork_.posivc[i][2] << ")" << endl;
-    //std::cout << "vcwork posfvc("
-    //          << vcwork_.posfvc[i][0] << ","
-    //          << vcwork_.posfvc[i][1] << ","
-    //          << vcwork_.posfvc[i][2] << ")" << endl;
-    //std::cout << "posinnuc posnuc("
-    //          << posinnuc_.posnuc[i][0] << ","
-    //          << posinnuc_.posnuc[i][1] << ","
-    //          << posinnuc_.posnuc[i][2] << ")" << endl;
+  if(NucDeEx::Utils::fVerbose>=2){
+    std::cout << "Zt=" << Zt << " Nt=" << Nt << "  mom=" << mom_nucleus.Mag() << " Ex=" << Ex << endl;
+    std::cout << "vcwork nvc " << vcwork_.nvc << std::endl;
+    std::cout << "vcwork posvc(" << vcwork_.posvc[0] << "," << vcwork_.posvc[1] << "," << vcwork_.posvc[2] << ")" << std::endl;
+    std::cout << "###" << std::endl;
+    for(int i=0;i<vcwork_.nvc;i++){
+      std::cout << "ipvc=" << vcwork_.ipvc[i] << " icrnvc=" << vcwork_.icrnvc[i] << " iflgvc=" << vcwork_.iflgvc[i] << endl;
+      std::cout << "mass=" << vcwork_.amasvc[i] 
+                << "  " << sqrt( pow(vcwork_.pvc[i][0],2) + pow(vcwork_.pvc[i][1],2) + pow(vcwork_.pvc[i][2],2) ) << endl;
+      //std::cout << "vcwork posivc("
+      //          << vcwork_.posivc[i][0] << ","
+      //          << vcwork_.posivc[i][1] << ","
+      //          << vcwork_.posivc[i][2] << ")" << endl;
+      //std::cout << "vcwork posfvc("
+      //          << vcwork_.posfvc[i][0] << ","
+      //          << vcwork_.posfvc[i][1] << ","
+      //          << vcwork_.posfvc[i][2] << ")" << endl;
+      //std::cout << "posinnuc posnuc("
+      //          << posinnuc_.posnuc[i][0] << ","
+      //          << posinnuc_.posnuc[i][1] << ","
+      //          << posinnuc_.posnuc[i][2] << ")" << endl;
+    }
   }
-*/
   //for(int i=0;i<vcvrtx_.nvtxvc;i++){
   //  std::cout << "vcvrtx pvtxvc("
   //            << vcvrtx_.pvtxvc[i][0] << ","
