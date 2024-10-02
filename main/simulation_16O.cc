@@ -63,15 +63,15 @@ int main(int argc, char* argv[]){
   const int N = nuc->N;
   const int A = Z+N;
   int Zt,Nt;
-  if(Z+N==11) Zt=6,Nt=6;
-  if(Z+N==15) Zt=8,Nt=8;
+  if(Z+N==11 || Z+N==12) Zt=6,Nt=6;
+  if(Z+N==15 || Z+N==16) Zt=8,Nt=8;
   
   // prepare output root file
   os.str("");  
   os << "sim_out/";
   if(flag_jpi){
-    if(A==11) os << "12C/";
-    else if(A==15) os << "16O/";
+    if(A==11||A==12) os << "12C/";
+    else if(A==15||A==16) os << "16O/";
     else abort();
   }
   os << argv[1] << "_ldmodel" << ldmodel;
@@ -119,40 +119,6 @@ int main(int argc, char* argv[]){
   gStyle->SetTitleXSize(0.045);
   gStyle->SetTitleYSize(0.045);
   gStyle->SetTitleYOffset(0.95);
-  TH2D* h_sf_random = new TH2D("h_sf_random","",400,0,800,400,0,400);
-  TH1D* h_sf_E_random = new TH1D("h_sf_E_random","",400,0,400); // missing E
-  TH1D* h_sf_p_random = new TH1D("h_sf_p_random","",400,0,800);
-  TH1D* h_sf_Ex_random[4];// [0]: all
-  for(int i=0;i<4;i++){
-    os.str("");
-    os << "h_sf_Ex_random_" << i;
-    h_sf_Ex_random[i] = new TH1D(os.str().c_str(),"",500,-100,400);
-  }
-
-
-  // Set Ex and mom tables (from SF) and proton separation energy
-  os.str("");  
-  if(flag_jpi){
-    if(Z+N==11){ // 12C
-      os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke12_tot.root";
-      S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("12C")->S[2];
-    }else if(Z+N==15){
-      os << getenv("NUCDEEX_ROOT") << "/tables/sf/pke16.root";
-      S = NucDeEx::Utils::NucleusTable->GetNucleusPtr("16O")->S[2];
-    }
-  }else{
-    std::cerr << "flag_jpi = " << flag_jpi << std::endl;
-    std::cerr << "This is not supported" << std::endl;
-    return -1;
-  }
-  std::cout << "S = " << S << std::endl;
-  TFile* rootf = new TFile(os.str().c_str(),"READ");
-  TH2D* h_sf_int = (TH2D*) rootf->Get("h_sf_int");
-  h_sf_int->SetDirectory(0);
-  gRandom->SetSeed(seed); // for TH2 GetRandom2
-  rootf->Close();
-  delete rootf;
-
 
   TCanvas* c_detail;
   string pdfname;
@@ -160,8 +126,8 @@ int main(int argc, char* argv[]){
     os.str("");
     os << "fig_sim/";
     if(flag_jpi){
-      if(A==11) os << "12C/";
-      else if(A==15) os << "16O/";
+      if(A==11||A==12) os << "12C/";
+      else if(A==15||A==16) os << "16O/";
       else abort();
     }
     os << "fig_" << argv[1] << "_ldmodel" << ldmodel;
@@ -179,12 +145,8 @@ int main(int argc, char* argv[]){
 
   while(eventID<numofevent){
     // determine momentum (scalar) and missing E according to SF
-    h_sf_int->GetRandom2(PinitMag,MissE);
-    Ex=MissE-S;
-    h_sf_random->Fill(PinitMag,MissE);
-    h_sf_E_random->Fill(MissE);
-    h_sf_p_random->Fill(PinitMag);
-    h_sf_Ex_random[0]->Fill(Ex);
+    PinitMag = 0;
+    Ex=25;
     // determine angle 
     double costheta = 2.*gRandom->Rndm()-1;
     double sintheta = sqrt( 1. - pow(costheta,2) );
@@ -216,7 +178,6 @@ int main(int argc, char* argv[]){
     PinitZ   = Pinit.Z();
     size=particle.size();
 
-    h_sf_Ex_random[shell]->Fill(Ex);
     
     os.str("");
     os_remove_g.str("");
@@ -352,77 +313,9 @@ int main(int argc, char* argv[]){
   }
 
 
-  TCanvas* c = new TCanvas("c","c",0,0,800,600);
-  c->Divide(2,2);
-  c->cd(1);
-  h_sf_Ex_random[0]->GetXaxis()->SetRangeUser(-10,150);
-  h_sf_Ex_random[0]->SetStats(0);
-  h_sf_Ex_random[0]->SetMinimum(0);
-  h_sf_Ex_random[0]->GetXaxis()->SetTitle("Excitation energy (MeV)");
-  h_sf_Ex_random[0]->GetYaxis()->SetTitle("Events/bin");
-  h_sf_Ex_random[0]->Draw("HIST");
-  THStack* h_s_sf_Ex_random = new THStack("h_s_sf_Ex_random","");
-  const int color[4]={1,600-7,632-7,920};
-  for(int i=1;i<4;i++){
-    h_sf_Ex_random[i]->SetFillColor(color[i]);
-    h_s_sf_Ex_random->Add(h_sf_Ex_random[i]);
-  }
-  h_s_sf_Ex_random->Draw("same");
-  TLine* l_Ex_min = new TLine(Ex_min,0,Ex_min,h_sf_Ex_random[0]->GetMaximum()*1.05);
-  l_Ex_min->SetLineStyle(2);
-  l_Ex_min->SetLineColor(kRed);
-  if(Ex_min>0) l_Ex_min->Draw("same");
-  TLine* l_Ex_max = new TLine(Ex_max,0,Ex_max,h_sf_Ex_random[0]->GetMaximum()*1.05);
-  l_Ex_max->SetLineStyle(2);
-  l_Ex_max->SetLineColor(kRed);
-  if(Ex_max>0) l_Ex_max->Draw("same");
-  gPad->RedrawAxis();
-  //
-  c->cd(2);
-  gPad->SetLogz();
-  h_sf_random->SetStats(0);
-  h_sf_random->SetMinimum(1);
-  h_sf_random->GetXaxis()->SetTitle("Momentum (MeV)");
-  h_sf_random->GetYaxis()->SetTitle("Missing energy (MeV)");
-  h_sf_random->Draw("colz");
-  h_sf_random->SetStats(0);
-  c->cd(3);
-  h_sf_E_random->SetStats(0);
-  h_sf_E_random->SetMinimum(0);
-  h_sf_E_random->GetXaxis()->SetRangeUser(0,150);
-  h_sf_E_random->GetXaxis()->SetTitle("Missing energy (MeV)");
-  h_sf_E_random->GetYaxis()->SetTitle("Events/bin");
-  h_sf_E_random->Draw("HIST");
-  TLine* l_S = new TLine(S,0,S,h_sf_E_random->GetMaximum()*1.05);
-  l_S->SetLineStyle(2);
-  l_S->SetLineColor(kRed);
-  l_S->Draw("same");
-  c->cd(4);
-  h_sf_p_random->SetStats(0);
-  h_sf_p_random->SetMinimum(0);
-  h_sf_p_random->GetXaxis()->SetTitle("Momentum (MeV)");
-  h_sf_p_random->GetYaxis()->SetTitle("Events/bin");
-  h_sf_p_random->Draw("HIST");
-  os.str("");
-  os << "fig_sim/";
-  if(flag_jpi){
-    if(A==11) os << "12C/";
-    else if(A==15) os << "16O/";
-    else abort();
-  }
-  os << "fig_" << argv[1] << "_ldmodel" << ldmodel;
-  if(parity_optmodall) os << "_parity_optmodall";
-  os << "_sf.pdf";
-  c->Print(os.str().c_str());
 
 
   outf->cd();
-  for(int i=0;i<4;i++){
-    h_sf_Ex_random[i]->Write();
-  }
-  h_sf_E_random->Write();
-  h_sf_p_random->Write();
-  h_sf_random->Write();
   tree->Write();
   outf->Close();
   delete outf;
