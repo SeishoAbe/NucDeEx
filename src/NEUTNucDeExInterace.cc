@@ -8,6 +8,8 @@
 #include "neworkC.h"
 
 #include <TVector3.h>
+#include <TFile.h>
+#include <TTree.h>
 
 #include "NucDeExUtils.hh"
 #include "NucDeExRandom.hh"
@@ -16,6 +18,11 @@
 
 NucDeExDeexcitation* nucdeex;
 static bool nucdeex_initialized=false;
+
+//TFile* tmp;
+//TTree* tree;
+float Ex;
+int mode;
 
 void NucDeExInitialize(void);
 float ExcitationEnergy(int Zt, int Nt);
@@ -37,8 +44,8 @@ int nucdeex_()
   // --- 
   // free proton  -> Nothing to do
   if(posinnuc_.ibound==0) return 1;
-  // currently QE and 2p2h only
-  if(! ( abs(nework_.modene)<=2 ||
+  // currently QE only
+  if(! ( abs(nework_.modene)==1 ||
        (abs(nework_.modene)>=51&&  abs(nework_.modene)<=52) ) ) return 0;
   // target should be nucleon
   if(vcwork_.ipvc[1]!=2112 && vcwork_.ipvc[1]!=2212) return 0;
@@ -82,7 +89,9 @@ int nucdeex_()
 
   // Calculate input variables to NucDeEx
   NucDeExInitialize();
-  float Ex = ExcitationEnergy(Zt,Nt);
+  Ex = ExcitationEnergy(Zt,Nt);
+  mode = nework_.modene;
+  //tree->Fill();
   TVector3 mom_nucleus = NucleusMomentum(); // mom of residual nucleus
   //ofs_tmp << nework_.modene << " " << Ex << "  " << mom_nucleus.Mag() << endl;
   NucDeExEventInfo theNucDeExResult = nucdeex->DoDeex(Zt,Nt,Z,N,Ex,mom_nucleus);
@@ -229,6 +238,12 @@ void NucDeExInitialize(void)
 
   if(NucDeEx::Utils::fVerbose>0) std::cout << "NucDeEx initialized" << std::endl;
   nucdeex_initialized=true;
+
+  //tmp = new TFile("tmp.root","RECREATE");
+  //tree = new TTree("tree","tree");
+  //tree->Branch("Ex",&Ex,"Ex/F");
+  //tree->Branch("mode",&mode,"mode/I");
+  //tree->SetAutoSave(1);
 
   return;
 }
