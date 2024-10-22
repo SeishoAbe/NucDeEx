@@ -19,10 +19,11 @@
 NucDeExDeexcitation* nucdeex;
 static bool nucdeex_initialized=false;
 
-//TFile* tmp;
-//TTree* tree;
+TFile* tmp;
+TTree* tree;
 float Ex;
 int mode;
+int Z, N;
 
 void NucDeExInitialize(void);
 float ExcitationEnergy(int Zt, int Nt);
@@ -55,7 +56,7 @@ int nucdeex_()
   if(! ( (Zt==6 && Nt==6) || (Zt==8 && Nt==8) ) ) return 0;
 
   // --- determine Z and N of residual nucleus --- //
-  int Z=Zt, N=Nt;
+  Z=Zt, N=Nt;
   bool flag_CC=0;// 1: CC, 0:NC
   if(abs(nework_.modene)<30) flag_CC=1;
   bool flag_nu=0;// 1: neutrino, 0: antineutrino
@@ -92,6 +93,7 @@ int nucdeex_()
   Ex = ExcitationEnergy(Zt,Nt);
   mode = nework_.modene;
   //tree->Fill();
+
   TVector3 mom_nucleus = NucleusMomentum(); // mom of residual nucleus
   //ofs_tmp << nework_.modene << " " << Ex << "  " << mom_nucleus.Mag() << endl;
   NucDeExEventInfo theNucDeExResult = nucdeex->DoDeex(Zt,Nt,Z,N,Ex,mom_nucleus);
@@ -238,12 +240,15 @@ void NucDeExInitialize(void)
 
   if(NucDeEx::Utils::fVerbose>0) std::cout << "NucDeEx initialized" << std::endl;
   nucdeex_initialized=true;
-
-  //tmp = new TFile("tmp.root","RECREATE");
-  //tree = new TTree("tree","tree");
-  //tree->Branch("Ex",&Ex,"Ex/F");
-  //tree->Branch("mode",&mode,"mode/I");
-  //tree->SetAutoSave(1);
+/*
+  tmp = new TFile("tmp.root","RECREATE");
+  tree = new TTree("tree","tree");
+  tree->Branch("Ex",&Ex,"Ex/F");
+  tree->Branch("Z",&Z,"Z/I");
+  tree->Branch("N",&N,"N/I");
+  tree->Branch("mode",&mode,"mode/I");
+  tree->SetAutoSave(1);
+*/
 
   return;
 }
