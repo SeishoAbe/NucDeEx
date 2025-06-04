@@ -45,6 +45,9 @@ class NucDeExDeexcitation: public NucDeExDeexcitationBase{
   //        2 : p3/2-hole
   //        3 : p1/2-hole (only for 16O target)
 
+  void SetVersionPhole(int v){ version_phole = v ; }
+  int GetVersionPhole(){ return version_phole ; }
+
   private:
   NucDeExDeexcitationTALYS* deex_talys;
   NucDeExDeexcitationPhole* deex_phole;
