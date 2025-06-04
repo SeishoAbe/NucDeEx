@@ -135,11 +135,12 @@ void NucDeExDeexcitationPhole::DoDeex_v3(const int Zt, const int Nt,
   */
   EventInfo = deex_talys->DoDeex(Zt,Nt,Z,N,Ex,mom);
 
-  cout << "##" << Ex << endl;
-  for(int i=0;i<EventInfo.ParticleVector.size();i++){
-      NucDeExParticle p = EventInfo.ParticleVector.at(i);
-      cout << p._PDG << " " << p.kE() << endl;
-  }
+  //cout << "##" << Ex << endl;
+  //for(int i=0;i<EventInfo.ParticleVector.size();i++){
+  //    NucDeExParticle p = EventInfo.ParticleVector.at(i);
+  //    cout << p._PDG << " " << p.kE() << endl;
+  //}
+
   if(EventInfo.ParticleVector.size()==1) EventInfo.fShell=3; // g.s.
   else EventInfo.fShell=2; // gamma discrete
 }
