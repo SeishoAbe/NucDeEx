@@ -131,6 +131,7 @@ void NucDeExDeexcitationPhole::DoDeex_v3(const int Zt, const int Nt,
   S = nuc_target->S[decay_mode];
   Qvalue = Ex_target - S - Ex_daughter;
   Decay(1); // breakflag on
+  cout << "##" << Ex << endl;
   for(int i=0;i<EventInfo.ParticleVector.size();i++){
       NucDeExParticle p = EventInfo.ParticleVector.at(i);
       cout << p._PDG << " " << p.kE() << endl;
