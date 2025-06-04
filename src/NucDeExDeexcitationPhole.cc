@@ -118,6 +118,7 @@ void NucDeExDeexcitationPhole::DoDeex_v3(const int Zt, const int Nt,
 /////////////////////////////////////////////
 {
   // set paremeters for boost calculation
+  /*
   decay_mode=0; 
   Ex_target  = Ex;
   Ex_daughter=0;
@@ -131,6 +132,9 @@ void NucDeExDeexcitationPhole::DoDeex_v3(const int Zt, const int Nt,
   S = nuc_target->S[decay_mode];
   Qvalue = Ex_target - S - Ex_daughter;
   Decay(1); // breakflag on
+  */
+  EventInfo = deex_talys->DoDeex(Zt,Nt,Z,N,Ex,mom);
+
   cout << "##" << Ex << endl;
   for(int i=0;i<EventInfo.ParticleVector.size();i++){
       NucDeExParticle p = EventInfo.ParticleVector.at(i);
