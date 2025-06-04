@@ -53,7 +53,7 @@ void NucDeExDeexcitationPhole::SetParameters()
     Br_p32_15O = new double[Nlevel_p32_15O]{0.872,0.064,0.064}; // guess
     // Br_p32_15O = new double[Nlevel_p32_15O]{1.,0,0}; // original Ejiri's value
 
-  }else if(version==2){ // new method from v2.1 (**only below separation E**)
+  }else if(version==2 || version==3){ // new method from v2.1 (**only below separation E**)
     // 11B* (Panin et al., Phys. Lett. B 753 204-210. Experimental data)
     Nlevel_p32_11B = 3; 
     E_p32_11B  = new double[Nlevel_p32_11B]{0.,2.125,5.020};
@@ -98,10 +98,44 @@ NucDeExEventInfo NucDeExDeexcitationPhole::DoDeex(const int Zt, const int Nt,
 
   if(version==1)      DoDeex_v1(Zt,Nt,Z,N,Ex,mom);
   else if(version==2) DoDeex_v2(Zt,Nt,Z,N,Ex,mom);
+  else if(version==3){
+    // v3 is only applicable for 11C and 11B. For others, use v2 instead.
+    if((Z==5 && N==6)||(Z==6 && N==5)){
+      DoDeex_v3(Zt,Nt,Z,N,Ex,mom);
+    }else{
+      DoDeex_v2(Zt,Nt,Z,N,Ex,mom);
+    }
+  }
   else exit(1);
 
   return EventInfo;
 }
+
+
+/////////////////////////////////////////////
+void NucDeExDeexcitationPhole::DoDeex_v3(const int Zt, const int Nt,
+                   const int Z, const int N, const double Ex, const TVector3& mom)
+/////////////////////////////////////////////
+{
+  // set paremeters for boost calculation
+  decay_mode=0; 
+  Ex_target  = Ex;
+  Ex_daughter=0;
+  mass_particle=0;
+  mass_target = ElementMassInMeV(Z_target+N_target, Z_target);
+  mass_daughter=mass_target;
+  name_daughter = name_target;
+  Z_daughter = Z_target;
+  N_daughter = N_target;
+  nuc_daughter = nuc_target;
+  S = nuc_target->S[decay_mode];
+  Qvalue = Ex_target - S - Ex_daughter;
+  Decay(1); // breakflag on
+  cout << "size " << EventInfo.ParticleVector.size() << endl;
+  if(EventInfo.ParticleVector.size()==1) EventInfo.fShell=1;
+  else EventInfo.fShell=2;
+}
+
 
 /////////////////////////////////////////////
 void NucDeExDeexcitationPhole::DoDeex_v2(const int Zt, const int Nt,
