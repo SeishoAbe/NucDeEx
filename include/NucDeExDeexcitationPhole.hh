@@ -27,6 +27,14 @@ class NucDeExDeexcitationPhole: public NucDeExDeexcitationBase{
                           const TVector3& mom=TVector3(0,0,0));
     // Note: Energy level is determined irrelevant to Ex
 
+
+  void DoDeex_v3(const int Zt, const int Nt,
+                 const int Z, const int N, const double Ex,
+                 const TVector3& mom=TVector3(0,0,0));
+  // Called if version==3
+  //   - This function is expected to be used with new carbon SF, PRC 110, 054612 (2024).
+  //   - We don't need to determine the excited state with this new SF.
+
   void DoDeex_v2(const int Zt, const int Nt,
                  const int Z, const int N, const double Ex,
                  const TVector3& mom=TVector3(0,0,0));

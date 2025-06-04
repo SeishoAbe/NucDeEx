@@ -36,6 +36,7 @@ int main(int argc, char* argv[]){
   NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
   NucDeEx::Random::SetSeed(seed); // optional (default: 1)
   NucDeExDeexcitation* deex = new NucDeExDeexcitation();
+  deex->Init();
   // --------------------- //
 
   int Zt=0, Nt=0;

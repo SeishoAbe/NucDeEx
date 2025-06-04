@@ -17,7 +17,7 @@ NucDeExDeexcitation::NucDeExDeexcitation():ldmodel(2),parity_optmodall(1), versi
 ///////////////////////////
 {
   NucDeEx::Utils::SetPATH();
-  Init();
+  //Init();
 }
 
 ///////////////////////////
@@ -25,7 +25,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, const int
 ///////////////////////////
 {
   NucDeEx::Utils::SetPATH();
-  Init();
+  //Init();
 }
 
 #ifdef INCL_DEEXCITATION_NUCDEEX
@@ -35,7 +35,7 @@ NucDeExDeexcitation::NucDeExDeexcitation(const int ld, const bool p_o, const int
 ///////////////////////////
 { 
   NucDeEx::Utils::SetPATH(config);
-  Init();
+  //Init();
 }
 #endif
 
