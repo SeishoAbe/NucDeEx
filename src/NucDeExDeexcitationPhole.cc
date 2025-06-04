@@ -132,8 +132,8 @@ void NucDeExDeexcitationPhole::DoDeex_v3(const int Zt, const int Nt,
   Qvalue = Ex_target - S - Ex_daughter;
   Decay(1); // breakflag on
   cout << "size " << EventInfo.ParticleVector.size() << endl;
-  if(EventInfo.ParticleVector.size()==1) EventInfo.fShell=1;
-  else EventInfo.fShell=2;
+  if(EventInfo.ParticleVector.size()==1) EventInfo.fShell=3; // g.s.
+  else EventInfo.fShell=2; // gamma discrete
 }
 
 
