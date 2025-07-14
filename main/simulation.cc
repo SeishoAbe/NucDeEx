@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
   std::cout << "SEED = " << seed << std::endl;
 
   // ---- FIXME --- // 
-  const int numofevent=1e6; // to be generated
+  const int numofevent=5e6; // to be generated
   const bool flag_fig=0;
   //const int numofevent=1000; // to be generated
   //const bool flag_fig=1;

@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
   std::cout << "SEED = " << seed << std::endl;
 
   // ---- FIXME --- // 
-  const int numofevent=1e6; // to be generated
+  const int numofevent=5e6; // to be generated
   const bool flag_fig=0;
   //const int numofevent=1000; // to be generated
   //const bool flag_fig=1;
@@ -54,6 +54,7 @@ int main(int argc, char* argv[]){
   NucDeEx::Utils::fVerbose=verbose; // optional (default: 0)
   NucDeEx::Random::SetSeed(seed); // optional (default: 1)
   NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall,2);// new v2.1~
+  deex->Init();
   //NucDeExDeexcitation* deex = new NucDeExDeexcitation(ldmodel, parity_optmodall,1); // old ~v1.3
   // --------------------- //
 
