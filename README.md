@@ -7,7 +7,18 @@ Note that NucDeEx simply refering the pre-tabulated branching ratios calculated 
 Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
 
 ## Citing NucDeEx
-**If you use NucDeEx, please always cite [this paper](https://link.aps.org/doi/10.1103/PhysRevD.109.036009) and [TALYS's paper](https://doi.org/10.1140/epja/s10050-023-01034-3)**:
+**If you use NucDeEx, please always cite the following three papers**:
+```
+@misc{abe2025benchmarksapplicationsnucleardeexcitation,
+      title={Benchmarks and applications of the nuclear deexcitation event generator \textsc{NucDeEx}}, 
+      author={Seisho Abe},
+      year={2025},
+      eprint={2508.04040},
+      archivePrefix={arXiv},
+      primaryClass={hep-ex},
+      url={https://arxiv.org/abs/2508.04040}, 
+}
+```
 ```
 @article{PhysRevD.109.036009,
   title = {Nuclear deexcitation simulator for neutrino interactions and nucleon decays of $^{12}\mathrm{C}$ and $^{16}\mathrm{O}$ based on TALYS},
