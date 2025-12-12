@@ -23,7 +23,10 @@ namespace NucDeEx{
         fTDatabasePDG = new TDatabasePDG();
       }
       if(fTGeoManager==NULL){
+        TGeoManager* old_global_manager = gGeoManager;
+        gGeoManager = nullptr;
         fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
+        gGeoManager = old_global_manager;
         fTGeoElementTable = fTGeoManager->GetElementTable();
       }
     }
