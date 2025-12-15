@@ -9,14 +9,19 @@ Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac
 ## Citing NucDeEx
 **If you use NucDeEx, please always cite the following three papers**:
 ```
-@misc{abe2025benchmarksapplicationsnucleardeexcitation,
-      title={Benchmarks and applications of the nuclear deexcitation event generator \textsc{NucDeEx}}, 
-      author={Seisho Abe},
-      year={2025},
-      eprint={2508.04040},
-      archivePrefix={arXiv},
-      primaryClass={hep-ex},
-      url={https://arxiv.org/abs/2508.04040}, 
+@article{2v9j-ncf4,
+  title = {Benchmarks and applications of the nuclear deexcitation event generator nucdeex},
+  author = {Abe, Seisho},
+  journal = {Phys. Rev. D},
+  volume = {112},
+  issue = {11},
+  pages = {112013},
+  numpages = {12},
+  year = {2025},
+  month = {Dec},
+  publisher = {American Physical Society},
+  doi = {10.1103/2v9j-ncf4},
+  url = {https://link.aps.org/doi/10.1103/2v9j-ncf4}
 }
 ```
 ```
