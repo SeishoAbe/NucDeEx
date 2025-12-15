@@ -4,7 +4,7 @@ NucDeEx requires  [ROOT](https://root.cern/) to be built, and the main physics p
 Note that NucDeEx simply refering the pre-tabulated branching ratios calculated by TALYS, i.e., **NucDeEx software itself is independ of the TALYS software**.
 
 ## Contact 
-Seisho Abe (Kamioka Obs., ICRR, the University of Tokyo): seisho@icrr.u-tokyo.ac.jp
+Seisho Abe (The University of Tokyo): seisho@hep.phys.s.u-tokyo.ac.jp
 
 ## Citing NucDeEx
 **If you use NucDeEx, please always cite the following three papers**:
