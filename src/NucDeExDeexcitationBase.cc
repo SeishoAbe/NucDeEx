@@ -200,6 +200,9 @@ double NucDeExDeexcitationBase::ElementMassInMeV(const TGeoElementRN* ele)
   if(ele==0) return -1; // no profile can be found.
   double mass = ele->MassNo()*NucDeEx::amu_c2
                    + ele->MassEx(); // (MeV)
+  if(NucDeEx::Utils::fVerbose>1){
+    std::cout << "mass including electron (MeV) = " << mass << std::endl;
+  }
   // This mass should be nuclei mass, not istoopic mass.
   // We should subtract electron masss.
   mass -= ele->AtomicNo()*NucDeEx::Utils::fTDatabasePDG->GetParticle(11)->Mass()*1e3;// GeV2MeV
