@@ -114,7 +114,7 @@ NucDeExEventInfo NucDeExDeexcitationTALYS::DoDeex(const int Zt, const int Nt,
       DaughterExPoint(&Ex_daughter,&Ex_daughter_point);
 
       // --- Get mass using ROOT libraries
-      if(decay_mode<=2){ // obtained from TDatabasePDG
+      if(decay_mode<=2){ // obtained from TDatabasePDG (gamma, neutron, proton)
         mass_particle = NucDeEx::Utils::fTDatabasePDG->GetParticle(NucDeEx::PDG_particle[decay_mode])->Mass()*1e3;// GeV2MeV
       }else{ // obtained from TGeoElementRN
         int a_particle = (NucDeEx::PDG_particle[decay_mode]%1000)/10;
