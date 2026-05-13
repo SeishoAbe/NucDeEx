@@ -206,7 +206,7 @@ double NucDeExDeexcitationBase::ElementMassInMeV(const TGeoElementRN* ele)
   // This mass should be nuclei mass, not istoopic mass.
   // We should subtract electron masss.
   mass -= ele->AtomicNo()*NucDeEx::Utils::fTDatabasePDG->GetParticle(11)->Mass()*1e3;// GeV2MeV
-  cout << NucDeEx::Utils::fTDatabasePDG->GetParticle(11)->Mass()*1e3 << endl;
+  //cout << NucDeEx::Utils::fTDatabasePDG->GetParticle(11)->Mass()*1e3 << endl; // MeV
 
   double mass_amu = mass/NucDeEx::amu_c2; // MeV to AMU
   if(NucDeEx::Utils::fVerbose>1){
