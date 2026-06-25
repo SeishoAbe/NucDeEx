@@ -11,7 +11,11 @@
 G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
   IDeExcitation(config),
   theConfig(config),
+#ifdef INCL_DEEXCITATION_NUCDEEX
   theNucDeEx(new NucDeExDeexcitation(2,1,2,theConfig))
+#else
+  theNucDeEx(new NucDeExDeexcitation(2,1,2))
+#endif
 {
   NucDeEx::Utils::fVerbose=2;
   NucDeEx::Random::SetSeed(1);
