@@ -11,7 +11,6 @@ namespace NucDeEx{
     std::string NUCDEEX_ROOT="";
     NucDeExNucleusTable* NucleusTable=nullptr;
     TDatabasePDG* fTDatabasePDG=nullptr;
-    TGeoManager* fTGeoManager=nullptr;
     TGeoElementTable* fTGeoElementTable=nullptr;
 
     void Init()
@@ -22,14 +21,10 @@ namespace NucDeEx{
       if(fTDatabasePDG==nullptr){
         fTDatabasePDG = new TDatabasePDG();
       }
-      std::cout << "gGeoManager=" << gGeoManager << std::endl;
-      if(fTGeoManager==nullptr){
-        TGeoManager* old_global_manager = gGeoManager;
-        gGeoManager = nullptr;
-        fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
-        fTGeoElementTable = fTGeoManager->GetElementTable();
-        gGeoManager = old_global_manager;
-        std::cout << "TGeoManager new" << std::endl;
+      if(gGeoManager == nullptr) {
+        std::cout << "Create TGeoManager" << std::endl;
+        new TGeoManager("NucDeEx","NucDeEx");
+        fTGeoElementTable = gGeoManager->GetElementTable();
       }
     }
 

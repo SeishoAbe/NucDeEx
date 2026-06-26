@@ -17,7 +17,6 @@ namespace NucDeEx{
     extern NucDeExNucleusTable* NucleusTable;
     extern std::string NUCDEEX_ROOT;
     extern TDatabasePDG* fTDatabasePDG;
-    extern TGeoManager* fTGeoManager;
     extern TGeoElementTable* fTGeoElementTable;
     // needs "extern". These are defined in *.cc
 
