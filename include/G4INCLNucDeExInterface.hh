@@ -17,6 +17,8 @@ public:
 
   virtual void deExciteRemnant(G4INCL::EventInfo *eventInfo, const int i);
 
+  NucDeExDeexcitation* GetNucDeExPtr(){ return theNucDeEx ; }
+
 private:
   G4INCL::Config *theConfig;
   NucDeExDeexcitation *theNucDeEx;

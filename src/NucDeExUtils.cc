@@ -9,25 +9,21 @@ namespace NucDeEx{
     // --- Define & initialize --- //
     int fVerbose=0;
     std::string NUCDEEX_ROOT="";
-    NucDeExNucleusTable* NucleusTable=NULL;
-    TDatabasePDG* fTDatabasePDG=NULL;
-    TGeoManager* fTGeoManager=NULL;
-    TGeoElementTable* fTGeoElementTable=NULL;
+    NucDeExNucleusTable* NucleusTable=nullptr;
+    TDatabasePDG* fTDatabasePDG=nullptr;
+    TGeoElementTable* fTGeoElementTable=nullptr;
 
     void Init()
     {
-      if(NucleusTable==NULL){
+      if(NucleusTable==nullptr){
          NucleusTable = new NucDeExNucleusTable();
       }
-      if(fTDatabasePDG==NULL){
+      if(fTDatabasePDG==nullptr){
         fTDatabasePDG = new TDatabasePDG();
       }
-      if(fTGeoManager==NULL){
-        TGeoManager* old_global_manager = gGeoManager;
-        gGeoManager = nullptr;
-        fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
-        gGeoManager = old_global_manager;
-        fTGeoElementTable = fTGeoManager->GetElementTable();
+      if(gGeoManager == nullptr) {
+        new TGeoManager("NucDeEx","NucDeEx");
+        fTGeoElementTable = gGeoManager->GetElementTable();
       }
     }
 
@@ -37,14 +33,14 @@ namespace NucDeEx{
       const char* env;
 #ifndef WITH_NEUT
       env = std::getenv("NUCDEEX_ROOT");
-      if(env==NULL){
+      if(env==nullptr){
         std::cerr << "The env $NUCDEEX_ROOT is not specified" << std::endl;
         exit(1);
       }
       NUCDEEX_ROOT = (std::string) env;
 #else
       env = std::getenv("NEUT_ROOT");
-      if(env==NULL){
+      if(env==nullptr){
         std::cerr << "The env $NEUT_ROOT is not specified" << std::endl;
         exit(1);
       }

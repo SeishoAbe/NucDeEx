@@ -19,9 +19,6 @@ G4INCLNucDeExInterface::G4INCLNucDeExInterface(G4INCL::Config *config) :
 {
   NucDeEx::Utils::fVerbose=2;
   NucDeEx::Random::SetSeed(1);
-  Zt = theConfig->getTargetZ();
-  At = theConfig->getTargetA();
-  Nt = At-Zt;
 }
 
 G4INCLNucDeExInterface::~G4INCLNucDeExInterface() {
@@ -29,6 +26,10 @@ G4INCLNucDeExInterface::~G4INCLNucDeExInterface() {
 }
 
 void G4INCLNucDeExInterface::deExciteRemnant(G4INCL::EventInfo *eventInfo, const int i) {
+  Zt = theConfig->getTargetZ();
+  At = theConfig->getTargetA();
+  Nt = At-Zt;
+
   int particleIndex = eventInfo->nParticles;
 
   Pinit.SetXYZ(eventInfo->pxRem[i],eventInfo->pyRem[i],eventInfo->pzRem[i]);
