@@ -64,7 +64,8 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
 /////////////////////////////////////////////
 {
   if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
-    std::cerr << "ERROR: This tool does not support the target nucleus" << std::endl;
+    std::cerr << "ERROR: NucDeEx does not support the target nucleus." << std::endl;
+    std::cerr << "Zt = " << Zt << ", Nt = " << Nt << std::endl;
     exit(1);
   }
   if(NucDeEx::Utils::fVerbose>0){
@@ -114,7 +115,8 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
 /////////////////////////////////////////////
 {
   if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
-    std::cerr << "ERROR: This tool does not support the target nucleus" << std::endl;
+    std::cerr << "ERROR: NucDeEx does not support the target nucleus." << std::endl;
+    std::cerr << "Zt = " << Zt << ", Nt = " << Nt << std::endl;
     exit(1);
   }
   if(NucDeEx::Utils::fVerbose>0){
