@@ -22,8 +22,8 @@ namespace NucDeEx{
       if(fTDatabasePDG==nullptr){
         fTDatabasePDG = new TDatabasePDG();
       }
+      std::cout << "gGeoManager=" << gGeoManager << std::endl;
       if(fTGeoManager==nullptr){
-        std::cout << "gGeoManager=" << gGeoManager << std::endl;
         TGeoManager* old_global_manager = gGeoManager;
         gGeoManager = nullptr;
         fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
