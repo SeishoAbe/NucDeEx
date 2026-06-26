@@ -28,7 +28,7 @@ namespace NucDeEx{
         fTGeoManager = new TGeoManager("NucDeEx","NucDeEx");
         fTGeoElementTable = fTGeoManager->GetElementTable();
         gGeoManager = old_global_manager;
-        std::Cout << "TGeoManager new" << std::endl;
+        std::cout << "TGeoManager new" << std::endl;
       }
     }
 
