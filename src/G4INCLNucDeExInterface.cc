@@ -26,6 +26,7 @@ G4INCLNucDeExInterface::~G4INCLNucDeExInterface() {
 }
 
 void G4INCLNucDeExInterface::deExciteRemnant(G4INCL::EventInfo *eventInfo, const int i) {
+  std::cout << "deExciteRemnant " << std::endl;
   Zt = theConfig->getTargetZ();
   At = theConfig->getTargetA();
   Nt = At-Zt;
