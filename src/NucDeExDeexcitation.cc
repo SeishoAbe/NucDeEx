@@ -63,6 +63,7 @@ NucDeExEventInfo NucDeExDeexcitation::DoDeex(const int Zt, const int Nt,
                           const int Z, const int N, const double Ex, const TVector3& mom)
 /////////////////////////////////////////////
 {
+  std::cout << "DODEEX HERE" << std::endl;
   if(! ((Zt==6 && Nt==6 )||(Zt==8 && Nt==8)) ){
     std::cerr << "ERROR: NucDeEx does not support the target nucleus." << std::endl;
     std::cerr << "Zt = " << Zt << ", Nt = " << Nt << std::endl;
