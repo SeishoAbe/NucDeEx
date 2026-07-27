@@ -55,6 +55,7 @@ void NucDeExDeexcitation::Init()
   deex_talys = new NucDeExDeexcitationTALYS(ldmodel,parity_optmodall);
   deex_phole = new NucDeExDeexcitationPhole(version_phole);
   deex_phole->SetPtrTALYS(deex_talys);
+  std::cout << "Phole version = " << version_phole << std::endl;
 }
 
 // New main method from v2.1
