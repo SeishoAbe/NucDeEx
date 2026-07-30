@@ -3,11 +3,15 @@
 
 namespace NucDeEx{
   namespace Random{
-    TRandom3 rndm(1);
-    double random(){ return rndm.Rndm(); }
+    TRandom3* rndm = nullptr;
+    double random(){ 
+      if(!rndm) rndm = new TRandom3(1);
+      return rndm->Rndm();
+    }
     void SetSeed(int s)
     { 
-      rndm.SetSeed(s);
+      if(!rndm) rndm = new TRandom3(1);
+      rndm->SetSeed(s);
       std::cout << "NucDeEx::Random::SetSeed(" << s << ")" << std::endl;
     }
   }
