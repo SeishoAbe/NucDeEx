@@ -23,8 +23,8 @@ namespace NucDeEx{
       }
       if(gGeoManager == nullptr) {
         new TGeoManager("NucDeEx","NucDeEx");
-        fTGeoElementTable = gGeoManager->GetElementTable();
       }
+      fTGeoElementTable = gGeoManager->GetElementTable();
     }
 
     void SetPATH()
